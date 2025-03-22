@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "a0-project",
+    "slug": "snack-e96d54d3-eb70-45c0-b2a7-6e81f97119c4",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.Demodey007.snacke96d54d3eb7045c0b2a76e81f97119c4"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "description": "Quickly generate React Native components with AI",
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to update your profile picture."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "4c578d6d-e9e5-4cc9-bb3d-b29394e88bce"
+      }
+    }
+  }
+}

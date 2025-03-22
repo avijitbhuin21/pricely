@@ -1,0 +1,57 @@
+{
+    "data": {
+        "slice mango drink 1": [
+            {
+                "name": "Slice Mango Drink 1.75 l Combo",
+                "price": "178",
+                "image": "https://cdn.zeptonow.com/production/ik-seo/inventory/product/d933d43e-e647-44be-9892-7960bc844c7b-3351/Slice-Mango-Drink-1-75-l-Combo.jpg",
+                "url": "https://www.zeptonow.com/pn/slice-mango-drink-175-l-combo/pvid/9ea5dcca-7d98-46dc-a727-cf46039c7033",
+                "quantity": "1.75 l X 2"
+            }
+        ],
+        "slice juice combo": [
+            {
+                "name": "Slice Juice Combo",
+                "price": "84",
+                "image": "https://cdn.zeptonow.com/production/ik-seo/inventory/product/7580a576-6150-45b0-ac29-774a06127044-Slice_(Pack_of_3)/Slice-Juice-Combo.jpg",
+                "url": "https://www.zeptonow.com/pn/slice-juice-combo/pvid/63fcf0ab-dcaf-4c0d-8758-91e61f15561e",
+                "quantity": "600 ml X 3"
+            },
+            {
+                "name": "Slice Juice Combo",
+                "price": "58",
+                "image": "https://cdn.zeptonow.com/production/ik-seo/inventory/product/ac113843-e1d1-49f2-8e75-5ea6601eca93-Slice_(Pack_of_2)/Slice-Juice-Combo.jpg",
+                "url": "https://www.zeptonow.com/pn/slice-juice-combo/pvid/eb0307ba-f01f-4f27-85d0-204ef4600ed2",
+                "quantity": "600 ml X 2"
+            }
+        ],
+        "frooti mango drink": [
+            {
+                "name": "Frooti Mango Drink",
+                "price": "93",
+                "image": "https://cdn.zeptonow.com/production/ik-seo/cms/product_variant/b0bddcaf-3fa6-43b2-bd6d-8eceebbb9e37/Frooti-Mango-Drink.jpeg",
+                "url": "https://www.zeptonow.com/pn/frooti-mango-drink/pvid/80c00d69-d2b9-45f6-aac9-2771dc94683f",
+                "quantity": "1.8 l"
+            },
+            {
+                "name": "Frooti Mango Drink",
+                "price": "72",
+                "image": "https://cdn.zeptonow.com/production/ik-seo/cms/product_variant/21622b2b-8913-4405-ab3e-969c5dd50bf7/Frooti-Mango-Drink.jpeg",
+                "url": "https://www.zeptonow.com/pn/frooti-mango-drink/pvid/73a33d8f-45f6-4a11-82ca-f5880412bf91",
+                "quantity": "1.2 L"
+            },
+            {
+                "name": "Frooti Mango Drink",
+                "price": "39",
+                "image": "https://cdn.zeptonow.com/production/ik-seo/cms/product_variant/9f3ba90d-de2f-4c0a-abbd-338ac9df8c37/Frooti-Mango-Drink.jpeg",
+                "url": "https://www.zeptonow.com/pn/frooti-mango-drink/pvid/5d31041f-31fd-47b0-b1a4-cb03a40c30f4",
+                "quantity": "600 ml"
+            }
+        ]
+    },
+    "credentials": {
+        "ZEPTO": {
+            "storeId": "ab3bee45-6ef0-4dbe-bf5f-253d0817ceb5"
+        }
+    }
+}

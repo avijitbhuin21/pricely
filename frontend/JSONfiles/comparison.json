@@ -1,0 +1,804 @@
+[
+    {
+        "data": {
+            "image": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/e24eda9c-3cc7-4e66-bc2b-80383eb85a80.jpg?ts=1715152398",
+            "name": "Frooti Mango Drink",
+            "quantity": "125 ml",
+            "buy_button": {
+                "blinkit": {
+                    "price": "10",
+                    "url": "https://blinkit.com/prn/frooti-mango-drink/prid/500868"
+                },
+                "instamart": {
+                    "price": "10",
+                    "url": "https://www.swiggy.com/instamart/item/RZRJ0IUI3H?storeId=867466"
+                },
+                "bigbasket": {
+                    "price": "10",
+                    "url": "https://www.bigbasket.com//pd/274035/frooti-drink-fresh-n-juicy-mango-150-ml-tetra/"
+                },
+                "dmart": {
+                    "price": "9.00",
+                    "url": "https://www.dmart.in/product/frooti-mango-drink-(10-u-x-160-ml)-pjuicesfrti70xx20418"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.grofers.com/da/cms-assets/cms/product/3f067e7d-9d9f-4cf9-8b2e-26c68a365058.jpg?ts=1739433581",
+            "name": "Frooti Mango Drink",
+            "quantity": "1.8 ltr",
+            "buy_button": {
+                "blinkit": {
+                    "price": "100",
+                    "url": "https://blinkit.com/prn/frooti-mango-drink-18-l/prid/10536"
+                },
+                "instamart": {
+                    "price": "92",
+                    "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
+                },
+                "bigbasket": {
+                    "price": "89",
+                    "url": "https://www.bigbasket.com//pd/40194542/frooti-mango-drink-2-l-bottle/"
+                },
+                "zepto": {
+                    "price": "93",
+                    "url": "https://www.zeptonow.com/pn/frooti-mango-drink/pvid/80c00d69-d2b9-45f6-aac9-2771dc94683f"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/6c428434-df61-41a1-886a-802a41269705.jpg?ts=1715152371",
+            "name": "Frooti Mango Drink",
+            "quantity": "600 ml",
+            "buy_button": {
+                "blinkit": {
+                    "price": "40",
+                    "url": "https://blinkit.com/prn/frooti-mango-drink/prid/18612"
+                },
+                "bigbasket": {
+                    "price": "40",
+                    "url": "https://www.bigbasket.com//pd/40129410/frooti-mango-drink-fresh-n-juicy-600-ml-bottle/"
+                },
+                "zepto": {
+                    "price": "39",
+                    "url": "https://www.zeptonow.com/pn/frooti-mango-drink/pvid/5d31041f-31fd-47b0-b1a4-cb03a40c30f4"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/5987050f-5e83-4449-a8de-34c975c3b38d_softdrinks-juiceandsoda_GJPCXX5271_MN.png",
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "1.2 L",
+            "buy_button": {
+                "instamart": {
+                    "price": "69",
+                    "url": "https://www.swiggy.com/instamart/item/3X0YDUXSQ7?storeId=867466"
+                },
+                "zepto": {
+                    "price": "72",
+                    "url": "https://www.zeptonow.com/pn/frooti-mango-drink/pvid/73a33d8f-45f6-4a11-82ca-f5880412bf91"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/2f4da923-e964-4939-a4da-744ad7e5cb10_softdrinks-juiceandsoda_S1TOPDG0V7_MN.png",
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "300 ml",
+            "buy_button": {
+                "instamart": {
+                    "price": "20",
+                    "url": "https://www.swiggy.com/instamart/item/3HRRU56W1U?storeId=867466"
+                },
+                "dmart": {
+                    "price": "18.00",
+                    "url": "https://www.dmart.in/product/frooti-mango-drink-pfrtdrink0froo23xx270224"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/663fb194d53faa531d33e641c551a074",
+            "name": "Frooti Soft Drink",
+            "quantity": "200 ml",
+            "buy_button": {
+                "instamart": {
+                    "price": "15",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                },
+                "bigbasket": {
+                    "price": "15",
+                    "url": "https://www.bigbasket.com//pd/265783/frooti-drink-fresh-n-juicy-mango-200-ml/"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/11c6da5f6bbb67989957b5728b34ff0d",
+            "name": "Catch Jeera Powder",
+            "quantity": "200 g",
+            "buy_button": {
+                "instamart": {
+                    "price": "110",
+                    "url": "https://www.swiggy.com/instamart/item/Y0EAW3JKQL?storeId=867466"
+                },
+                "dmart": {
+                    "price": "42.00",
+                    "url": "https://www.dmart.in/product/jelly-mazza-soft-candy-celebration-pack-pcandies0jell13xx240423"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.grofers.com/app/images/products/sliding_image/32790a.jpg?ts=1721583207",
+            "name": "Slice Mango Drink",
+            "quantity": "1.75 ltr",
+            "buy_button": {
+                "blinkit": {
+                    "price": "93",
+                    "url": "https://blinkit.com/prn/slice-mango-drink-175-l/prid/32790"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/8947746c-bb0a-41b3-9910-582e121661bc.jpg?ts=1716822535",
+            "name": "Slice Mango Drink",
+            "quantity": "2 x 1.2 ltr",
+            "buy_button": {
+                "blinkit": {
+                    "price": "149",
+                    "url": "https://blinkit.com/prn/slice-mango-drink-12-l-pack-of-2/prid/237980"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/a7a1c304-51ee-44e7-a510-6cc6c7b453e6.jpg?ts=1721645442",
+            "name": "Frooti Mango Drink",
+            "quantity": "10 x 125 ml",
+            "buy_button": {
+                "blinkit": {
+                    "price": "100",
+                    "url": "https://blinkit.com/prn/frooti-mango-drink-10-x-125-ml/prid/559556"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/0c6204d9-c212-4bd0-9894-ade7b4ef7903.jpg?ts=1719921233",
+            "name": "MARS Cosmetics Candylicious Sheer Lip Gloss",
+            "quantity": "4 ml",
+            "buy_button": {
+                "blinkit": {
+                    "price": "240",
+                    "url": "https://blinkit.com/prn/mars-cosmetics-candylicious-sheer-lip-gloss-02tutti-frooti/prid/557057"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.grofers.com/da/cms-assets/cms/product/ba168daf-df9f-4304-909e-6f8da613346d.jpg",
+            "name": "MBDH Wellness Ignite Alphonso Mango Chocolate Bar for Couples",
+            "quantity": "60 g",
+            "buy_button": {
+                "blinkit": {
+                    "price": "599",
+                    "url": "https://blinkit.com/prn/mbdh-wellness-ignite-alphonso-mango-chocolate-bar-for-couples/prid/617979"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/19ed1cd1-4cc2-4a04-bf40-ce819b875ee7_softdrinks-juiceandsoda_3TQI792U18_MN.png",
+            "name": "Frooti Mango Fruit Drink Tetra",
+            "quantity": "10 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "90",
+                    "url": "https://www.swiggy.com/instamart/item/RZRJ0IUI3H?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/19ed1cd1-4cc2-4a04-bf40-ce819b875ee7_softdrinks-juiceandsoda_3TQI792U18_MN.png",
+            "name": "Frooti Mango Fruit Drink Tetra",
+            "quantity": "10 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "90",
+                    "url": "https://www.swiggy.com/instamart/item/RZRJ0IUI3H?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/87a077ce-bcbb-4c20-a78b-8cc8a37f6227_softdrinks-juiceandsoda_YS1N3MVV4J_MN.png",
+            "name": "Frooti Mango Fruit Drink Tetra",
+            "quantity": "125 ml",
+            "buy_button": {
+                "instamart": {
+                    "price": "10",
+                    "url": "https://www.swiggy.com/instamart/item/RZRJ0IUI3H?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/1/22/3a7e1756-d0c8-4581-87e7-4a181fcacc72_352938.png",
+            "name": "Frooti Mango Fruit Drink Tetra",
+            "quantity": "4 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "39",
+                    "url": "https://www.swiggy.com/instamart/item/O6L9JNAK1P?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/1/22/6646e1eb-48d1-40b9-b512-4ba94483234e_808005.png",
+            "name": "Frooti Mango Fruit Drink Tetra",
+            "quantity": "8 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "80",
+                    "url": "https://www.swiggy.com/instamart/item/Z4894ZEMOJ?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/2ce584ad-b98c-4f7b-b2c4-c8d2f241ca8d_softdrinks-juiceandsoda_7BV6NTTTFS_MN.png",
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "2 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "182",
+                    "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/4e725545ec2ba507a8a3353a1586a13b",
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "6 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "114",
+                    "url": "https://www.swiggy.com/instamart/item/3HRRU56W1U?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/577b76f7b933312d3e908d03656f72cd",
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "4 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "78",
+                    "url": "https://www.swiggy.com/instamart/item/3HRRU56W1U?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/ac4835fb-0e96-4b4b-830d-9f5097efbbde_softdrinks-juiceandsoda_AD056SDJ2N_MN.png",
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "2 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "40",
+                    "url": "https://www.swiggy.com/instamart/item/3HRRU56W1U?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/2ce584ad-b98c-4f7b-b2c4-c8d2f241ca8d_softdrinks-juiceandsoda_7BV6NTTTFS_MN.png",
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "2 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "182",
+                    "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/63d381a04a2e44ed73c36b027db6120b",
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "1.8 L",
+            "buy_button": {
+                "instamart": {
+                    "price": "92",
+                    "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/1/22/cbbc8586-1dd8-438b-aab6-0b3341cf57af_266318.png",
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "8 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "160",
+                    "url": "https://www.swiggy.com/instamart/item/0Q0QCKU48R?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/8/5/9dc8306d-c798-4d6d-95b9-c277cc063b11_880679.png",
+            "name": "Frooti Soft Drink",
+            "quantity": "10 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "150",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/3a6cd16e8696d95088cc6381a7d64319",
+            "name": "Frooti Soft Drink",
+            "quantity": "6 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "85",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/2f3c36396f8becf3ef178c773d673831",
+            "name": "Frooti Soft Drink",
+            "quantity": "4 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "58",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/5383c74c-12fb-427f-9242-a4d93a2d7086_softdrinks-juiceandsoda_3C681VJAOJ_MN.png",
+            "name": "Frooti Soft Drink",
+            "quantity": "2 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "30",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/8/5/9dc8306d-c798-4d6d-95b9-c277cc063b11_880679.png",
+            "name": "Frooti Soft Drink",
+            "quantity": "10 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "150",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/3a6cd16e8696d95088cc6381a7d64319",
+            "name": "Frooti Soft Drink",
+            "quantity": "6 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "85",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/2f3c36396f8becf3ef178c773d673831",
+            "name": "Frooti Soft Drink",
+            "quantity": "4 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "58",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/5383c74c-12fb-427f-9242-a4d93a2d7086_softdrinks-juiceandsoda_3C681VJAOJ_MN.png",
+            "name": "Frooti Soft Drink",
+            "quantity": "2 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "30",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/663fb194d53faa531d33e641c551a074",
+            "name": "Frooti Soft Drink",
+            "quantity": "200 ml",
+            "buy_button": {
+                "instamart": {
+                    "price": "15",
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/1/22/ca9d3419-573f-4695-b3bf-9b69588c60ff_608571.png",
+            "name": "Frooti Soft Drink",
+            "quantity": "8 pieces",
+            "buy_button": {
+                "instamart": {
+                    "price": "120",
+                    "url": "https://www.swiggy.com/instamart/item/3XPAOKB6I7?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/2/22/aa005470-633c-4283-9028-2f29c5bc7f41_754581.jpg",
+            "name": "Pluckk Cold Pressed Guava Juice (No Added Sugar)",
+            "quantity": "200 ml",
+            "buy_button": {
+                "instamart": {
+                    "price": "60",
+                    "url": "https://www.swiggy.com/instamart/item/PVFO3K149L?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/12/5/ccdd0f02-1d07-4648-aa17-68f6421cdb32_89406.png",
+            "name": "Pluckk Cold Pressed Orange Valencia Juice (No Added Sugar)",
+            "quantity": "200 ml",
+            "buy_button": {
+                "instamart": {
+                    "price": "83",
+                    "url": "https://www.swiggy.com/instamart/item/4I7Z44UD1J?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/12/5/7634bf6b-55af-46c0-8db4-441cb96daac2_67700.png",
+            "name": "Pluckk Cold Pressed Pineapple Juice (No Added Sugar)",
+            "quantity": "200 ml",
+            "buy_button": {
+                "instamart": {
+                    "price": "74",
+                    "url": "https://www.swiggy.com/instamart/item/9X3OFYYCAI?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/3/19/e7a16760-e74d-4ee1-b2c9-bfd32be4f356_625170_1.png",
+            "name": "Pluckk Cold Pressed Pomegranate Juice (No Added Sugar)",
+            "quantity": "200 ml",
+            "buy_button": {
+                "instamart": {
+                    "price": "88",
+                    "url": "https://www.swiggy.com/instamart/item/NYYHAFR714?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/xrsnypihix6fb3ia696n",
+            "name": "Catch Jeera Powder",
+            "quantity": "100 g",
+            "buy_button": {
+                "instamart": {
+                    "price": "57",
+                    "url": "https://www.swiggy.com/instamart/item/Y0EAW3JKQL?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/hdnflelvizfiuiwza2fi",
+            "name": "Del Monte Extra Virgin Olive Oil",
+            "quantity": "1 L",
+            "buy_button": {
+                "instamart": {
+                    "price": "1700",
+                    "url": "https://www.swiggy.com/instamart/item/E22D7G2G5E?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/10/4/4082b645-3e17-4142-8573-1056c2af5dbc_509585_1.png",
+            "name": "Pluckk Cold Pressed Aam Panna Juice (No Added Sugar)",
+            "quantity": "200 ml",
+            "buy_button": {
+                "instamart": {
+                    "price": "55",
+                    "url": "https://www.swiggy.com/instamart/item/MJA58QXV3K?storeId=867466"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://www.bigbasket.com/media/uploads/p/l/1209387_4-frooti-fresh-n-juicy-mango-drink.jpg",
+            "name": "Fresh 'N' Juicy Mango Drink",
+            "quantity": "4 x 150 ml",
+            "buy_button": {
+                "bigbasket": {
+                    "price": "40",
+                    "url": "https://www.bigbasket.com/pd/1209387/frooti-fresh-n-juicy-mango-drink-4x150-ml-tetra/"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://www.bigbasket.com/media/uploads/p/l/1226989_1-frooti-drink-fresh-n-juicy-mango.jpg",
+            "name": "Drink - Fresh 'N' Juicy Mango",
+            "quantity": "3 x 125 ml",
+            "buy_button": {
+                "bigbasket": {
+                    "price": "30",
+                    "url": "https://www.bigbasket.com//pd/1226989/frooti-drink-fresh-n-juicy-mango-3x125-ml-tetra/"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://www.bigbasket.com/media/uploads/p/l/265699_4-frooti-drink-fresh-n-juicy-mango.jpg",
+            "name": "Mango Drink",
+            "quantity": "1.2 L",
+            "buy_button": {
+                "bigbasket": {
+                    "price": "61",
+                    "url": "https://www.bigbasket.com/pd/265699/frooti-drink-fresh-n-juicy-mango-12-l-bottle/"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://www.bigbasket.com/media/uploads/p/l/265689_4-frooti-drink-fresh-n-juicy-mango.jpg",
+            "name": "Mango Drink",
+            "quantity": "300 ml",
+            "buy_button": {
+                "bigbasket": {
+                    "price": "20",
+                    "url": "https://www.bigbasket.com//pd/265689/frooti-drink-fresh-n-juicy-mango-300-ml-bottle/"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/JUN130002106xx4JUN23_5_B.jpg",
+            "name": "Frooti Mango Drink Bottle",
+            "quantity": "2 L",
+            "buy_button": {
+                "dmart": {
+                    "price": "117.00",
+                    "url": "https://www.dmart.in/product/frooti-mango-drink-bottle-pfrtdrink0froo21xx90623"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/MAY120001743xx29MAY23_5_B.jpg",
+            "name": "Jelly Mazza Fruity Strawberry Chews",
+            "quantity": "37 gm",
+            "buy_button": {
+                "dmart": {
+                    "price": "9.00",
+                    "url": "https://www.dmart.in/product/jelly-mazza-fruity-strawberry-chews-pcandies0jell15xx120520"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/MAY120001744xx29MAY23_5_B.jpg",
+            "name": "Jelly Mazza Guava Fruity Chews",
+            "quantity": "37 gm",
+            "buy_button": {
+                "dmart": {
+                    "price": "10.00",
+                    "url": "https://www.dmart.in/product/jelly-mazza-guava-fruity-chews-pcandies0jell11xx200520"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/JUL120004901xx21JUL23_5_B.jpg",
+            "name": "Jelly Mazza Fruity Pops Grape",
+            "quantity": "150 g",
+            "buy_button": {
+                "dmart": {
+                    "price": "38.00",
+                    "url": "https://www.dmart.in/product/jelly-mazza-fruity-pops-grape-pcandies0jell3xx130521"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/JUL120004900xx21JUL23_5_B.jpg",
+            "name": "Jelly Mazza Fruity Pops Orange",
+            "quantity": "150 g",
+            "buy_button": {
+                "dmart": {
+                    "price": "38.00",
+                    "url": "https://www.dmart.in/product/jelly-mazza-fruity-pops-orange-pcandies0jell5xx130521"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/FEB120000550xx12FEB25_5_B.jpg",
+            "name": "Britannia Fruity Fun 100% Veg Cake",
+            "quantity": "55 g",
+            "buy_button": {
+                "dmart": {
+                    "price": "20.00",
+                    "url": "https://www.dmart.in/product/britannia-veg-cake"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/FEB120006093xx19FEB23_5_B.jpg",
+            "name": "Jelly Mazza Chatpati Imli Soft Candy",
+            "quantity": "24 g",
+            "buy_button": {
+                "dmart": {
+                    "price": "5.00",
+                    "url": "https://www.dmart.in/product/jelly-mazza-chatpati-imli-soft-candy-pcandies0jell1xx190223"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/FEB120006094xx19FEB23_5_B.jpg",
+            "name": "Jelly Mazza Kaccha Mango Soft Candy",
+            "quantity": "24 g",
+            "buy_button": {
+                "dmart": {
+                    "price": "5.00",
+                    "url": "https://www.dmart.in/product/jelly-mazza-kaccha-mango-soft-candy-pcandies0jell3xx190223"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/DEC120001895xx17DEC24_5_B.jpg",
+            "name": "Parle Happy Happy Tutti Frutty Flavoured Cake",
+            "quantity": "100 g",
+            "buy_button": {
+                "dmart": {
+                    "price": "33.00",
+                    "url": "https://www.dmart.in/product/parle-happy-happy-tutti-frutty-flavoured-cake-pcake0parl9xx221219"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.dmart.in/images/products/JUN120005288xx21JUN22_5_B.jpg",
+            "name": "Christopher Cocoa Original Tutti Frutti",
+            "quantity": "200 g",
+            "buy_button": {
+                "dmart": {
+                    "price": "99.00",
+                    "url": "https://www.dmart.in/product/christopher-cocoa-dry-tutti-frutti-cherries-pcandies0chri13xx091221"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.zeptonow.com/production/ik-seo/inventory/product/d933d43e-e647-44be-9892-7960bc844c7b-3351/Slice-Mango-Drink-1-75-l-Combo.jpg",
+            "name": "Slice Mango Drink 1.75 l Combo",
+            "quantity": "1.75 l X 2",
+            "buy_button": {
+                "zepto": {
+                    "price": "178",
+                    "url": "https://www.zeptonow.com/pn/slice-mango-drink-175-l-combo/pvid/9ea5dcca-7d98-46dc-a727-cf46039c7033"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.zeptonow.com/production/ik-seo/inventory/product/7580a576-6150-45b0-ac29-774a06127044-Slice_(Pack_of_3)/Slice-Juice-Combo.jpg",
+            "name": "Slice Juice Combo",
+            "quantity": "600 ml X 3",
+            "buy_button": {
+                "zepto": {
+                    "price": "84",
+                    "url": "https://www.zeptonow.com/pn/slice-juice-combo/pvid/63fcf0ab-dcaf-4c0d-8758-91e61f15561e"
+                }
+            }
+        }
+    },
+    {
+        "data": {
+            "image": "https://cdn.zeptonow.com/production/ik-seo/inventory/product/ac113843-e1d1-49f2-8e75-5ea6601eca93-Slice_(Pack_of_2)/Slice-Juice-Combo.jpg",
+            "name": "Slice Juice Combo",
+            "quantity": "600 ml X 2",
+            "buy_button": {
+                "zepto": {
+                    "price": "58",
+                    "url": "https://www.zeptonow.com/pn/slice-juice-combo/pvid/eb0307ba-f01f-4f27-85d0-204ef4600ed2"
+                }
+            }
+        }
+    }
+]

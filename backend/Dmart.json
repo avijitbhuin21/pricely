@@ -1,0 +1,120 @@
+{
+    "data": {
+        "frooti mango drink": [
+            {
+                "name": "Frooti Mango Drink",
+                "price": "9.00",
+                "image": "https://cdn.dmart.in/images/products/FEB130000056xx26FEB23_5_B.jpg",
+                "url": "https://www.dmart.in/product/frooti-mango-drink-(10-u-x-160-ml)-pjuicesfrti70xx20418",
+                "quantity": "125 ml"
+            },
+            {
+                "name": "Frooti Mango Drink",
+                "price": "18.00",
+                "image": "https://cdn.dmart.in/images/products/FEB130002208xx27FEB24_5_B.jpg",
+                "url": "https://www.dmart.in/product/frooti-mango-drink-pfrtdrink0froo23xx270224",
+                "quantity": "300 ml"
+            }
+        ],
+        "frooti mango drink bottle": [
+            {
+                "name": "Frooti Mango Drink Bottle",
+                "price": "117.00",
+                "image": "https://cdn.dmart.in/images/products/JUN130002106xx4JUN23_5_B.jpg",
+                "url": "https://www.dmart.in/product/frooti-mango-drink-bottle-pfrtdrink0froo21xx90623",
+                "quantity": "2 L"
+            }
+        ],
+        "jelly mazza fruity strawberry chews": [
+            {
+                "name": "Jelly Mazza Fruity Strawberry Chews",
+                "price": "9.00",
+                "image": "https://cdn.dmart.in/images/products/MAY120001743xx29MAY23_5_B.jpg",
+                "url": "https://www.dmart.in/product/jelly-mazza-fruity-strawberry-chews-pcandies0jell15xx120520",
+                "quantity": "37 gm"
+            }
+        ],
+        "jelly mazza guava fruity chews": [
+            {
+                "name": "Jelly Mazza Guava Fruity Chews",
+                "price": "10.00",
+                "image": "https://cdn.dmart.in/images/products/MAY120001744xx29MAY23_5_B.jpg",
+                "url": "https://www.dmart.in/product/jelly-mazza-guava-fruity-chews-pcandies0jell11xx200520",
+                "quantity": "37 gm"
+            }
+        ],
+        "jelly mazza fruity pops grape": [
+            {
+                "name": "Jelly Mazza Fruity Pops Grape",
+                "price": "38.00",
+                "image": "https://cdn.dmart.in/images/products/JUL120004901xx21JUL23_5_B.jpg",
+                "url": "https://www.dmart.in/product/jelly-mazza-fruity-pops-grape-pcandies0jell3xx130521",
+                "quantity": "150 g"
+            }
+        ],
+        "jelly mazza fruity pops orange": [
+            {
+                "name": "Jelly Mazza Fruity Pops Orange",
+                "price": "38.00",
+                "image": "https://cdn.dmart.in/images/products/JUL120004900xx21JUL23_5_B.jpg",
+                "url": "https://www.dmart.in/product/jelly-mazza-fruity-pops-orange-pcandies0jell5xx130521",
+                "quantity": "150 g"
+            }
+        ],
+        "britannia fruity fun 100": [
+            {
+                "name": "Britannia Fruity Fun 100% Veg Cake",
+                "price": "20.00",
+                "image": "https://cdn.dmart.in/images/products/FEB120000550xx12FEB25_5_B.jpg",
+                "url": "https://www.dmart.in/product/britannia-veg-cake",
+                "quantity": "55 g"
+            }
+        ],
+        "jelly mazza chatpati imli soft candy": [
+            {
+                "name": "Jelly Mazza Chatpati Imli Soft Candy",
+                "price": "5.00",
+                "image": "https://cdn.dmart.in/images/products/FEB120006093xx19FEB23_5_B.jpg",
+                "url": "https://www.dmart.in/product/jelly-mazza-chatpati-imli-soft-candy-pcandies0jell1xx190223",
+                "quantity": "24 g"
+            }
+        ],
+        "jelly mazza kaccha mango soft candy": [
+            {
+                "name": "Jelly Mazza Kaccha Mango Soft Candy",
+                "price": "5.00",
+                "image": "https://cdn.dmart.in/images/products/FEB120006094xx19FEB23_5_B.jpg",
+                "url": "https://www.dmart.in/product/jelly-mazza-kaccha-mango-soft-candy-pcandies0jell3xx190223",
+                "quantity": "24 g"
+            }
+        ],
+        "jelly mazza soft candy celebration pack": [
+            {
+                "name": "Jelly Mazza Soft Candy Celebration Pack",
+                "price": "42.00",
+                "image": "https://cdn.dmart.in/images/products/APR120006408xx24APR23_5_B.jpg",
+                "url": "https://www.dmart.in/product/jelly-mazza-soft-candy-celebration-pack-pcandies0jell13xx240423",
+                "quantity": "200 g"
+            }
+        ],
+        "parle happy happy tutti frutty flavoured cake": [
+            {
+                "name": "Parle Happy Happy Tutti Frutty Flavoured Cake",
+                "price": "33.00",
+                "image": "https://cdn.dmart.in/images/products/DEC120001895xx17DEC24_5_B.jpg",
+                "url": "https://www.dmart.in/product/parle-happy-happy-tutti-frutty-flavoured-cake-pcake0parl9xx221219",
+                "quantity": "100 g"
+            }
+        ],
+        "christopher cocoa original tutti frutti": [
+            {
+                "name": "Christopher Cocoa Original Tutti Frutti",
+                "price": "99.00",
+                "image": "https://cdn.dmart.in/images/products/JUN120005288xx21JUN22_5_B.jpg",
+                "url": "https://www.dmart.in/product/christopher-cocoa-dry-tutti-frutti-cherries-pcandies0chri13xx091221",
+                "quantity": "200 g"
+            }
+        ]
+    },
+    "credentials": null
+}
