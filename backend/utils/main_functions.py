@@ -50,7 +50,7 @@ def decode_api_key(encoded_key):
 
 
 
-async def get_compared_data_with_timing(search_query: str, location_data) -> tuple:
+async def get_compared_data_with_timing(search_query: str, location_data, credentials = None) -> tuple:
     # Define the search functions and their respective platforms
     search_tasks = {
         'blinkit': search_blinkit,
@@ -73,7 +73,7 @@ async def get_compared_data_with_timing(search_query: str, location_data) -> tup
         start = time.time()
         try:
             # Run the synchronous function in a thread pool
-            result = await asyncio.to_thread(search_function, query, location_data)
+            result = await asyncio.to_thread(search_function, query, location_data, credentials)
             elapsed = time.time() - start
             
             results[platform] = result
