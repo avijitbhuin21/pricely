@@ -41,14 +41,19 @@ def get_zepto_credentials(location_data):
 
     data_str = parse_cookies(dict(response.headers) ['Zr-Cookies'])['serviceability']
     storeId = json.loads(urllib.parse.unquote_plus(data_str))
+    if storeId['primaryStore']['serviceable'] == False:
+        storeId = 'location not servicable'
+    else:
+        storeId = storeId['primaryStore']['storeId']
+
+   
     log_debug(storeId, 'storeid')
-
-    storeId = storeId['primaryStore']['storeId']
-
+    
     data = {}
     data['ZEPTO'] = {
         'storeId': storeId,
     }
+    
 
     return data
 
@@ -78,6 +83,8 @@ def search_zepto(item_name, location_data, credentials=None):
         try:
             credentials = get_zepto_credentials(location_data) if credentials is None else credentials
             storeId = credentials['ZEPTO']['storeId']
+            if storeId == 'location not servicable':
+                return {"data": {}, "credentials": {}}
 
             headers = {
                 'accept': 'application/json, text/plain, */*',

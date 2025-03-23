@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "a0-project",
+    "name": "Pricely",
     "slug": "snack-e96d54d3-eb70-45c0-b2a7-6e81f97119c4",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Pricely_app_icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/Pricely_app_icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,16 +17,16 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/Pricely_app_icon.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.Demodey007.snacke96d54d3eb7045c0b2a76e81f97119c4"
+      "package": "com.sagnikdey007.snacke96d54d3eb7045c0b2a76e81f97119c4"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/Pricely_app_icon.png"
     },
     "description": "Quickly generate React Native components with AI",
     "plugins": [

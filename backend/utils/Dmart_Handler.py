@@ -65,7 +65,7 @@ def format_dmart_data(data):
 
 def search_dmart(item_name, location_data, credentials=None):
     if check_location_service_status(location_data) == False:
-        return {"status": "Failed", "message": "Location is not serviceable"}
+        return {"data": {}, "credentials": {}}
 
     else:
         for i in range(3):

@@ -6,6 +6,7 @@ import HomeScreen from '../screens/HomeScreen';
 import CompareResultScreen from '../screens/CompareResultScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import CartScreen from '../screens/Cart';
+import OffersScreen from '../screens/OffersScreen';
 
 // Define the root stack parameter list
 export type RootStackParamList = {
@@ -13,6 +14,7 @@ export type RootStackParamList = {
   CompareResult: { query: string };
   Profile: undefined;
   Cart: undefined;
+  Offers: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -39,6 +41,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="Cart"
           component={CartScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Offers"
+          component={OffersScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

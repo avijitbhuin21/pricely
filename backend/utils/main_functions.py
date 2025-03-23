@@ -16,6 +16,9 @@ from utils.Dmart_Handler import search_dmart
 from utils.Instamart_Handler import search_instamart
 from utils.Zepto_Handler import search_zepto
 
+import asyncio
+import time
+from typing import Dict, Any
 
 def get_api_key():
     api_keys = os.getenv('Google_map_api_key', '').split()
@@ -45,11 +48,9 @@ def decode_api_key(encoded_key):
     
     return decoded_key.decode('utf-8')
 
-import concurrent.futures
-import time
-from typing import Dict, Any
 
-def get_compared_data_with_timing(search_query: str) -> tuple:
+
+async def get_compared_data_with_timing(search_query: str, location_data) -> tuple:
     # Define the search functions and their respective platforms
     search_tasks = {
         'blinkit': search_blinkit,
@@ -67,43 +68,29 @@ def get_compared_data_with_timing(search_query: str) -> tuple:
         'sequential_estimate': 0
     }
     
-    # Use ThreadPoolExecutor for concurrent execution
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        # Start all search tasks
-        future_to_platform = {}
-        for platform, search_function in search_tasks.items():
-            # Wrap each function to measure its execution time
-            def timed_search(platform, func, query):
-                start = time.time()
-                try:
-                    result = func(query)
-                    elapsed = time.time() - start
-                    return {
-                        'data': result,
-                        'time': elapsed
-                    }
-                except Exception as exc:
-                    elapsed = time.time() - start
-                    return {
-                        'data': {},
-                        'error': str(exc),
-                        'time': elapsed
-                    }
+    async def process_platform(platform, search_function, query):
+        """Asynchronous wrapper for each platform's search function"""
+        start = time.time()
+        try:
+            # Run the synchronous function in a thread pool
+            result = await asyncio.to_thread(search_function, query, location_data)
+            elapsed = time.time() - start
             
-            future = executor.submit(timed_search, platform, search_function, search_query)
-            future_to_platform[future] = platform
-        
-        # Process results as they complete
-        for future in concurrent.futures.as_completed(future_to_platform):
-            platform = future_to_platform[future]
-            try:
-                result_with_timing = future.result()
-                results[platform] = result_with_timing['data']
-                timing_info['platform_times'][platform] = result_with_timing['time']
-                timing_info['sequential_estimate'] += result_with_timing['time']
-            except Exception as exc:
-                print(f"{platform} search generated an exception: {exc}")
-                results[platform] = {}
+            results[platform] = result
+            timing_info['platform_times'][platform] = elapsed
+            timing_info['sequential_estimate'] += elapsed
+            
+        except Exception as exc:
+            print(f"{platform} search generated an exception: {exc}")
+            results[platform] = {}
+    
+    # Create tasks for all platforms
+    tasks = []
+    for platform, search_function in search_tasks.items():
+        tasks.append(process_platform(platform, search_function, search_query))
+    
+    # Wait for all search operations to complete
+    await asyncio.gather(*tasks)
     
     # Calculate the total concurrent execution time
     timing_info['total_time'] = time.time() - timing_info['total_start']

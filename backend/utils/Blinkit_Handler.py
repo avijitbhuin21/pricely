@@ -61,6 +61,8 @@ def get_blinkit_credentials(location_data):
 
 def format_blinkit_data(data):
     final_data = {'data': {}, 'credentials': data['credentials']}
+    if'objects' not in data['data']:
+        return final_data
     for i in data['data']['objects'][1:]:
         name = i['tracking']['widget_meta']['title']
         log_debug(name, 'name')

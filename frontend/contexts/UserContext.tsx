@@ -8,7 +8,7 @@ export interface UserContextType {
 }
 
 export const UserContext = createContext<UserContextType>({
-  userName: 'Demo',
+  userName: 'Sagnik',
   location: '',
   setLocation: () => {},
   setUserName: () => {},
@@ -16,7 +16,7 @@ export const UserContext = createContext<UserContextType>({
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [location, setLocation] = useState('Select Location');
-  const [userName, setUserName] = useState('Demo');
+  const [userName, setUserName] = useState('Sagnik');
 
   return (
     <UserContext.Provider value={{ userName, location, setLocation, setUserName }}>

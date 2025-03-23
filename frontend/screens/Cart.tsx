@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Dimensions,
   Platform,
   Alert,
   Linking,
@@ -14,16 +13,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { AnimatedBackground } from '../components/AnimatedBackground';
+import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { useLocation } from '../contexts/LocationContext';
 import { useCart } from '../contexts/CartContext';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-type RootStackParamList = {
-  Home: undefined;
-  Cart: undefined;
-  CompareResult: { query: string };
-};
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 interface CartItemProps {
   item: {
@@ -126,9 +121,8 @@ const CartScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <AnimatedBackground />
       <Header
-        userName="Demo"
+        userName="Sagnik"
         currentLocation={currentLocation}
         onLocationSelect={updateLocation}
         onAutoLocate={autoLocate}
@@ -192,23 +186,11 @@ const CartScreen = () => {
         </View>
       </View>
 
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navButton}
-          onPress={() => navigation.navigate('Home')}
-        >
-          <Ionicons name="home" size={24} color="#2196F3" />
-          <Text style={styles.navText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#2196F3" />
-          <Text style={styles.navText}>Back</Text>
-        </TouchableOpacity>
-      </View>
+      <Footer
+        navigation={navigation}
+        activeTab="cart"
+        setActiveTab={(tab) => {}} // Since Cart screen doesn't manage active tab state
+      />
     </SafeAreaView>
   );
 };
@@ -216,6 +198,7 @@ const CartScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'snow',
   },
   content: {
     flex: 1,
@@ -223,6 +206,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Account for bottom navigation
   },
   title: {
+    fontFamily: 'ARCHIVE',
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
@@ -253,8 +237,9 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   emptyCartText: {
+    fontFamily: 'Poppins',
     fontSize: 16,
-    color: '#666',
+    color: '#fff',
     marginTop: 12,
   },
   cartItem: {
@@ -275,18 +260,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemName: {
+    fontFamily: 'Poppins',
     fontSize: 14,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: '#fff',
   },
   itemQuantity: {
+    fontFamily: 'Poppins',
     fontSize: 12,
-    color: '#666',
+    color: '#fff',
     marginTop: 2,
   },
   shopName: {
+    fontFamily: 'Poppins',
     fontSize: 12,
-    color: '#2196F3',
+    color: '#fff',
     marginTop: 2,
   },
   priceContainer: {
@@ -296,9 +284,10 @@ const styles = StyleSheet.create({
     minWidth: 100,
   },
   price: {
+    fontFamily: 'Poppins',
     fontSize: 14,
     fontWeight: '700',
-    color: '#2ecc71',
+    color: '#fff',
     marginBottom: 8,
   },
   buttonGroup: {
@@ -321,6 +310,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
+    fontFamily: 'Poppins',
     color: '#fff',
     fontWeight: '600',
     fontSize: 12,
@@ -332,9 +322,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   summaryTitle: {
+    fontFamily: 'ARCHIVE',
     fontSize: 18,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: '#fff',
     marginBottom: 16,
   },
   summaryRow: {
@@ -344,16 +335,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   summaryLabel: {
+    fontFamily: 'Poppins',
     fontSize: 14,
-    color: '#666',
+    color: '#fff',
   },
   summaryValue: {
+    fontFamily: 'Poppins',
     fontSize: 14,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: '#fff',
   },
   discountText: {
-    color: '#2ecc71',
+    color: '#fff',
   },
   totalRow: {
     borderTopWidth: 1,
@@ -362,14 +355,16 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   totalLabel: {
+    fontFamily: 'Poppins',
     fontSize: 16,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: '#fff',
   },
   totalValue: {
+    fontFamily: 'Poppins',
     fontSize: 18,
     fontWeight: '700',
-    color: '#2196F3',
+    color: '#fff',
   },
   orderButton: {
     marginTop: 20,
@@ -387,41 +382,6 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.6,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  navButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 8,
-  },
-  navText: {
-    fontSize: 14,
-    color: '#2196F3',
-    marginTop: 4,
-    fontWeight: '500',
   },
 });
 

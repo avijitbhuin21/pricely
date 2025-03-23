@@ -1,7 +1,9 @@
 import React, { useRef, useEffect } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SearchBarProps } from '../types';
+
+const SPICE_IMAGE_URL = 'https://images.unsplash.com/photo-1532336414038-cf19250c5757';
 
 const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
@@ -46,6 +48,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <View style={styles.wrapper}>
+      <Image
+        source={{ uri: SPICE_IMAGE_URL }}
+        style={styles.spiceImage}
+        resizeMode="cover"
+      />
       <Animated.View
         style={[
           styles.container,
@@ -96,16 +103,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    width: '100%',
     alignItems: 'center',
-    marginTop: 10,
+  },
+  spiceImage: {
+    width: '100%',
+    height: 200,
+    marginVertical: 0,
   },
   container: {
     flexDirection: 'row',
     padding: 12,
     backgroundColor: 'rgba(2, 5, 20, 0.85)',
-    borderRadius: 25,
+    // backgroundColor: 'cream',
     alignItems: 'center',
     shadowColor: '#80e5ff',
     shadowOffset: { width: 0, height: 2 },
@@ -115,7 +125,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: 'rgba(128, 229, 255, 0.4)',
     width: '100%',
-    maxWidth: 500,
+    marginTop: 0,
   },
   searchIcon: {
     marginRight: 10,

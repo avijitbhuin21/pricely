@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,13 @@ import {
   Modal,
   TextInput,
   FlatList,
-  Animated,
   Dimensions,
   ListRenderItem,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HeaderProps, Location } from '../types';
+import { useNavigation } from '@react-navigation/native';
 
 type NominatimResult = {
   place_id: number;
@@ -37,11 +38,11 @@ const Header: React.FC<HeaderProps> = ({
   onLocationSelect,
   onAutoLocate,
 }): React.ReactElement => {
+  const navigation = useNavigation();
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Location[]>([AUTO_LOCATE]);
   const [isLoading, setIsLoading] = useState(false);
-  const logoScale = useRef(new Animated.Value(1)).current;
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const searchLocations = async (query: string) => {
@@ -104,51 +105,6 @@ const Header: React.FC<HeaderProps> = ({
     }, 500);
   };
 
-  useEffect(() => {
-    const angryAnimation = Animated.sequence([
-      Animated.spring(logoScale, {
-        toValue: 1.2,
-        tension: 100,
-        friction: 3,
-        useNativeDriver: true,
-      }),
-      Animated.sequence([
-        Animated.timing(logoScale, {
-          toValue: 0.95,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(logoScale, {
-          toValue: 1.05,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(logoScale, {
-          toValue: 0.98,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(logoScale, {
-          toValue: 1,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]);
-
-    const runAnimation = () => {
-      Animated.sequence([
-        angryAnimation,
-        Animated.delay(3000)
-      ]).start(runAnimation);
-    };
-
-    runAnimation();
-    return () => {
-      logoScale.setValue(1);
-    };
-  }, [logoScale]);
-
   const handleLocationSelect = (location: Location) => {
     if (location.isAutoLocate) {
       onAutoLocate();
@@ -157,6 +113,11 @@ const Header: React.FC<HeaderProps> = ({
     }
     setLocationModalVisible(false);
     setSearchQuery('');
+  };
+
+  const handleProfilePress = () => {
+    //@ts-ignore
+    navigation.navigate('Profile');
   };
 
   const renderLocationItem: ListRenderItem<Location> = ({ item }) => (
@@ -188,54 +149,56 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <View style={styles.header}>
       <View style={styles.leftContainer}>
-        <Animated.View style={[styles.logoContainer, {
-          transform: [{ scale: logoScale }, {
-            rotate: logoScale.interpolate({
-              inputRange: [1, 1.1],
-              outputRange: ['0deg', '10deg']
-            })
-          }]
-        }]}>
-          <Text style={styles.logo}>🐤</Text>
-          <Text style={styles.logoBeak}>〉</Text>
-          <View style={styles.logoEyebrow} />
-        </Animated.View>
-        <View style={styles.userInfo}>
-          <Text style={styles.welcomeText}>Welcome,</Text>
-          <Text style={styles.userName}>{userName}</Text>
+        <TouchableOpacity
+          style={styles.profileButton}
+          onPress={handleProfilePress}
+        >
+          <Ionicons name="person-circle-outline" size={36} color="#ffffff" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.centerContainer}>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../assets/Pricely_app_icon.png')}
+            style={styles.logo}
+          />
         </View>
       </View>
 
-      <TouchableOpacity
-        style={[
-          styles.locationButton,
-          currentLocation === 'Detecting location...' && styles.pulsingLocationButton
-        ]}
-        onPress={() => {
-          if (currentLocation !== 'Detecting location...') {
-            setLocationModalVisible(true);
-          }
-        }}
-        disabled={currentLocation === 'Detecting location...'}
-      >
-        <Ionicons
-          name={currentLocation === 'Detecting location...' ? "locate" : "location"}
-          size={18}
-          color={currentLocation === 'Detecting location...' ? "#007AFF" : "#80e5ff"}
-        />
-        <Text
+      <View style={styles.rightContainer}>
+
+        <TouchableOpacity
           style={[
-            styles.locationText,
-            currentLocation === 'Detecting location...' && { color: '#007AFF' }
+            styles.locationButton,
+            currentLocation === 'Detecting location...' && styles.pulsingLocationButton
           ]}
-          numberOfLines={1}
+          onPress={() => {
+            if (currentLocation !== 'Detecting location...') {
+              setLocationModalVisible(true);
+            }
+          }}
+          disabled={currentLocation === 'Detecting location...'}
         >
-          {currentLocation}
-        </Text>
-        {currentLocation !== 'Detecting location...' && (
-          <Ionicons name="chevron-down" size={16} color="#80e5ff" />
-        )}
-      </TouchableOpacity>
+          <Ionicons
+            name={currentLocation === 'Detecting location...' ? "locate" : "location"}
+            size={18}
+            color={currentLocation === 'Detecting location...' ? "#007AFF" : "#80e5ff"}
+          />
+          <Text
+            style={[
+              styles.locationText,
+              currentLocation === 'Detecting location...' && { color: '#007AFF' }
+            ]}
+            numberOfLines={1}
+          >
+            {currentLocation}
+          </Text>
+          {currentLocation !== 'Detecting location...' && (
+            <Ionicons name="chevron-down" size={16} color="#80e5ff" />
+          )}
+        </TouchableOpacity>
+      </View>
 
       <Modal
         visible={isLocationModalVisible}
@@ -299,18 +262,38 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: 'transparent',
+    backgroundColor: '#C60053',
+  },
+  centerContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    zIndex: 1,
   },
   leftContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    zIndex: 2,
+    width: 44,
+  },
+  rightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    zIndex: 2,
+  },
+  profileButton: {
+    padding: 4,
+    marginLeft: -8,
   },
   logoContainer: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FF5252',
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -318,29 +301,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
-    position: 'relative',
   },
   logo: {
-    fontSize: 26,
-    marginTop: -2,
-  },
-  logoBeak: {
-    position: 'absolute',
-    right: 8,
-    top: '45%',
-    transform: [{ rotate: '90deg' }],
-    fontSize: 16,
-    color: '#FFA000',
-    fontWeight: 'bold',
-  },
-  logoEyebrow: {
-    position: 'absolute',
-    width: 10,
-    height: 2,
-    backgroundColor: '#333',
-    transform: [{ rotate: '-30deg' }],
-    top: 12,
-    right: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
   userInfo: {
     marginLeft: 12,
