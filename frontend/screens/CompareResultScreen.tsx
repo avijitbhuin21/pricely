@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Footer from '../components/Footer';
-import comparisonData from '../JSONfiles/comparison.json';
-import { useLocation } from '../contexts/LocationContext';
-import { useCart } from '../contexts/CartContext';
 import {
   View,
   Text,
@@ -15,14 +11,29 @@ import {
   Dimensions,
   Platform,
   Animated,
+  ImageSourcePropType,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Header from '../components/Header';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '../navigation/AppNavigator';
 import Toast from 'react-native-toast-message';
+
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import comparisonData from '../JSONfiles/comparison.json';
+import { useLocation } from '../contexts/LocationContext';
+import { useCart } from '../contexts/CartContext';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
+// Import shop logos
+const shopLogos: { [key: string]: ImageSourcePropType } = {
+  blinkit: require('../assets/logos/blinkit.png'),
+  instamart: require('../assets/logos/instamart.png'),
+  bigbasket: require('../assets/logos/bigbasket.png'),
+  dmart: require('../assets/logos/d-mart.png'),
+  zepto: require('../assets/logos/zepto.png'),
+};
 
 interface CompareResultItem {
   id: string;
@@ -41,42 +52,47 @@ const ComparisonCard: React.FC<{
   opacity: Animated.Value;
   onAddToCart: (shopName: string, price: string, remove: boolean) => void;
   isInCart: (shopId: string) => boolean;
-}> = ({ item, opacity, onAddToCart, isInCart }) => (
-  <Animated.View
-    style={[
-      styles.card,
-      {
-        opacity,
-        transform: [{
-          translateY: opacity.interpolate({
-            inputRange: [0, 1],
-            outputRange: [50, 0]
-          })
-        }]
-      }
-    ]}
-  >
-    <LinearGradient
-      colors={['rgba(255,255,255,0.98)', 'rgba(255,255,255,0.95)']}
-      style={styles.cardGradient}
+}> = ({ item, opacity, onAddToCart, isInCart }) => {
+  const areAllItemsInCart = item.shops.every(shop => isInCart(`${item.id}-${shop.name}`));
+
+  const handleAddAllItems = () => {
+    const shouldRemove = areAllItemsInCart;
+    item.shops.forEach(shop => {
+      onAddToCart(shop.name, shop.price, shouldRemove);
+    });
+  };
+
+  return (
+    <Animated.View
+      style={[
+        styles.card,
+        {
+          opacity,
+          transform: [{
+            translateY: opacity.interpolate({
+              inputRange: [0, 1],
+              outputRange: [50, 0]
+            })
+          }]
+        }
+      ]}
     >
-      <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
-      <View style={styles.cardContent}>
-        <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-        <Text style={styles.quantity}>{item.quantity}</Text>
-        <View style={styles.shopsContainer}>
-          {item.shops.map((shop, index) => (
-            <View key={index} style={styles.shopItem}>
-              <View style={styles.shopInfo}>
-                <MaterialCommunityIcons
-                  name={getShopIcon(shop.name)}
-                  size={20}
-                  color="#333"
+      <LinearGradient
+        colors={['rgba(255,255,255,0.98)', 'rgba(255,255,255,0.95)']}
+        style={styles.cardGradient}
+      >
+        <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
+        <View style={styles.cardContent}>
+          <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
+          <Text style={styles.quantity}>{item.quantity}</Text>
+          <View style={styles.shopsContainer}>
+            {item.shops.map((shop, index) => (
+              <View key={index} style={styles.shopItem}>
+                <Image
+                  source={getShopLogo(shop.name)}
                   style={styles.shopIcon}
+                  resizeMode="contain"
                 />
-                <Text style={styles.shopName}>{shop.name}</Text>
-              </View>
-              <View style={styles.priceContainer}>
                 <Text style={styles.price}>₹{shop.price}</Text>
                 {isInCart(`${item.id}-${shop.name}`) ? (
                   <TouchableOpacity
@@ -108,29 +124,32 @@ const ComparisonCard: React.FC<{
                   </TouchableOpacity>
                 )}
               </View>
-            </View>
-          ))}
+            ))}
+          </View>
+          <TouchableOpacity
+            style={styles.addAllButton}
+            onPress={handleAddAllItems}
+          >
+            <LinearGradient
+              colors={areAllItemsInCart ? ['#ff6b6b', '#ee5253'] : ['#4c669f', '#3b5998', '#192f6a']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.addAllButtonGradient}
+            >
+              <Text style={styles.addAllButtonText}>
+                {areAllItemsInCart ? 'Remove all items' : 'Add all items'}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
-      </View>
-    </LinearGradient>
-  </Animated.View>
-);
+      </LinearGradient>
+    </Animated.View>
+  );
+};
 
-const getShopIcon = (shopName: string) => {
-  switch (shopName.toLowerCase()) {
-    case 'blinkit':
-      return 'lightning-bolt';
-    case 'instamart':
-      return 'cart';
-    case 'bigbasket':
-      return 'basket-outline';
-    case 'dmart':
-      return 'store';
-    case 'zepto':
-      return 'flash';
-    default:
-      return 'shopping';
-  }
+const getShopLogo = (shopName: string): ImageSourcePropType => {
+  const key = shopName.toLowerCase();
+  return shopLogos[key] || shopLogos['bigbasket']; // fallback to bigbasket if logo not found
 };
 
 export default function CompareResultScreen() {
@@ -231,7 +250,6 @@ export default function CompareResultScreen() {
         onAutoLocate={autoLocate}
       />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Compare Results</Text>
         {loading ? (
           <View style={styles.messageContainer}>
             <ActivityIndicator size="large" color="#2196F3" />
@@ -323,33 +341,20 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   shopItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.1)',
   },
-  shopInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
   shopIcon: {
-    marginRight: 8,
-  },
-  shopName: {
-    fontFamily: 'Poppins',
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    textTransform: 'capitalize',
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    width: 40,
+    height: 40,
   },
   price: {
     fontFamily: 'Poppins',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '700',
     color: '#2ecc71',
   },
@@ -379,8 +384,8 @@ const styles = StyleSheet.create({
   },
   message: {
     fontFamily: 'Poppins',
-    fontSize: 16,
-    color: '#fff',
+    fontSize: 20,
+    color: '#333',
     marginTop: 10,
   },
   error: {
@@ -390,11 +395,28 @@ const styles = StyleSheet.create({
     fontFamily: 'ARCHIVE',
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#333',
     marginVertical: 12,
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
+  },
+  addAllButton: {
+    marginTop: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  addAllButtonGradient: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addAllButtonText: {
+    fontFamily: 'Poppins',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
