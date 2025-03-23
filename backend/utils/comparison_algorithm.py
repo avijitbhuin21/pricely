@@ -223,16 +223,33 @@ def format_output(product_groups):
 
 def compare_products(data):
     """Main function to compare products across platforms."""
+    # Check for empty input
+    if not data or all(not data.get(source) for source in data):
+        print("DEBUG: Empty input data detected")
+        return []
+        
     # Preprocess data to ensure consistent structure
     processed_data = {}
+    print(f"DEBUG: Processing input data with sources: {list(data.keys())}")
+    
     for source, source_data in data.items():
+        if not source_data:  # Skip empty sources
+            print(f"DEBUG: Empty data for source {source}")
+            continue
         processed_data[source] = source_data
+    
+    # If no valid data sources after preprocessing
+    if not processed_data:
+        print("DEBUG: No valid data sources after preprocessing")
+        return []
     
     # Find matching products
     product_groups = find_best_product_matches(processed_data)
+    print(f"DEBUG: Found {len(product_groups)} product groups")
     
     # Format the output
     results = format_output(product_groups)
+    print(f"DEBUG: Formatted {len(results)} results")
     
     return results
 
