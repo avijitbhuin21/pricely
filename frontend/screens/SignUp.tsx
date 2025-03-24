@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type SignUpScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
 import {
@@ -14,6 +15,7 @@ import {
   Platform,
   Dimensions,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -21,34 +23,47 @@ const { width, height } = Dimensions.get('window');
 const SignUp = () => {
   const navigation = useNavigation<SignUpScreenNavigationProp>();
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleNext = () => {
-    // Basic validation
-    if (!name.trim()) {
-      setError('Please enter your name');
-      return;
-    }
-    if (!number.trim() || number.length < 10 && number.length > 10) {
-      setError('Please enter a valid phone number');
-      return;
-    }
-    if (!password.trim() || password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
+  const handleNext = async () => {
+    try {
+      setLoading(true);
+      // Basic validation
+      if (!name.trim()) {
+        setError('Please enter your name');
+        return;
+      }
+      if (!phoneNumber.trim() || phoneNumber.length !== 10) {
+        setError('Please enter a valid phone number');
+        return;
+      }
+      if (!password.trim() || password.length < 6) {
+        setError('Password must be at least 6 characters');
+        return;
+      }
 
-    // Clear any previous errors
-    setError('');
+      // Clear any previous errors
+      setError('');
 
-    // Navigate to verification screen with user data
-    navigation.navigate('SignUpVerification', {
-      name: name.trim(),
-      phoneNumber: number.trim(),
-      password: password.trim()
-    });
+      // Save user data to AsyncStorage
+      const userData = {
+        name: name.trim(),
+        phoneNumber: phoneNumber.trim(),
+        password: password.trim()
+      };
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+
+      // Navigate to verification screen with user data
+      navigation.navigate('SignUpVerification', userData);
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+      console.error('SignUp error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -78,8 +93,8 @@ const SignUp = () => {
           <TextInput
             style={styles.input}
             placeholder="Enter your phone number"
-            value={number}
-            onChangeText={setNumber}
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
             keyboardType="phone-pad"
             placeholderTextColor="#666"
           />
@@ -99,8 +114,16 @@ const SignUp = () => {
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
+        <TouchableOpacity
+          style={[styles.nextButton, loading && styles.disabledButton]}
+          onPress={handleNext}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.nextButtonText}>Next</Text>
+          )}
         </TouchableOpacity>
 
         <View style={styles.signInContainer}>
@@ -189,6 +212,10 @@ const styles = StyleSheet.create({
   signInLink: {
     color: '#FF1493',
     fontWeight: 'bold',
+  },
+  disabledButton: {
+    backgroundColor: '#ffb6c1', // Lighter pink when disabled
+    opacity: 0.7,
   },
 });
 

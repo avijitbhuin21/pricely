@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   View,
   Text,
@@ -7,8 +8,10 @@ import {
   StyleSheet,
   Dimensions,
   StatusBar,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -21,19 +24,60 @@ type SignUpVerificationScreenNavigationProp = StackNavigationProp<
 
 const SignUpVerification = () => {
   const navigation = useNavigation<SignUpVerificationScreenNavigationProp>();
+  const route = useRoute();
+  const userData = route.params as { name: string; phoneNumber: string; password: string };
+  
   const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleVerify = () => {
-    // Check if code is 4 digits
-    if (code.length === 4) {
-      // Navigate to HomeScreen
-      navigation.navigate('Home');
+  const handleVerify = async () => {
+    try {
+      // Check if code is 4 digits
+      if (code.length !== 4) {
+        setError('Please enter a valid 4-digit code');
+        return;
+      }
+
+      setLoading(true);
+      setError('');
+
+      // Mock verification delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // For demo purposes, any 4-digit code works
+      // Store login status
+      await AsyncStorage.setItem('isLoggedIn', 'true');
+
+      // Navigate to SignIn screen
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'SignIn' }],
+      });
+    } catch (err) {
+      setError('Verification failed. Please try again.');
+      console.error('Verification error:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleResendCode = () => {
-    // Mock resend logic
-    setCode('');
+  const handleResendCode = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      // Mock resend delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setCode('');
+      Alert.alert('Success', 'Verification code has been resent.');
+    } catch (err) {
+      setError('Failed to resend code. Please try again.');
+      console.error('Resend error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,15 +91,23 @@ const SignUpVerification = () => {
       <View style={styles.bottomSection}>
         <Text style={styles.headerText}>Account Verification</Text>
         <Text style={styles.instructionText}>
-          Please enter the 4 digit code sent to Your Number
+          Please enter the 4 digit code sent to {userData.phoneNumber}
         </Text>
         
         <View style={styles.codeInputContainer}>
           {[...Array(4)].map((_, index) => (
             <View
               key={index}
-              style={styles.codeBox}
-            />
+              style={[
+                styles.codeBox,
+                code.length > index && styles.codeBoxFilled,
+                code.length === index && styles.codeBoxActive
+              ]}
+            >
+              <Text style={styles.codeText}>
+                {code[index] || ''}
+              </Text>
+            </View>
           ))}
           <TextInput
             style={styles.codeInput}
@@ -64,23 +116,38 @@ const SignUpVerification = () => {
               // Only allow numbers and max 4 digits
               if (/^\d*$/.test(text) && text.length <= 4) {
                 setCode(text);
+                setError('');
               }
             }}
             keyboardType="number-pad"
             maxLength={4}
             autoFocus={true}
-            placeholder="0000"
-            placeholderTextColor="#ccc"
-            textAlign="center"
+            caretHidden={true}
+            editable={!loading}
           />
         </View>
+
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
         
-        <TouchableOpacity onPress={handleResendCode}>
-          <Text style={styles.resendText}>Resend Code</Text>
+        <TouchableOpacity 
+          onPress={handleResendCode}
+          disabled={loading}
+        >
+          <Text style={[styles.resendText, loading && styles.disabledText]}>
+            Resend Code
+          </Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.verifyButton} onPress={handleVerify}>
-          <Text style={styles.verifyButtonText}>Verify</Text>
+        <TouchableOpacity 
+          style={[styles.verifyButton, loading && styles.disabledButton]}
+          onPress={handleVerify}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.verifyButtonText}>Verify</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -90,7 +157,7 @@ const SignUpVerification = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF1493', // Hot pink background
+    backgroundColor: '#FF1493',
   },
   topSection: {
     flex: 0.4,
@@ -124,25 +191,42 @@ const styles = StyleSheet.create({
   },
   instructionText: {
     color: 'gray',
-    marginBottom: 20,
+    marginBottom: 30,
     textAlign: 'center',
   },
   codeInputContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: width * 0.7,
-    marginBottom: 20,
+    marginBottom: 30,
   },
   codeBox: {
     width: width * 0.15,
     height: width * 0.15,
-    borderWidth: 1,
-    borderColor: 'lightgray',
-    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  codeBoxFilled: {
+    borderColor: '#FF1493',
+    backgroundColor: '#fff',
+  },
+  codeBoxActive: {
+    borderColor: '#FF1493',
+    borderWidth: 3,
+  },
+  codeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
   },
   resendText: {
     color: '#FF1493',
     marginBottom: 20,
+    fontSize: 16,
+    fontWeight: '600',
   },
   verifyButton: {
     backgroundColor: '#FF1493',
@@ -160,11 +244,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: width * 0.7,
     height: width * 0.15,
-    fontSize: 24,
-    letterSpacing: width * 0.13,
-    paddingHorizontal: width * 0.04,
-    color: '#000',
-    backgroundColor: 'transparent',
+    opacity: 0,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  disabledButton: {
+    backgroundColor: '#ffb6c1',
+    opacity: 0.7,
+  },
+  disabledText: {
+    opacity: 0.7,
   },
 });
 

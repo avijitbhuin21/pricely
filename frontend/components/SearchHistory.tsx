@@ -1,7 +1,10 @@
+// SearchHistory.tsx
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SearchHistoryProps } from '../types';
+
+const ITEM_HEIGHT = 48; // height of a single search history item
 
 const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress, onClearHistory, onDeleteSearch }) => {
   if (searches.length === 0) return null;
@@ -18,7 +21,10 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress, 
           <Text style={styles.clearButtonText}>Clear All</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={[styles.historyList, { maxHeight: searches.length > 3 ? ITEM_HEIGHT * 3 : 'auto' }]}
+        showsVerticalScrollIndicator={true}
+      >
         {searches.map((item, index) => (
           <Pressable
             key={index}
@@ -27,10 +33,10 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress, 
               pressed && styles.historyItemPressed
             ]}
             onPress={() => onSearchPress(item)}
-            android_ripple={{ color: 'rgba(128, 229, 255, 0.2)' }}
+            android_ripple={{ color: 'rgba(232, 9, 156, 0.1)' }}
           >
             <View style={styles.historyItemContent}>
-              <Ionicons name="time-outline" size={20} color="rgba(128, 229, 255, 0.8)" />
+              <Ionicons name="time-outline" size={20} color="#666" />
               <Text style={styles.historyText} numberOfLines={1} ellipsizeMode="tail">
                 {item}
               </Text>
@@ -40,7 +46,7 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress, 
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={styles.deleteButton}
             >
-              <Ionicons name="close-outline" size={20} color="rgba(128, 229, 255, 0.8)" />
+              <Ionicons name="close-outline" size={20} color="#666" />
             </TouchableOpacity>
           </Pressable>
         ))}
@@ -52,17 +58,13 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress, 
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: 'rgba(2, 5, 20, 0.85)',
+    backgroundColor: '#fff',
     borderRadius: 12,
-    elevation: 5,
-    shadowColor: '#80e5ff',
+    elevation: 3,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    margin: 20,
-    marginTop: 10,
-    borderWidth: 1.5,
-    borderColor: 'rgba(128, 229, 255, 0.4)',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   header: {
     flexDirection: 'row',
@@ -71,42 +73,32 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#ffffff',
-    textShadowColor: 'rgba(128, 229, 255, 0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
+    color: '#333',
   },
   clearButton: {
     padding: 8,
-    backgroundColor: 'rgba(128, 229, 255, 0.2)',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: 'rgba(128, 229, 255, 0.4)',
   },
   clearButtonText: {
-    color: '#80e5ff',
+    color: '#E8099C',
     fontSize: 14,
     fontWeight: '600',
-    textShadowColor: 'rgba(128, 229, 255, 0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
   },
-  scrollView: {
-    maxHeight: 250,
+  historyList: {
+    width: '100%',
   },
   historyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    height: ITEM_HEIGHT,
     paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(128, 229, 255, 0.2)',
+    borderBottomColor: '#f0f0f0',
     justifyContent: 'space-between',
   },
   historyItemPressed: {
-    backgroundColor: 'rgba(128, 229, 255, 0.1)',
+    backgroundColor: 'rgba(232, 9, 156, 0.05)',
   },
   historyItemContent: {
     flexDirection: 'row',
@@ -117,18 +109,11 @@ const styles = StyleSheet.create({
   historyText: {
     marginLeft: 12,
     fontSize: 16,
-    color: '#ffffff',
+    color: '#333',
     flex: 1,
-    textShadowColor: 'rgba(128, 229, 255, 0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
   },
   deleteButton: {
     padding: 8,
-    backgroundColor: 'rgba(128, 229, 255, 0.1)',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: 'rgba(128, 229, 255, 0.3)',
   },
 });
 
