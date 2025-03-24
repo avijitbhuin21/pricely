@@ -52,7 +52,8 @@ const ComparisonCard: React.FC<{
   opacity: Animated.Value;
   onAddToCart: (shopName: string, price: string, remove: boolean) => void;
   isInCart: (shopId: string) => boolean;
-}> = ({ item, opacity, onAddToCart, isInCart }) => {
+  style?: any;
+}> = ({ item, opacity, onAddToCart, isInCart, style }) => {
   const areAllItemsInCart = item.shops.every(shop => isInCart(`${item.id}-${shop.name}`));
 
   const handleAddAllItems = () => {
@@ -74,7 +75,8 @@ const ComparisonCard: React.FC<{
               outputRange: [50, 0]
             })
           }]
-        }
+        },
+        style
       ]}
     >
       <LinearGradient
@@ -83,64 +85,68 @@ const ComparisonCard: React.FC<{
       >
         <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
         <View style={styles.cardContent}>
-          <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-          <Text style={styles.quantity}>{item.quantity}</Text>
-          <View style={styles.shopsContainer}>
-            {item.shops.map((shop, index) => (
-              <View key={index} style={styles.shopItem}>
-                <Image
-                  source={getShopLogo(shop.name)}
-                  style={styles.shopIcon}
-                  resizeMode="contain"
-                />
-                <Text style={styles.price}>₹{shop.price}</Text>
-                {isInCart(`${item.id}-${shop.name}`) ? (
-                  <TouchableOpacity
-                    onPress={() => onAddToCart(shop.name, shop.price, true)}
-                    style={styles.button}
-                  >
-                    <LinearGradient
-                      colors={['#ff6b6b', '#ee5253']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.buttonGradient}
+          <View style={styles.topContent}>
+            <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
+            <Text style={styles.quantity}>{item.quantity}</Text>
+            <View style={styles.shopsContainer}>
+              {item.shops.map((shop, index) => (
+                <View key={index} style={styles.shopItem}>
+                  <Image
+                    source={getShopLogo(shop.name)}
+                    style={styles.shopIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.price}>₹{shop.price}</Text>
+                  {isInCart(`${item.id}-${shop.name}`) ? (
+                    <TouchableOpacity
+                      onPress={() => onAddToCart(shop.name, shop.price, true)}
+                      style={styles.button}
                     >
-                      <Ionicons name="remove" size={16} color="#fff" />
-                    </LinearGradient>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => onAddToCart(shop.name, shop.price, false)}
-                    style={styles.button}
-                  >
-                    <LinearGradient
-                      colors={['#2ecc71', '#27ae60']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.buttonGradient}
+                      <LinearGradient
+                        colors={['#ff6b6b', '#ee5253']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.buttonGradient}
+                      >
+                        <Ionicons name="remove" size={16} color="#fff" />
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => onAddToCart(shop.name, shop.price, false)}
+                      style={styles.button}
                     >
-                      <Ionicons name="add" size={16} color="#fff" />
-                    </LinearGradient>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))}
+                      <LinearGradient
+                        colors={['#2ecc71', '#27ae60']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.buttonGradient}
+                      >
+                        <Ionicons name="add" size={16} color="#fff" />
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+            </View>
           </View>
-          <TouchableOpacity
-            style={styles.addAllButton}
-            onPress={handleAddAllItems}
-          >
-            <LinearGradient
-              colors={areAllItemsInCart ? ['#ff6b6b', '#ee5253'] : ['#4c669f', '#3b5998', '#192f6a']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.addAllButtonGradient}
+          <View style={styles.bottomContent}>
+            <TouchableOpacity
+              style={styles.addAllButton}
+              onPress={handleAddAllItems}
             >
-              <Text style={styles.addAllButtonText}>
-                {areAllItemsInCart ? 'Remove all items' : 'Add all items'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={areAllItemsInCart ? ['#ff6b6b', '#ee5253'] : ['#4c669f', '#3b5998', '#192f6a']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.addAllButtonGradient}
+              >
+                <Text style={styles.addAllButtonText}>
+                  {areAllItemsInCart ? 'Remove all items' : 'Add all items'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
       </LinearGradient>
     </Animated.View>
@@ -219,6 +225,27 @@ export default function CompareResultScreen() {
   const renderComparisonPairs = () => {
     const pairs = [];
     for (let i = 0; i < compareData.length; i += 2) {
+      const firstCard = compareData[i];
+      const secondCard = i + 1 < compareData.length ? compareData[i + 1] : null;
+      
+      // Calculate dynamic height based on number of shops
+      const firstCardShops = firstCard.shops.length;
+      const secondCardShops = secondCard ? secondCard.shops.length : 0;
+      const maxShops = Math.max(firstCardShops, secondCardShops);
+      
+      // Calculate exact height needed
+      const imageHeight = 160;
+      const headerHeight = 65; // Reduced space for name and quantity
+      const shopItemHeight = Dimensions.get('window').height * 0.056;
+      const bottomButtonHeight = Dimensions.get('window').height * 0.06;
+      const padding = Dimensions.get('window').height * 0.025;
+      
+      // Calculate height needed for all items
+      const contentHeight = headerHeight + (maxShops * shopItemHeight) + bottomButtonHeight + padding;
+      const minHeight = imageHeight + contentHeight;
+      
+      const cardStyle = { minHeight };
+
       pairs.push(
         <View key={`pair-${i}`} style={styles.comparePair}>
           <ComparisonCard
@@ -226,6 +253,7 @@ export default function CompareResultScreen() {
             opacity={fadeAnims[i] || new Animated.Value(1)}
             onAddToCart={(shopName, price, remove) => handleCartAction(compareData[i], shopName, price, remove)}
             isInCart={isInCart}
+            style={cardStyle}
           />
           {i + 1 < compareData.length && (
             <ComparisonCard
@@ -233,6 +261,7 @@ export default function CompareResultScreen() {
               opacity={fadeAnims[i + 1] || new Animated.Value(1)}
               onAddToCart={(shopName, price, remove) => handleCartAction(compareData[i + 1], shopName, price, remove)}
               isInCart={isInCart}
+              style={cardStyle}
             />
           )}
         </View>
@@ -280,7 +309,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'snow',
   },
   content: {
-    padding: 12,
+    padding: 16,
     paddingBottom: 100,
   },
   cardContainer: {
@@ -289,134 +318,206 @@ const styles = StyleSheet.create({
   comparePair: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 20,
     paddingHorizontal: 4,
   },
   card: {
     width: Dimensions.get('window').width * 0.45,
-    minHeight: 400,
     backgroundColor: 'white',
-    borderRadius: 16,
+    borderRadius: Dimensions.get('window').width * 0.035,
     overflow: 'hidden',
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
+        shadowColor: 'rgba(0,0,0,0.15)',
+        shadowOffset: { width: 1, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 12,
       },
       android: {
         elevation: 6,
       },
     }),
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.03)',
   },
   cardGradient: {
+    backgroundColor: 'white',
+    flexDirection: 'column',
     flex: 1,
+    height: '100%',
   },
   image: {
     width: '100%',
-    height: 200,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    height: Dimensions.get('window').height * 0.2,
+    maxHeight: 160,
+    borderTopLeftRadius: Dimensions.get('window').width * 0.035,
+    borderTopRightRadius: Dimensions.get('window').width * 0.035,
+    backgroundColor: '#f8f8f8',
   },
   cardContent: {
-    padding: 16,
+    padding: Dimensions.get('window').width * 0.025,
+    paddingBottom: 0,
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  topContent: {
+    flex: 1,
+  },
+  bottomContent: {
+    paddingTop: Dimensions.get('window').height * 0.008,
+    paddingBottom: Dimensions.get('window').height * 0.008,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
+    backgroundColor: 'white',
   },
   name: {
     fontFamily: 'Poppins',
-    fontSize: 16,
+    fontSize: Dimensions.get('window').width * 0.034,
     fontWeight: '700',
     color: '#1a1a1a',
-    marginBottom: 4,
-    lineHeight: 20,
+    marginBottom: Dimensions.get('window').height * 0.004,
+    lineHeight: Dimensions.get('window').width * 0.042,
+    letterSpacing: -0.3,
+    textShadowColor: 'rgba(0,0,0,0.03)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1,
   },
   quantity: {
     fontFamily: 'Poppins',
-    fontSize: 14,
+    fontSize: Dimensions.get('window').width * 0.03,
     color: '#666',
-    marginBottom: 8,
+    marginBottom: Dimensions.get('window').height * 0.006,
     fontWeight: '500',
+    opacity: 0.9,
   },
   shopsContainer: {
-    marginTop: 8,
+    marginTop: Dimensions.get('window').height * 0.006,
+    flexDirection: 'column',
   },
   shopItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: Dimensions.get('window').height * 0.008,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
+    borderBottomColor: 'rgba(0,0,0,0.04)',
+    height: Dimensions.get('window').height * 0.056,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 6,
   },
   shopIcon: {
-    width: 40,
-    height: 40,
+    width: Dimensions.get('window').width * 0.065,
+    height: Dimensions.get('window').width * 0.065,
+    marginRight: Dimensions.get('window').width * 0.015,
+    flexShrink: 0,
+    opacity: 0.95,
   },
   price: {
     fontFamily: 'Poppins',
-    fontSize: 20,
+    fontSize: Dimensions.get('window').width * 0.034,
     fontWeight: '700',
     color: '#2ecc71',
+    flexGrow: 1,
+    textAlign: 'center',
+    paddingHorizontal: Dimensions.get('window').width * 0.008,
+    minWidth: Dimensions.get('window').width * 0.14,
+    letterSpacing: 0.2,
+    textShadowColor: 'rgba(46,204,113,0.1)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1,
   },
   button: {
     overflow: 'hidden',
-    borderRadius: 16,
+    borderRadius: Dimensions.get('window').width * 0.016,
+    marginLeft: Dimensions.get('window').width * 0.015,
+    flexShrink: 0,
+    ...Platform.select({
+      ios: {
+        shadowColor: 'rgba(0,0,0,0.12)',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   buttonGradient: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: Dimensions.get('window').width * 0.014,
+    paddingHorizontal: Dimensions.get('window').width * 0.014,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 32,
+    width: Dimensions.get('window').width * 0.065,
+    height: Dimensions.get('window').width * 0.065,
+    borderRadius: Dimensions.get('window').width * 0.016,
   },
   buttonText: {
     fontFamily: 'Poppins',
     color: '#fff',
     fontWeight: '600',
-    fontSize: 13,
+    fontSize: 14,
   },
   messageContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
-    marginTop: 20,
+    padding: 24,
+    marginTop: 24,
   },
   message: {
     fontFamily: 'Poppins',
-    fontSize: 20,
+    fontSize: 18,
     color: '#333',
-    marginTop: 10,
+    marginTop: 12,
+    textAlign: 'center',
+    lineHeight: 24,
   },
   error: {
     color: '#ff6b6b',
+    opacity: 0.9,
   },
   title: {
     fontFamily: 'ARCHIVE',
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    marginVertical: 12,
+    marginVertical: 16,
     textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+    textShadowColor: 'rgba(0,0,0,0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   addAllButton: {
-    marginTop: 16,
-    borderRadius: 16,
+    borderRadius: Dimensions.get('window').width * 0.02,
     overflow: 'hidden',
+    marginTop: Dimensions.get('window').height * 0.008,
+    ...Platform.select({
+      ios: {
+        shadowColor: 'rgba(0,0,0,0.15)',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   addAllButtonGradient: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: Dimensions.get('window').height * 0.01,
+    paddingHorizontal: Dimensions.get('window').width * 0.03,
     alignItems: 'center',
     justifyContent: 'center',
+    height: Dimensions.get('window').height * 0.042,
   },
   addAllButtonText: {
     fontFamily: 'Poppins',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: Dimensions.get('window').width * 0.032,
+    fontWeight: '600',
     color: '#fff',
+    textAlign: 'center',
+    letterSpacing: 0.2,
   },
 });
