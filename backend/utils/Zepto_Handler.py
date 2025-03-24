@@ -58,22 +58,27 @@ def get_zepto_credentials(location_data):
     return data
 
 def format_zepto_data(data):
+
     final_data = {'data': {}, 'credentials': data['credentials']}
     for i in data['data']['layout'][1:]:
         products = i['data']['resolver']['data']['items']
         for j in products:
             item = {
                 'name': j['productResponse']['product']['name'],
-                'price': str(int(j['productResponse']['price']['sp'])//100),
+                'price': str(int(j['productResponse']['superSaverSellingPrice'])//100),
                 'image': convert_to_image_url_zepto(j['productResponse']['productVariant']['images'][0]['path'], j['productResponse']['product']['name']),
                 'url': f'https://www.zeptonow.com/pn/{blinkit_clean_string(j['productResponse']['product']['name'])}/pvid/{j['productResponse']['productVariant']['id']}',
                 'quantity': j['productResponse']['productVariant']['formattedPacksize'],
             }
             formatted_name = format_name(j['productResponse']['product']['name'])
-            if formatted_name in final_data['data']:
-                final_data['data'][formatted_name].append(item)
-            else:
-                final_data['data'][formatted_name] = [item]
+
+            log_debug(j['productResponse']['outOfStock'], 'outOfStock', 'WARNING')
+
+            if j['productResponse']['outOfStock'] != True:
+                if formatted_name in final_data['data']:
+                    final_data['data'][formatted_name].append(item)
+                else:
+                    final_data['data'][formatted_name] = [item]
 
     return final_data
 
