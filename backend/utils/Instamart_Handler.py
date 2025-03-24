@@ -235,6 +235,8 @@ def get_instamart_credentials(location_data: Dict[str, Any]) -> Dict[str, Any]:
 
 def format_instamart_data(data: Dict[str, Any]) -> Dict[str, Any]:
     """Format Instamart search results into a standardized structure."""
+    with open('insta_temp.json', 'w') as f:
+        json.dump(data, f, indent=4)
     try:
         final_data = {'data': {}, 'credentials': data['credentials']}
         
