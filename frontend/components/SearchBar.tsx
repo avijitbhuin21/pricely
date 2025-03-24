@@ -1,9 +1,8 @@
+// SearchBar.tsx
 import React, { useRef, useEffect } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SearchBarProps } from '../types';
-
-const SPICE_IMAGE_URL = 'https://images.unsplash.com/photo-1532336414038-cf19250c5757';
 
 const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
@@ -12,25 +11,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSubmitEditing
 }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    // Subtle breathing animation for the search bar
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(glowAnim, {
-          toValue: 0,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, []);
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -47,98 +27,75 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <View style={styles.wrapper}>
-      <Image
-        source={{ uri: SPICE_IMAGE_URL }}
-        style={styles.spiceImage}
-        resizeMode="cover"
-      />
-      <Animated.View
-        style={[
-          styles.container,
-          {
-            transform: [{ scale: scaleAnim }],
-            shadowOpacity: glowAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0.2, 0.4],
-            }),
-          }
-        ]}
-      >
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          transform: [{ scale: scaleAnim }],
+        }
+      ]}
+    >
+      <View style={styles.searchContainer}>
         <Ionicons
           name="search"
           size={22}
-          color="rgba(128, 229, 255, 0.8)"
+          color="#666"
           style={styles.searchIcon}
         />
         <TextInput
           style={styles.input}
-          placeholder="Search..."
-          placeholderTextColor="rgba(128, 229, 255, 0.5)"
+          placeholder="Search for products..."
+          placeholderTextColor="#999"
           value={value}
           onChangeText={onChangeText}
           onSubmitEditing={onSubmitEditing}
           returnKeyType="search"
           clearButtonMode="while-editing"
         />
-        <TouchableOpacity
-          onPress={onSearch}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          style={styles.searchButton}
-        >
-          <Animated.View style={[
-            styles.buttonContent,
-            {
-              transform: [{ scale: scaleAnim }]
-            }
-          ]}>
-            <Ionicons name="arrow-forward" size={24} color="rgba(128, 229, 255, 0.8)" />
-          </Animated.View>
-        </TouchableOpacity>
-      </Animated.View>
-    </View>
+      </View>
+      <TouchableOpacity
+        onPress={onSearch}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={styles.searchButton}
+      >
+        <View style={styles.buttonContent}>
+          <Ionicons name="arrow-forward" size={24} color="#fff" />
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  spiceImage: {
-    width: '100%',
-    height: 200,
-    marginVertical: 0,
-  },
   container: {
     flexDirection: 'row',
-    padding: 12,
-    backgroundColor: 'rgba(2, 5, 20, 0.85)',
-    // backgroundColor: 'cream',
     alignItems: 'center',
-    shadowColor: '#80e5ff',
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 5,
-    borderWidth: 1.5,
-    borderColor: 'rgba(128, 229, 255, 0.4)',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
     width: '100%',
-    marginTop: 0,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   searchIcon: {
     marginRight: 10,
   },
   input: {
     flex: 1,
-    height: 44,
+    height: 40,
     paddingHorizontal: 10,
-    color: '#ffffff',
+    color: '#333',
     fontSize: 16,
-    textShadowColor: 'rgba(128, 229, 255, 0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
   },
   searchButton: {
     marginLeft: 10,
@@ -147,11 +104,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(128, 229, 255, 0.2)',
+    backgroundColor: '#E8099C',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(128, 229, 255, 0.4)',
   },
 });
 
