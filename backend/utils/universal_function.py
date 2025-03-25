@@ -3,22 +3,73 @@ import requests
 import os
 from datetime import datetime
 import json
-import urllib.parse
+import sys
 import time
 import random
 import re
 
 load_dotenv()
 
+
+# Log level configurations
 DEBUG = True
+ERROR = True
+SUCCESS = True
+INFO = True
+WARNING = True
 
 def log_debug(data, name=None, level="DEBUG"):
-    if DEBUG:
+    # Check the appropriate flag based on the log level
+    level_upper = level.upper()
+    should_log = False
+    
+    if level_upper == "DEBUG" and DEBUG:
+        should_log = True
+    elif level_upper == "ERROR" and ERROR:
+        should_log = True
+    elif level_upper == "SUCCESS" and SUCCESS:
+        should_log = True
+    elif level_upper == "INFO" and INFO:
+        should_log = True
+    elif level_upper == "WARNING" and WARNING:
+        should_log = True
+    
+    if should_log:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if isinstance(data, (dict, list)):
             data = json.dumps(data, indent=2)
+        
         message = f"[{timestamp}] [{level}] {name}: {data}" if name else f"[{timestamp}] [{level}] {data}"
-        print(message)
+        
+        # Colors for different log levels
+        colors = {
+            "DEBUG": ("yellow", "\033[33m"),     # Yellow
+            "ERROR": ("red", "\033[31m"),        # Red
+            "SUCCESS": ("green", "\033[32m"),    # Green
+            "INFO": ("cyan", "\033[36m"),        # Cyan
+            "WARNING": ("orange", "\033[33m"),   # Orange (using yellow ANSI)
+        }
+        
+        # Default to no color if level not found
+        html_color, ansi_color = colors.get(level_upper, ("black", ""))
+        reset_code = "\033[0m"
+        
+        # Check if running in Jupyter notebook
+        try:
+            # If get_ipython exists and is in notebook, we're in Jupyter
+            shell = get_ipython().__class__.__name__
+            if shell == 'ZMQInteractiveShell':  # Jupyter notebook or qtconsole
+                from IPython.display import display, HTML
+                colored_message = f"<span style='color:{html_color}'>{message}</span>"
+                display(HTML(colored_message))
+                return
+        except (NameError, ImportError):
+            # Not in Jupyter, use ANSI colors for terminal
+            pass
+            
+        # Standard terminal output with ANSI colors
+        colored_message = f"{ansi_color}{message}{reset_code}" if ansi_color else message
+        print(colored_message)
 
 def geocode_location(location_name, api_key=random.choice(os.getenv('Google_map_api_key', '').split())):
     try:

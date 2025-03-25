@@ -3,6 +3,7 @@ import urllib
 import json
 import os
 from dotenv import load_dotenv
+import uuid
 
 # LOCAL IMPORTS
 from .universal_function import *
@@ -58,22 +59,30 @@ def get_zepto_credentials(location_data):
     return data
 
 def format_zepto_data(data):
+
+    with open('zepto_temp.json', 'w') as f:
+        json.dump(data, f, indent=4)
+
     final_data = {'data': {}, 'credentials': data['credentials']}
     for i in data['data']['layout'][1:]:
         products = i['data']['resolver']['data']['items']
         for j in products:
             item = {
                 'name': j['productResponse']['product']['name'],
-                'price': str(int(j['productResponse']['price']['sp'])//100),
+                'price': str(int(j['productResponse']['superSaverSellingPrice'])//100),
                 'image': convert_to_image_url_zepto(j['productResponse']['productVariant']['images'][0]['path'], j['productResponse']['product']['name']),
                 'url': f'https://www.zeptonow.com/pn/{blinkit_clean_string(j['productResponse']['product']['name'])}/pvid/{j['productResponse']['productVariant']['id']}',
                 'quantity': j['productResponse']['productVariant']['formattedPacksize'],
             }
             formatted_name = format_name(j['productResponse']['product']['name'])
-            if formatted_name in final_data['data']:
-                final_data['data'][formatted_name].append(item)
-            else:
-                final_data['data'][formatted_name] = [item]
+
+            log_debug(j['productResponse']['outOfStock'], 'outOfStock', 'WARNING')
+
+            if j['productResponse']['outOfStock'] != True:
+                if formatted_name in final_data['data']:
+                    final_data['data'][formatted_name].append(item)
+                else:
+                    final_data['data'][formatted_name] = [item]
 
     return final_data
 
@@ -84,16 +93,23 @@ def search_zepto(item_name, location_data, credentials=None):
             credentials = get_zepto_credentials(location_data) if credentials is None else credentials
             storeId = credentials['ZEPTO']['storeId']
             if storeId == 'location not servicable':
+                log_debug('Location not servicable', 'Error', 'ERROR')
                 return {"data": {}, "credentials": {}}
 
             headers = {
                 'accept': 'application/json, text/plain, */*',
                 'accept-language': 'en-US,en;q=0.9',
-                'appversion': '12.59.0',
+                'app_sub_platform': 'WEB',
+                'app_version': '12.63.1',
+                'appversion': '12.63.1',
+                'auth_revamp_flow': 'v2',
                 'content-type': 'application/json',
+                'marketplace_type': 'ZEPTO_NOW',
+                'origin': 'https://www.zeptonow.com',
                 'platform': 'WEB',
                 'priority': 'u=1, i',
                 'referer': 'https://www.zeptonow.com/',
+                'requestid': str(uuid.uuid4()),
                 'sec-ch-ua': '"Chromium";v="134", "Not:A-Brand";v="24", "Microsoft Edge";v="134"',
                 'sec-ch-ua-mobile': '?0',
                 'sec-ch-ua-platform': '"Windows"',
@@ -126,6 +142,7 @@ def search_zepto(item_name, location_data, credentials=None):
                 headers=headers,
                 data=body 
             )
+            log_debug(response.json(), 'response', 'INFO')
 
             return format_zepto_data({"data": response.json(), "credentials": credentials})
         except Exception as e:

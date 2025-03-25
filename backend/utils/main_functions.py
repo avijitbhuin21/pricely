@@ -3,100 +3,87 @@ import random
 from dotenv import load_dotenv
 from datetime import datetime
 import base64
-import json
+import json,time, psutil
+from pyngrok import ngrok
+import asyncio
+
+#LOCAL IMPORTS
+from .universal_function import *
+from .comparison_algorithm import *
+
 
 load_dotenv()
 
-# Local imports
-from utils.universal_function import *
-from utils.comparison_algorithm import compare_products
-from utils.Blinkit_Handler import search_blinkit
-from utils.BigBasket_Handler import search_bigbasket
-from utils.Dmart_Handler import search_dmart
-from utils.Instamart_Handler import search_instamart
-from utils.Zepto_Handler import search_zepto
-
-import asyncio
-import time
-from typing import Dict, Any
-
 def get_api_key():
-    api_keys = os.getenv('Google_map_api_key', '').split()
+    print("Starting get_api_key function")
+    api_keys = os.getenv('Google_map_api_key', '')
+    print(f"Raw environment variable value: {api_keys[:10]}..." if api_keys else "No API key found")
+    
+    api_keys = api_keys.split()
     if not api_keys:
         raise ValueError("No API keys found in environment variable 'Google_map_api_key'")
     
+    print(f"Found {len(api_keys)} API keys")
     key = random.choice(api_keys)
     now = datetime.now()
     hour_number = int(now.strftime("%I"))
+    print(f"Current hour (12-hour format): {hour_number}")
     
-    encoded_key = key.encode('utf-8')
-    for _ in range(hour_number):
-        encoded_key = base64.b64encode(encoded_key)
-    
-    return str(encoded_key, 'utf-8')
+    try:
+        encoded_key = key.encode('utf-8')
+        for i in range(hour_number):
+            encoded_key = base64.b64encode(encoded_key)
+            print(f"Encoding iteration {i+1}/{hour_number} completed")
+        
+        final_key = str(encoded_key, 'utf-8')
+        print("Successfully encoded API key")
+        return final_key
+    except Exception as e:
+        print(f"Error during key encoding: {str(e)}")
+        raise
 
-def decode_api_key(encoded_key):
-    now = datetime.now()
-    hour_number = int(now.strftime("%I"))
+def kill_ngrok_processes():
+    ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
+    # Kill using pyngrok
+    try:
+        ngrok.kill()
+        print("Killed ngrok processes via pyngrok")
+    except Exception as e:
+        print(f"pyngrok kill error: {e}")
     
-    decoded_key = encoded_key
-    for _ in range(hour_number):
+    # Find and kill by process name
+    for proc in psutil.process_iter(['pid', 'name']):
         try:
-            decoded_key = base64.b64decode(decoded_key)
-        except Exception as e:
-            raise ValueError(f"Failed to decode API key: {e}")
-    
-    return decoded_key.decode('utf-8')
+            if 'ngrok' in proc.info['name'].lower():
+                print(f"Killing ngrok process with PID {proc.info['pid']}")
+                psutil.Process(proc.info['pid']).terminate()
+                time.sleep(0.5)
+                if psutil.pid_exists(proc.info['pid']):
+                    psutil.Process(proc.info['pid']).kill()
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
 
+    # Additional OS-specific commands
+    try:
+        if os.name == 'nt':  # Windows
+            os.system('taskkill /F /IM ngrok.exe')
+        else:  # Linux/Mac
+            os.system('pkill -f ngrok')
+    except Exception as e:
+        print(f"OS command error: {e}")
+        
+    # Wait to ensure processes are terminated
+    time.sleep(2)
 
+def get_compared_results(search_query, lat, lon, credentials):
+    loc = geocode_location(str(lat) + ',' + str(lon))
+    try:
+        loop = asyncio.get_event_loop()
+        data = loop.run_until_complete(get_compared_data_with_timing(search_query, loc, credentials))
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        data = loop.run_until_complete(get_compared_data_with_timing(search_query, loc, credentials))
+        loop.close()
 
-async def get_compared_data_with_timing(search_query: str, location_data) -> tuple:
-    # Define the search functions and their respective platforms
-    search_tasks = {
-        'blinkit': search_blinkit,
-        'instamart': search_instamart,
-        'bigbasket': search_bigbasket,
-        'dmart': search_dmart,
-        'zepto': search_zepto
-    }
-    
-    # Store the results and timing information
-    results = {}
-    timing_info = {
-        'total_start': time.time(),
-        'platform_times': {},
-        'sequential_estimate': 0
-    }
-    
-    async def process_platform(platform, search_function, query):
-        """Asynchronous wrapper for each platform's search function"""
-        start = time.time()
-        try:
-            # Run the synchronous function in a thread pool
-            result = await asyncio.to_thread(search_function, query, location_data)
-            elapsed = time.time() - start
-            
-            results[platform] = result
-            timing_info['platform_times'][platform] = elapsed
-            timing_info['sequential_estimate'] += elapsed
-            
-        except Exception as exc:
-            print(f"{platform} search generated an exception: {exc}")
-            results[platform] = {}
-    
-    # Create tasks for all platforms
-    tasks = []
-    for platform, search_function in search_tasks.items():
-        tasks.append(process_platform(platform, search_function, search_query))
-    
-    # Wait for all search operations to complete
-    await asyncio.gather(*tasks)
-    
-    # Calculate the total concurrent execution time
-    timing_info['total_time'] = time.time() - timing_info['total_start']
-    timing_info['speedup'] = timing_info['sequential_estimate'] / timing_info['total_time']
-    
-    # Compare the collected data
-    compared_data = compare_products(results)
-    
-    return compared_data, timing_info
+    return data

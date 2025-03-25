@@ -1,71 +1,34 @@
 {
     "data": {
-        "fresh": [
-            {
-                "name": "Fresh 'N' Juicy Mango Drink",
-                "price": "40",
-                "quantity": "4 x 150 ml",
-                "image": "https://www.bigbasket.com/media/uploads/p/l/1209387_4-frooti-fresh-n-juicy-mango-drink.jpg",
-                "url": "https://www.bigbasket.com/pd/1209387/frooti-fresh-n-juicy-mango-drink-4x150-ml-tetra/"
-            },
-            {
-                "name": "Mango Drink",
-                "price": "10",
-                "quantity": "125 ml",
-                "image": "https://www.bigbasket.com/media/uploads/p/l/274035_9-frooti-drink-fresh-n-juicy-mango.jpg",
-                "url": "https://www.bigbasket.com//pd/274035/frooti-drink-fresh-n-juicy-mango-150-ml-tetra/"
-            },
-            {
-                "name": "Mango Drink",
-                "price": "15",
-                "quantity": "200 ml",
-                "image": "https://www.bigbasket.com/media/uploads/p/l/265783_7-frooti-drink-fresh-n-juicy-mango.jpg",
-                "url": "https://www.bigbasket.com//pd/265783/frooti-drink-fresh-n-juicy-mango-200-ml/"
-            },
-            {
-                "name": "Drink - Fresh 'N' Juicy Mango",
-                "price": "30",
-                "quantity": "3 x 125 ml",
-                "image": "https://www.bigbasket.com/media/uploads/p/l/1226989_1-frooti-drink-fresh-n-juicy-mango.jpg",
-                "url": "https://www.bigbasket.com//pd/1226989/frooti-drink-fresh-n-juicy-mango-3x125-ml-tetra/"
-            }
-        ],
         "mango drink": [
-            {
-                "name": "Mango Drink",
-                "price": "61",
-                "quantity": "1.2 L",
-                "image": "https://www.bigbasket.com/media/uploads/p/l/265699_4-frooti-drink-fresh-n-juicy-mango.jpg",
-                "url": "https://www.bigbasket.com/pd/265699/frooti-drink-fresh-n-juicy-mango-12-l-bottle/"
-            },
             {
                 "name": "Mango Drink",
                 "price": "89",
                 "quantity": "1.8 L",
-                "image": "https://www.bigbasket.com/media/uploads/p/l/40194542_3-frooti-mango-drink.jpg",
-                "url": "https://www.bigbasket.com//pd/40194542/frooti-mango-drink-2-l-bottle/"
-            },
-            {
-                "name": "Mango Drink",
-                "price": "20",
-                "quantity": "300 ml",
-                "image": "https://www.bigbasket.com/media/uploads/p/l/265689_4-frooti-drink-fresh-n-juicy-mango.jpg",
-                "url": "https://www.bigbasket.com//pd/265689/frooti-drink-fresh-n-juicy-mango-300-ml-bottle/"
+                "image": "https://www.bbassets.com/media/uploads/p/l/40194542_3-frooti-mango-drink.jpg",
+                "url": "https://www.bigbasket.com/pd/40194542/frooti-mango-drink-2-l-bottle/"
             },
             {
                 "name": "Mango Drink",
                 "price": "40",
                 "quantity": "600 ml",
-                "image": "https://www.bigbasket.com/media/uploads/p/l/40129410_7-frooti-mango-drink-fresh-n-juicy.jpg",
+                "image": "https://www.bbassets.com/media/uploads/p/l/40129410_7-frooti-mango-drink-fresh-n-juicy.jpg",
                 "url": "https://www.bigbasket.com//pd/40129410/frooti-mango-drink-fresh-n-juicy-600-ml-bottle/"
+            },
+            {
+                "name": "Mango Drink",
+                "price": "61",
+                "quantity": "1.2 L",
+                "image": "https://www.bbassets.com/media/uploads/p/l/265699_4-frooti-drink-fresh-n-juicy-mango.jpg",
+                "url": "https://www.bigbasket.com//pd/265699/frooti-drink-fresh-n-juicy-mango-12-l-bottle/"
             }
         ]
     },
     "credentials": {
         "BigBasket": {
-            "auth_string": "x-entry-context-id=100; x-entry-context=bb-b2c; _bb_locSrc=default; x-channel=web; _bb_bhid=; _bb_nhid=1723; _bb_vid=NjQzNDkyMzQ3NzE5MjkwMDk0; _bb_dsevid=; _bb_dsid=; _bb_cid=14; _bb_aid=MzAxNzU2NDE5NQ==; csrftoken=mM0rO0nJnyxI0HWtdGIzOpm0p2vHClRlV52OujyS3ehFIPMqsnKK2Rkq1VHyi80A; _bb_home_cache=1fec6365.1.visitor; _bb_bb2.0=1; is_global=0; _bb_addressinfo=MjIuNjM1MDA2fDg4LjQzNzAwMDF8TmF6cnVsIElzbGFtIEF2ZW51ZXw3MDAwNTJ8S29sa2F0YXwxfGZhbHNlfHRydWV8dHJ1ZXxCaWdiYXNrZXRlZXI=; _bb_pin_code=700052; _bb_sa_ids=12970; _is_tobacco_enabled=1; _is_bb1.0_supported=0; _bb_cda_sa_info=djIuY2RhX3NhLjEwMC4xMjk3MA==; is_integrated_sa=1; bb2_enabled=true; ts=2025-03-20%2003:42:15.637; csurftoken=UFiDOw.NjQzNDkyMzQ3NzE5MjkwMDk0.1742422335614.39l85yT4d9/8o7OC1b+AJgjvd2ktPgkpJXqNBBCKSHs=; ufi=1; bigbasket.com=1fbae015-4a93-42db-9340-d83c1b7b85ba; _gcl_au=1.1.995482043.1741792204; jarvis-id=5844d1e9-9e4f-4d6f-a3f1-dc9a281566ca; adb=0; _fbp=fb.1.1741792204246.62251282917562310; _ga_FRRYG5VKHX=GS1.1.1741792204.1.0.1741792204.60.0.0; _ga=GA1.2.1851803795.1741792204; _gid=GA1.2.1660596046.1741792204; _gat_UA-27455376-1=1; _bb_lat_long=MjIuNjM1MDA2fDg4LjQzNzAwMDE=",
-            "lat": 22.635006,
-            "lon": 88.4370001,
+            "auth_string": "x-entry-context-id=100; x-entry-context=bb-b2c; _bb_locSrc=default; x-channel=web; _bb_bhid=; _bb_nhid=1723; _bb_vid=NjUyMTIzMjQ0NjAyNjI2Nzk4; _bb_dsevid=; _bb_dsid=; _bb_cid=14; _bb_aid=MzAxNzU2NDE5NQ==; csrftoken=w1dZEXxt0mEQKX0nIHaZkqLhDmBeWFoNaEhtsiAYJiTpT6zZSUar3QbgkjjetlcM; _bb_home_cache=0287af27.1.visitor; _bb_bb2.0=1; is_global=0; _bb_addressinfo=MjIuNjI4ODMwNHw4OC40MzExMjc1fFJhamFyaGF0fDcwMDA1MnxLb2xrYXRhfDF8ZmFsc2V8dHJ1ZXx0cnVlfEJpZ2Jhc2tldGVlcg==; _bb_pin_code=700052; _bb_sa_ids=16421; _is_tobacco_enabled=0; _is_bb1.0_supported=0; _bb_cda_sa_info=djIuY2RhX3NhLjEwMC4xNjQyMQ==; is_integrated_sa=1; bb2_enabled=true; ts=2025-03-26%2002:36:17.340; csurftoken=IVKzLA.NjUyMTIzMjQ0NjAyNjI2Nzk4.1742936777311.RVMuHy3GfEHyL694V+0C9lNOloZrR0iB1mGfYac0uOE=; ufi=1; bigbasket.com=6cc5697d-db24-45a4-9722-e2a40b0c3f1a; _gcl_au=1.1.995482043.1741792204; jarvis-id=ee807db4-9ff0-432a-9c0e-be3b2b5922d9; adb=0; _fbp=fb.1.1741792204246.62251282917562310; _ga_FRRYG5VKHX=GS1.1.1741792204.1.0.1741792204.60.0.0; _ga=GA1.2.1851803795.1741792204; _gid=GA1.2.1660596046.1741792204; _gat_UA-27455376-1=1; _bb_lat_long=MjIuNjI4ODMwNHw4OC40MzExMjc1",
+            "lat": 22.6288304,
+            "lon": 88.4311275,
             "headers": {
                 "accept": "*/*",
                 "accept-language": "en-US,en;q=0.9",
@@ -81,15 +44,16 @@
                 "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0",
                 "content-type": "application/json",
                 "x-channel": "BB-WEB",
-                "x-tracker": "66396a01-38a6-4713-83ee-25aacf00bd5f",
-                "Cookie": "x-entry-context-id=100; x-entry-context=bb-b2c; _bb_locSrc=default; x-channel=web; _bb_bhid=; _bb_nhid=1723; _bb_vid=NjQzNDkyMzQ3NzE5MjkwMDk0; _bb_dsevid=; _bb_dsid=; _bb_cid=14; _bb_aid=MzAxNzU2NDE5NQ==; csrftoken=mM0rO0nJnyxI0HWtdGIzOpm0p2vHClRlV52OujyS3ehFIPMqsnKK2Rkq1VHyi80A; _bb_home_cache=1fec6365.1.visitor; _bb_bb2.0=1; is_global=0; _bb_addressinfo=MjIuNjM1MDA2fDg4LjQzNzAwMDF8TmF6cnVsIElzbGFtIEF2ZW51ZXw3MDAwNTJ8S29sa2F0YXwxfGZhbHNlfHRydWV8dHJ1ZXxCaWdiYXNrZXRlZXI=; _bb_pin_code=700052; _bb_sa_ids=12970; _is_tobacco_enabled=1; _is_bb1.0_supported=0; _bb_cda_sa_info=djIuY2RhX3NhLjEwMC4xMjk3MA==; is_integrated_sa=1; bb2_enabled=true; ts=2025-03-20%2003:42:15.637; csurftoken=UFiDOw.NjQzNDkyMzQ3NzE5MjkwMDk0.1742422335614.39l85yT4d9/8o7OC1b+AJgjvd2ktPgkpJXqNBBCKSHs=; ufi=1; bigbasket.com=1fbae015-4a93-42db-9340-d83c1b7b85ba; _gcl_au=1.1.995482043.1741792204; jarvis-id=5844d1e9-9e4f-4d6f-a3f1-dc9a281566ca; adb=0; _fbp=fb.1.1741792204246.62251282917562310; _ga_FRRYG5VKHX=GS1.1.1741792204.1.0.1741792204.60.0.0; _ga=GA1.2.1851803795.1741792204; _gid=GA1.2.1660596046.1741792204; _gat_UA-27455376-1=1; _bb_lat_long=MjIuNjM1MDA2fDg4LjQzNzAwMDE=",
+                "x-tracker": "84f5d9b9-b1eb-4156-afc5-e89bb7881a0c",
+                "Cookie": "x-entry-context-id=100; x-entry-context=bb-b2c; _bb_locSrc=default; x-channel=web; _bb_bhid=; _bb_nhid=1723; _bb_vid=NjUyMTIzMjQ0NjAyNjI2Nzk4; _bb_dsevid=; _bb_dsid=; _bb_cid=14; _bb_aid=MzAxNzU2NDE5NQ==; csrftoken=w1dZEXxt0mEQKX0nIHaZkqLhDmBeWFoNaEhtsiAYJiTpT6zZSUar3QbgkjjetlcM; _bb_home_cache=0287af27.1.visitor; _bb_bb2.0=1; is_global=0; _bb_addressinfo=MjIuNjI4ODMwNHw4OC40MzExMjc1fFJhamFyaGF0fDcwMDA1MnxLb2xrYXRhfDF8ZmFsc2V8dHJ1ZXx0cnVlfEJpZ2Jhc2tldGVlcg==; _bb_pin_code=700052; _bb_sa_ids=16421; _is_tobacco_enabled=0; _is_bb1.0_supported=0; _bb_cda_sa_info=djIuY2RhX3NhLjEwMC4xNjQyMQ==; is_integrated_sa=1; bb2_enabled=true; ts=2025-03-26%2002:36:17.340; csurftoken=IVKzLA.NjUyMTIzMjQ0NjAyNjI2Nzk4.1742936777311.RVMuHy3GfEHyL694V+0C9lNOloZrR0iB1mGfYac0uOE=; ufi=1; bigbasket.com=6cc5697d-db24-45a4-9722-e2a40b0c3f1a; _gcl_au=1.1.995482043.1741792204; jarvis-id=ee807db4-9ff0-432a-9c0e-be3b2b5922d9; adb=0; _fbp=fb.1.1741792204246.62251282917562310; _ga_FRRYG5VKHX=GS1.1.1741792204.1.0.1741792204.60.0.0; _ga=GA1.2.1851803795.1741792204; _gid=GA1.2.1660596046.1741792204; _gat_UA-27455376-1=1; _bb_lat_long=MjIuNjI4ODMwNHw4OC40MzExMjc1",
                 "x-caller": "UI-KIRK",
-                "x-csurftoken": "UFiDOw.NjQzNDkyMzQ3NzE5MjkwMDk0.1742422335614.39l85yT4d9/8o7OC1b+AJgjvd2ktPgkpJXqNBBCKSHs=",
+                "x-csurftoken": "IVKzLA.NjUyMTIzMjQ0NjAyNjI2Nzk4.1742936777311.RVMuHy3GfEHyL694V+0C9lNOloZrR0iB1mGfYac0uOE=",
                 "x-entry-context": "bb-b2c",
                 "x-entry-context-id": "100",
                 "x-requested-with": "XMLHttpRequest",
                 "x-nextjs-data": "1"
-            }
+            },
+            "auth_key": "X92yrBIlr-aybXRxFnarG"
         }
     }
 }

@@ -26,6 +26,13 @@
             },
             {
                 "name": "Frooti Mango Drink",
+                "price": 100,
+                "url": "https://blinkit.com/prn/frooti-mango-drink-10-x-125-ml/prid/559556",
+                "quantity": "10 x 125 ml",
+                "image": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/a7a1c304-51ee-44e7-a510-6cc6c7b453e6.jpg?ts=1721645442"
+            },
+            {
+                "name": "Frooti Mango Drink",
                 "price": 40,
                 "url": "https://blinkit.com/prn/frooti-mango-drink/prid/18612",
                 "quantity": "600 ml",
@@ -37,41 +44,43 @@
                 "url": "https://blinkit.com/prn/frooti-mango-drink-18-l/prid/10536",
                 "quantity": "1.8 ltr",
                 "image": "https://cdn.grofers.com/da/cms-assets/cms/product/3f067e7d-9d9f-4cf9-8b2e-26c68a365058.jpg?ts=1739433581"
-            },
-            {
-                "name": "Frooti Mango Drink",
-                "price": 100,
-                "url": "https://blinkit.com/prn/frooti-mango-drink-10-x-125-ml/prid/559556",
-                "quantity": "10 x 125 ml",
-                "image": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/a7a1c304-51ee-44e7-a510-6cc6c7b453e6.jpg?ts=1721645442"
             }
         ],
         "mars cosmetics candylicious sheer lip gloss": [
             {
                 "name": "MARS Cosmetics Candylicious Sheer Lip Gloss",
-                "price": 240,
+                "price": 230,
                 "url": "https://blinkit.com/prn/mars-cosmetics-candylicious-sheer-lip-gloss-02tutti-frooti/prid/557057",
                 "quantity": "4 ml",
-                "image": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/0c6204d9-c212-4bd0-9894-ade7b4ef7903.jpg?ts=1719921233"
+                "image": "http://cdn.grofers.com/app/assets/products/sliding_images/jpeg/0c6204d9-c212-4bd0-9894-ade7b4ef7903.jpg?ts=1719921233"
             }
         ],
-        "mbdh wellness ignite alphonso mango chocolate bar for couples": [
+        "tang instant drink mix": [
             {
-                "name": "MBDH Wellness Ignite Alphonso Mango Chocolate Bar for Couples",
-                "price": 599,
-                "url": "https://blinkit.com/prn/mbdh-wellness-ignite-alphonso-mango-chocolate-bar-for-couples/prid/617979",
-                "quantity": "60 g",
-                "image": "https://cdn.grofers.com/da/cms-assets/cms/product/ba168daf-df9f-4304-909e-6f8da613346d.jpg"
+                "name": "Tang Instant Drink Mix",
+                "price": 159,
+                "url": "https://blinkit.com/prn/tang-instant-drink-mix-mango/prid/108942",
+                "quantity": "500 g",
+                "image": "https://cdn.grofers.com/da/cms-assets/cms/product/c23ba6d0-c703-4ace-86e3-2c856972ecf2.jpg?ts=1742275155"
+            }
+        ],
+        "paper boat aamras mango drink": [
+            {
+                "name": "paper boat Aamras Mango Drink",
+                "price": 39,
+                "url": "https://blinkit.com/prn/paper-boat-aamras-mango-drink/prid/5440",
+                "quantity": "200 ml",
+                "image": "https://cdn.grofers.com/da/cms-assets/cms/product/6d20d79f-c60f-4e2b-941e-f7375e3395ac.jpg?ts=1728485904"
             }
         ]
     },
     "credentials": {
         "BLINKIT": {
-            "device_id": "14091fa2-cdc2-4290-9824-203dc65983eb",
+            "device_id": "8a2982ed-4d4c-4c34-8a11-f187f9418638",
             "appversion": 52434332,
-            "cookies": "gr_1_deviceId=14091fa2-cdc2-4290-9824-203dc65983eb; city=; __cf_bm=oZW3TwQ9VgAwuGIpoovBWenv7D6H3lFSUPNhmBiE.n0-1742422326-1.0.1.1-dPNJNswkbdgYe4bwW0324LIUinAsOW4C4J6o4nO3.Kkq3y0mDsmZG4__DzetZOsyqDa3yykc4PFF.Ig9xNcWJLWe.XOAbI5DUmkYyOI25Ps; __cfruid=6f0e8223b5dab3cceca3f0375d2c28ef0a9f8b52-1742422326; _cfuvid=E9IkRY4EebaCZ_azIt6VYYuC2ybKqQMacqwuc8BG8mE-1742422326688-0.0.1.1-604800000",
-            "lat": 22.635006,
-            "lon": 88.4370001,
+            "cookies": "gr_1_deviceId=8a2982ed-4d4c-4c34-8a11-f187f9418638; city=Belize City; __cf_bm=8jjBJ6mT6mtopi4OAig2aVGPr.WtTX9YzydJRVOYf3I-1742936755-1.0.1.1-y1nhOhTGxg9DkzV2yO2UTT_QhPrdLHUd1HlUEscGVjk6Vb2ro79Q7EkRSiidATDnxibwipvj_1EamnROqKfIIzHsCKuzVneT0hSP9hjk0ac; __cfruid=b9ea3bcf035b32687c42e394c2b658720648ef09-1742936755; _cfuvid=e566DmIqDDKRNQbIAitcAISr5aq76X0Ly0Lal3kM.fE-1742936755307-0.0.1.1-604800000",
+            "lat": 22.6288304,
+            "lon": 88.4311275,
             "auth_key": "c761ec3633c22afad934fb17a66385c1c06c5472b4898b866b7306186d0bb477"
         }
     }

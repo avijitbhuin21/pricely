@@ -1,0 +1,105 @@
+{
+    "data": [
+        {
+            "name": "Frooti Mango Drink",
+            "quantity": "10 x 125 ml",
+            "image_url": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/a7a1c304-51ee-44e7-a510-6cc6c7b453e6.jpg?ts=1721645442",
+            "buy_button": {
+                "blinkit": {
+                    "price": 100,
+                    "url": "https://blinkit.com/prn/frooti-mango-drink-10-x-125-ml/prid/559556"
+                },
+                "Instamart": {
+                    "price": 150,
+                    "url": "https://www.swiggy.com/instamart/item/XQJ3WQRC2F?storeId=867466"
+                }
+            }
+        },
+        {
+            "name": "Frooti Mango Drink",
+            "quantity": "125 ml",
+            "image_url": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/e24eda9c-3cc7-4e66-bc2b-80383eb85a80.jpg?ts=1715152398",
+            "buy_button": {
+                "blinkit": {
+                    "price": 10,
+                    "url": "https://blinkit.com/prn/frooti-mango-drink/prid/500868"
+                }
+            }
+        },
+        {
+            "name": "Frooti Mango Drink",
+            "quantity": "600 ml",
+            "image_url": "https://cdn.grofers.com/app/assets/products/sliding_images/jpeg/6c428434-df61-41a1-886a-802a41269705.jpg?ts=1715152371",
+            "buy_button": {
+                "blinkit": {
+                    "price": 40,
+                    "url": "https://blinkit.com/prn/frooti-mango-drink/prid/18612"
+                }
+            }
+        },
+        {
+            "name": "Frooti Mango Drink",
+            "quantity": "1.8 ltr",
+            "image_url": "https://cdn.grofers.com/da/cms-assets/cms/product/3f067e7d-9d9f-4cf9-8b2e-26c68a365058.jpg?ts=1739433581",
+            "buy_button": {
+                "blinkit": {
+                    "price": 100,
+                    "url": "https://blinkit.com/prn/frooti-mango-drink-18-l/prid/10536"
+                }
+            }
+        },
+        {
+            "name": "Frooti Mango Fruit Drink Tetra",
+            "quantity": "10 pieces",
+            "image_url": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/19ed1cd1-4cc2-4a04-bf40-ce819b875ee7_softdrinks-juiceandsoda_3TQI792U18_MN.png",
+            "buy_button": {
+                "Instamart": {
+                    "price": 90,
+                    "url": "https://www.swiggy.com/instamart/item/RZRJ0IUI3H?storeId=867466"
+                }
+            }
+        },
+        {
+            "name": "Frooti Soft Drink Bottle",
+            "quantity": "1.2 L",
+            "image_url": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/5987050f-5e83-4449-a8de-34c975c3b38d_softdrinks-juiceandsoda_GJPCXX5271_MN.png",
+            "buy_button": {
+                "Instamart": {
+                    "price": 69,
+                    "url": "https://www.swiggy.com/instamart/item/3X0YDUXSQ7?storeId=867466"
+                }
+            }
+        },
+        {
+            "name": "Frooti CP Pack",
+            "quantity": "125 ml",
+            "image_url": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/7/31/949eabf0-c23c-4643-9fde-a5d958831d0c_softdrinks-juiceandsoda_9GGAO0NB06_MN.png",
+            "buy_button": {
+                "Instamart": {
+                    "price": 100,
+                    "url": "https://www.swiggy.com/instamart/item/ZQAS1LNRZX?storeId=867466"
+                }
+            }
+        }
+    ],
+    "credentials": {
+        "ZEPTO": {
+            "storeId": "ab3bee45-6ef0-4dbe-bf5f-253d0817ceb5"
+        },
+        "BIGBASKET": {},
+        "BLINKIT": {
+            "device_id": "2f134c92-5b09-4ba0-8e6f-19835b6a81dd",
+            "appversion": 52434332,
+            "cookies": "gr_1_deviceId=2f134c92-5b09-4ba0-8e6f-19835b6a81dd; city=Johannesburg; __cf_bm=7uPzkhDevG0hN9HDz8Hdaa2LJCjfzRKKVVVox_si.kQ-1742779798-1.0.1.1-W4ivyxo8xvC20ZApwNbx2GZ.EGwzNiOSJxv0eu0SmZJeizWsiZSlrZm300uaFBIv2Y7jC3FBqj9ONwPNv_Ws8Js9T3nMVcAOxsABmJSlG6Q; __cfruid=6c21cb38c582ef550462cee0b8c5211f4cdd62fd-1742779798; _cfuvid=A.kRXFXxpm.WhYgAAszpFR6SjcVyC.jNuup_nFblcNM-1742779798193-0.0.1.1-604800000",
+            "lat": 22.635006,
+            "lon": 88.4370001,
+            "auth_key": "c761ec3633c22afad934fb17a66385c1c06c5472b4898b866b7306186d0bb477"
+        },
+        "INSTAMART": {
+            "cookies": "deviceId=s%3A588b761c-215d-4d57-9fa9-9adb94286835.mBjyy%2BMalZChzDNdEg6VC8IkqE9DJ6ZQCyGAQRyhVuQ; tid=s%3Ad706f403-f818-4d0d-96f9-c40fd1aa2b7c.kgy01Tjs%2BfxeOjGLgbNdR9Q2BkobuxYIEX5us1osvhw; sid=s%3Ajmuedeea-1c8c-42be-8491-2b3063572e6f.Ls%2FqQH7rK%2BB8I1Wyw5bWpY%2BTH1eKdToCs5GzAuiCi2I; versionCode=1200; platform=web; subplatform=dweb; statusBarHeight=0; bottomOffset=0; genieTrackOn=false; ally-on=false; isNative=false; strId=; openIMHP=false; webBottomBarHeight=0; imOrderAttribution={%22entryId%22:%22BANNER-undefined%22%2C%22entryName%22:%22store-menu-items-instamart%22}; userLocation=%7B%27lat%27%3A%2022.635006%2C%20%27lng%27%3A%2088.4370001%2C%20%27address%27%3A%20%27Kaikhali%20Main%20Rd%2C%20Kaikhali%2C%20West%20Bengal%20700052%2C%20India%27%2C%20%27id%27%3A%20%27%27%2C%20%27annotation%27%3A%20%27Kaikhali%20Main%20Rd%2C%20Kaikhali%2C%20West%20Bengal%20700052%2C%20India%27%2C%20%27name%27%3A%20%27%27%7D",
+            "primary_store": "867466",
+            "secondary_store": ""
+        },
+        "DMART": {}
+    }
+}

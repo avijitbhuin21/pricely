@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 import random
 import json
+import urllib.parse
 
 # LOCAL IMPORTS
 from .universal_function import *
@@ -2064,13 +2065,14 @@ def get_address_info_varifiers(cookies, headers, session_id):
                     params=params,
                     headers=headers
                 )
+            auth_key = response.text.split(',"buildId":"')[-1].split('",')[0]
             
             if 'Zr-Cookies' in dict(response.headers):
                 cookies.update(parse_cookies(dict(response.headers)['Zr-Cookies']))
                 log_debug(cookies, "BigBasket Cookies")
                 
             log_debug(parse_cookies(dict(response.headers)['Zr-Cookies']), "BigBasket address info")
-            return headers, cookies
+            return headers, cookies, auth_key
             
         except Exception as e:
             log_debug(f"Failed to verify address: {str(e)}", "BigBasket", "ERROR")
@@ -2185,7 +2187,7 @@ def get_Bigbasket_Credentials(location_data):
 
     xx = get_address_info_varifiers(cookies, headers, session_id)
     if xx != False:
-        h,c = xx
+        h,c,a = xx
         headers.update(h)
         cookies.update(c)
     else:
@@ -2200,6 +2202,7 @@ def get_Bigbasket_Credentials(location_data):
         'lat': location_data['results'][0]['geometry']['location']['lat'],
         'lon': location_data['results'][0]['geometry']['location']['lng'],
         'headers': headers,
+        "auth_key": a
     }
     return data
         
@@ -2229,8 +2232,6 @@ def format_bigbasket_data(data):
     return final_data
 
 def search_bigbasket(item_name, location_data, credentials = None):
-    if location_data['results'][0]['address_components'][1]['long_name'] not in dmart_cities:
-        return {"data": {}, "credentials": {}}
 
     credentials = get_Bigbasket_Credentials(location_data) if credentials is None else credentials
 
@@ -2241,6 +2242,7 @@ def search_bigbasket(item_name, location_data, credentials = None):
             data = credentials['BigBasket']
             auth_string = data['auth_string']
             headers = data['headers']
+            auth_key = data['auth_key']
 
             new_headers = {
                 'accept': '*/*',
@@ -2251,7 +2253,7 @@ def search_bigbasket(item_name, location_data, credentials = None):
             headers.update(new_headers)
 
             params = {
-                'url': f'https://www.bigbasket.com/_next/data/cn6n8UImd8SJt5t_wj2Jd/ps.json?q={urllib.parse.quote(item_name)}&nc=as&listing=ps',
+                'url': f'https://www.bigbasket.com/_next/data/{auth_key}/ps.json?q={urllib.parse.quote(item_name)}&nc=as&listing=ps',
                 'apikey': os.getenv('ZENROWS_API_KEY', ''),
                 'custom_headers': 'true',
             }
@@ -2261,7 +2263,9 @@ def search_bigbasket(item_name, location_data, credentials = None):
                 headers=headers,
                 params=params,
             )
-            log_debug(response.json(), "BigBasket")
+            log_debug(response.status_code, "BigBasket_status")
+            if response.status_code == 404:
+                return {"data": {}, "credentials": {}}
             return format_bigbasket_data({"data": response.json(), "credentials": credentials})
         
         except requests.RequestException as e:
