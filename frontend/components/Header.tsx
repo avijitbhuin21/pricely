@@ -14,7 +14,17 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { HeaderProps, Location } from '../types';
 import { useNavigation } from '@react-navigation/native';
-import { useLocation } from '../contexts/LocationContext';
+
+type NominatimResult = {
+  place_id: number;
+  display_name: string;
+  address: {
+    city?: string;
+    town?: string;
+    state?: string;
+    country?: string;
+  };
+}
 
 const AUTO_LOCATE: Location = { 
   id: 'auto', 
@@ -29,7 +39,6 @@ const Header: React.FC<HeaderProps> = ({
   onAutoLocate,
 }): React.ReactElement => {
   const navigation = useNavigation();
-  const { searchLocations: searchLocationsFromContext } = useLocation();
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Location[]>([AUTO_LOCATE]);
@@ -44,17 +53,35 @@ const Header: React.FC<HeaderProps> = ({
 
     setIsLoading(true);
     try {
-      const results = await searchLocationsFromContext(query);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'RentalApp/1.0'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
+      const results = await response.json();
+
       if (Array.isArray(results)) {
-        const locationResults = results.map((item) => ({
-          id: item.id,
-          name: item.description.split(',')[0],
-          fullName: item.description
+        const locationResults = results.map((item: NominatimResult) => ({
+          id: String(item.place_id),
+          name: item.address?.city ||
+                item.address?.town ||
+                item.address?.state ||
+                item.address?.country ||
+                item.display_name.split(',')[0],
+          fullName: item.display_name
         }));
 
-        setSearchResults(locationResults.length > 0
-          ? [AUTO_LOCATE, ...locationResults]
+        setSearchResults(locationResults.length > 0 
+          ? [AUTO_LOCATE, ...locationResults] 
           : [AUTO_LOCATE]
         );
       } else {
@@ -82,14 +109,10 @@ const Header: React.FC<HeaderProps> = ({
     if (location.isAutoLocate) {
       onAutoLocate();
     } else {
-      // Extract the main location name from the full description
-      // Google Places results have descriptions like "New York, NY, USA"
-      const mainLocationName = location.name.split(',')[0].trim();
-      onLocationSelect(mainLocationName);
+      onLocationSelect(location.name);
     }
     setLocationModalVisible(false);
     setSearchQuery('');
-    setSearchResults([AUTO_LOCATE]); // Reset search results
   };
 
   const handleProfilePress = () => {
@@ -160,12 +183,12 @@ const Header: React.FC<HeaderProps> = ({
           <Ionicons
             name={currentLocation === 'Detecting location...' ? "locate" : "location"}
             size={18}
-            color={currentLocation === 'Detecting location...' ? "#000" : "#fff"}
+            color={currentLocation === 'Detecting location...' ? "#007AFF" : "#80e5ff"}
           />
           <Text
             style={[
               styles.locationText,
-              currentLocation === 'Detecting location...' && { color: '#000' }
+              currentLocation === 'Detecting location...' && { color: '#007AFF' }
             ]}
             numberOfLines={1}
           >
@@ -315,21 +338,21 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   pulsingLocationButton: {
-    backgroundColor: 'rgb(255, 255, 255)',
-    borderColor: 'rgba(225, 0, 255, 0.71)',
+    backgroundColor: 'rgba(0, 122, 255, 0.15)',
+    borderColor: 'rgba(0, 122, 255, 0.3)',
   },
   locationText: {
     marginHorizontal: 6,
     fontSize: 14,
     color: '#ffffff',
     maxWidth: WINDOW_WIDTH * 0.25,
-    textShadowColor: 'rgba(255, 255, 255, 0.75)',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {
