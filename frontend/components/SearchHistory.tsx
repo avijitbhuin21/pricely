@@ -1,53 +1,63 @@
 // SearchHistory.tsx
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Image, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SearchHistoryProps } from '../types';
 
-const ITEM_HEIGHT = 48; // height of a single search history item
+// Style constants
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const VISIBLE_ITEMS = 3;
+const ITEM_WIDTH = Math.floor((SCREEN_WIDTH - 65) / VISIBLE_ITEMS);
+const ITEM_MARGIN = 4;
 
-const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress, onClearHistory, onDeleteSearch }) => {
+export interface SearchHistoryProps {
+  searches: Array<{
+    query: string;
+    imageUrl?: string;
+  }>;
+  onSearchPress: (query: string) => void;
+}
+
+const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress }) => {
   if (searches.length === 0) return null;
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Recent Searches</Text>
-        <TouchableOpacity
-          onPress={onClearHistory}
-          style={styles.clearButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Text style={styles.clearButtonText}>Clear All</Text>
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.title}>Recent Searches</Text>
       <ScrollView 
-        style={[styles.historyList, { maxHeight: searches.length > 3 ? ITEM_HEIGHT * 3 : 'auto' }]}
-        showsVerticalScrollIndicator={true}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.carouselContainer}
+        snapToInterval={ITEM_WIDTH}
+        decelerationRate="fast"
+        pagingEnabled
       >
-        {searches.map((item, index) => (
+        {[...searches].reverse().map((item, index) => (
           <Pressable
             key={index}
-            style={({ pressed }) => [
+            style={[
               styles.historyItem,
-              pressed && styles.historyItemPressed
+              { width: ITEM_WIDTH - ITEM_MARGIN * 2 }
             ]}
-            onPress={() => onSearchPress(item)}
-            android_ripple={{ color: 'rgba(232, 9, 156, 0.1)' }}
+            onPress={() => onSearchPress(item.query)}
           >
-            <View style={styles.historyItemContent}>
-              <Ionicons name="time-outline" size={20} color="#666" />
-              <Text style={styles.historyText} numberOfLines={1} ellipsizeMode="tail">
-                {item}
+            <View style={styles.imageContainer}>
+              {item.imageUrl ? (
+                <Image 
+                  source={{ uri: item.imageUrl }} 
+                  style={styles.historyImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={styles.placeholderImage}>
+                  <Ionicons name="image-outline" size={24} color="#666" />
+                </View>
+              )}
+            </View>
+            <View style={styles.textContainer}>
+              <Text style={styles.historyText} numberOfLines={2} ellipsizeMode="tail">
+                {item.query}
               </Text>
             </View>
-            <TouchableOpacity
-              onPress={() => onDeleteSearch(item)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              style={styles.deleteButton}
-            >
-              <Ionicons name="close-outline" size={20} color="#666" />
-            </TouchableOpacity>
           </Pressable>
         ))}
       </ScrollView>
@@ -57,7 +67,7 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress, 
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 8,
     backgroundColor: '#fff',
     borderRadius: 12,
     elevation: 3,
@@ -65,55 +75,57 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
+    marginHorizontal: 4,
   },
   title: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
+    marginBottom: 20,
+    marginLeft: 8,
   },
-  clearButton: {
-    padding: 8,
-  },
-  clearButtonText: {
-    color: '#E8099C',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  historyList: {
-    width: '100%',
+  carouselContainer: {
+    paddingHorizontal: 4,
   },
   historyItem: {
-    flexDirection: 'row',
     alignItems: 'center',
-    height: ITEM_HEIGHT,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    justifyContent: 'space-between',
+    padding: 8,
+    marginHorizontal: 4,
+    backgroundColor: 'transparent',
+    borderRadius: 16,
   },
-  historyItemPressed: {
-    backgroundColor: 'rgba(232, 9, 156, 0.05)',
-  },
-  historyItemContent: {
-    flexDirection: 'row',
+  imageContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
-    marginRight: 12,
+    overflow: 'hidden',
+    marginVertical: 10,
+    borderWidth: 2,
+    borderColor: '#E8099C',
+  },
+  placeholderImage: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#transparent',
+  },
+  historyImage: {
+    width: '100%',
+    height: '100%',
+  },
+  textContainer: {
+    alignItems: 'center',
+    width: '100%',
   },
   historyText: {
-    marginLeft: 12,
     fontSize: 16,
     color: '#333',
-    flex: 1,
-  },
-  deleteButton: {
-    padding: 8,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
 

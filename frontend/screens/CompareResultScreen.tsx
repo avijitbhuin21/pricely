@@ -16,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useNavigation, NavigationProp, useRoute, RouteProp } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
 import Footer from '../components/Footer';
@@ -50,7 +50,7 @@ interface CompareResultItem {
 const ComparisonCard: React.FC<{
   item: CompareResultItem;
   opacity: Animated.Value;
-  onAddToCart: (shopName: string, price: string, remove: boolean) => void;
+  onAddToCart: (item: CompareResultItem, shopName: string, price: string, remove: boolean) => void;
   isInCart: (shopId: string) => boolean;
   style?: any;
 }> = ({ item, opacity, onAddToCart, isInCart, style }) => {
@@ -59,7 +59,7 @@ const ComparisonCard: React.FC<{
   const handleAddAllItems = () => {
     const shouldRemove = areAllItemsInCart;
     item.shops.forEach(shop => {
-      onAddToCart(shop.name, shop.price, shouldRemove);
+      onAddToCart(item, shop.name, shop.price, shouldRemove);
     });
   };
 
@@ -99,7 +99,7 @@ const ComparisonCard: React.FC<{
                   <Text style={styles.price}>₹{shop.price}</Text>
                   {isInCart(`${item.id}-${shop.name}`) ? (
                     <TouchableOpacity
-                      onPress={() => onAddToCart(shop.name, shop.price, true)}
+                      onPress={() => onAddToCart(item, shop.name, shop.price, true)}
                       style={styles.button}
                     >
                       <LinearGradient
@@ -113,7 +113,7 @@ const ComparisonCard: React.FC<{
                     </TouchableOpacity>
                   ) : (
                     <TouchableOpacity
-                      onPress={() => onAddToCart(shop.name, shop.price, false)}
+                      onPress={() => onAddToCart(item, shop.name, shop.price, false)}
                       style={styles.button}
                     >
                       <LinearGradient
@@ -160,6 +160,7 @@ const getShopLogo = (shopName: string): ImageSourcePropType => {
 
 export default function CompareResultScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'CompareResult'>>();
   const { currentLocation, updateLocation, autoLocate } = useLocation();
   const { addToCart, removeFromCart, isInCart } = useCart();
   const [compareData, setCompareData] = useState<CompareResultItem[]>([]);
@@ -171,6 +172,13 @@ export default function CompareResultScreen() {
   useEffect(() => {
     fetchComparisonData();
   }, []);
+
+  useEffect(() => {
+    if (compareData.length > 0 && route.params?.onSearchComplete) {
+      const firstProductImage = compareData[0].image;
+      route.params.onSearchComplete(firstProductImage);
+    }
+  }, [compareData, route.params?.onSearchComplete]);
 
   const fetchComparisonData = () => {
     try {
@@ -204,12 +212,20 @@ export default function CompareResultScreen() {
         position: 'bottom',
       });
     } else {
+      // Capitalize shop name to match Cart screen's vendor names
+      let capitalizedShopName = shopName.charAt(0).toUpperCase() + shopName.slice(1);
+      // Fix case for special vendor names
+      if (capitalizedShopName === "Dmart") {
+        capitalizedShopName = "DMart";
+      } else if (capitalizedShopName === "Bigbasket") {
+        capitalizedShopName = "BigBasket";
+      }
       addToCart({
         id: `${item.id}-${shopName}`,
         name: item.name,
         image: item.image,
         quantity: item.quantity,
-        shopName: shopName,
+        shopName: capitalizedShopName,
         price: price,
         url: item.shops.find(shop => shop.name === shopName)?.link || ''
       });
@@ -251,7 +267,7 @@ export default function CompareResultScreen() {
           <ComparisonCard
             item={compareData[i]}
             opacity={fadeAnims[i] || new Animated.Value(1)}
-            onAddToCart={(shopName, price, remove) => handleCartAction(compareData[i], shopName, price, remove)}
+            onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
             isInCart={isInCart}
             style={cardStyle}
           />
@@ -259,7 +275,7 @@ export default function CompareResultScreen() {
             <ComparisonCard
               item={compareData[i + 1]}
               opacity={fadeAnims[i + 1] || new Animated.Value(1)}
-              onAddToCart={(shopName, price, remove) => handleCartAction(compareData[i + 1], shopName, price, remove)}
+              onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
               isInCart={isInCart}
               style={cardStyle}
             />
