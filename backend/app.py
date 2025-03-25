@@ -1,9 +1,12 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import os
 from pyngrok import ngrok
 import uvicorn
 
+# LOCAL IMPORTS
+from utils.main_functions import get_api_key
 
 load_dotenv()
 
@@ -23,7 +26,7 @@ async def get_search_results():
 
 @app.post("/get-api-key")
 async def get_api_key():
-    pass
+    return JSONResponse(content={"api_key": get_api_key()})
 
 def main():
     ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))  # Replace with your Ngrok auth token
