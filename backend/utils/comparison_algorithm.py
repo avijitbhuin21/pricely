@@ -283,7 +283,8 @@ def group_similar_products(products):
 
 def format_output(grouped_products, store_credentials):
     """Format the output as required."""
-    result_data = []
+    # Process each group and calculate the platform count
+    product_groups_with_count = []
     
     for group in grouped_products:
         if not group:
@@ -300,9 +301,12 @@ def format_output(grouped_products, store_credentials):
             "buy_button": {}
         }
         
-        # Add buy buttons for each store
+        # Count unique platforms and add buy buttons for each store
+        unique_platforms = set()
         for product in group:
             store_name = product['store'].lower()
+            unique_platforms.add(store_name)
+            
             formatted_store_name = store_name.capitalize() if store_name != 'instamart' else 'Instamart'
             if store_name == 'bigbasket':
                 formatted_store_name = 'BIGBASKET'
@@ -318,7 +322,14 @@ def format_output(grouped_products, store_credentials):
                 "url": product['url']
             }
         
-        result_data.append(product_entry)
+        # Add the group with its platform count
+        product_groups_with_count.append((product_entry, len(unique_platforms)))
+    
+    # Sort groups by platform count (descending)
+    product_groups_with_count.sort(key=lambda x: x[1], reverse=True)
+    
+    # Take only the top 30 items
+    top_30_products = [item[0] for item in product_groups_with_count[:30]]
     
     # Ensure all stores have credentials in the output, even if empty
     all_credentials = {
@@ -330,7 +341,7 @@ def format_output(grouped_products, store_credentials):
     }
     
     return {
-        "data": result_data,
+        "data": top_30_products,
         "credentials": all_credentials
     }
 

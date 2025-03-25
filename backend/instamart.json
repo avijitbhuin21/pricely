@@ -17,20 +17,6 @@
             },
             {
                 "name": "Frooti Mango Fruit Drink Tetra",
-                "price": 90,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/19ed1cd1-4cc2-4a04-bf40-ce819b875ee7_softdrinks-juiceandsoda_3TQI792U18_MN.png",
-                "quantity": "10 pieces",
-                "url": "https://www.swiggy.com/instamart/item/RZRJ0IUI3H?storeId=867466"
-            },
-            {
-                "name": "Frooti Mango Fruit Drink Tetra",
-                "price": 10,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/87a077ce-bcbb-4c20-a78b-8cc8a37f6227_softdrinks-juiceandsoda_YS1N3MVV4J_MN.png",
-                "quantity": "125 ml",
-                "url": "https://www.swiggy.com/instamart/item/RZRJ0IUI3H?storeId=867466"
-            },
-            {
-                "name": "Frooti Mango Fruit Drink Tetra",
                 "price": 39,
                 "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/1/22/3a7e1756-d0c8-4581-87e7-4a181fcacc72_352938.png",
                 "quantity": "4 pieces",
@@ -47,24 +33,24 @@
         "frooti soft drink bottle": [
             {
                 "name": "Frooti Soft Drink Bottle",
-                "price": 164,
+                "price": 69,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/5987050f-5e83-4449-a8de-34c975c3b38d_softdrinks-juiceandsoda_GJPCXX5271_MN.png",
+                "quantity": "1.2 L",
+                "url": "https://www.swiggy.com/instamart/item/3X0YDUXSQ7?storeId=867466"
+            },
+            {
+                "name": "Frooti Soft Drink Bottle",
+                "price": 182,
                 "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/2ce584ad-b98c-4f7b-b2c4-c8d2f241ca8d_softdrinks-juiceandsoda_7BV6NTTTFS_MN.png",
                 "quantity": "2 pieces",
                 "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
             },
             {
                 "name": "Frooti Soft Drink Bottle",
-                "price": 83,
+                "price": 92,
                 "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/63d381a04a2e44ed73c36b027db6120b",
                 "quantity": "1.8 L",
                 "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
-            },
-            {
-                "name": "Frooti Soft Drink Bottle",
-                "price": 69,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/5987050f-5e83-4449-a8de-34c975c3b38d_softdrinks-juiceandsoda_GJPCXX5271_MN.png",
-                "quantity": "1.2 L",
-                "url": "https://www.swiggy.com/instamart/item/3X0YDUXSQ7?storeId=867466"
             },
             {
                 "name": "Frooti Soft Drink Bottle",
@@ -96,6 +82,27 @@
             },
             {
                 "name": "Frooti Soft Drink Bottle",
+                "price": 69,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/5987050f-5e83-4449-a8de-34c975c3b38d_softdrinks-juiceandsoda_GJPCXX5271_MN.png",
+                "quantity": "1.2 L",
+                "url": "https://www.swiggy.com/instamart/item/3X0YDUXSQ7?storeId=867466"
+            },
+            {
+                "name": "Frooti Soft Drink Bottle",
+                "price": 182,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/2ce584ad-b98c-4f7b-b2c4-c8d2f241ca8d_softdrinks-juiceandsoda_7BV6NTTTFS_MN.png",
+                "quantity": "2 pieces",
+                "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
+            },
+            {
+                "name": "Frooti Soft Drink Bottle",
+                "price": 92,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/63d381a04a2e44ed73c36b027db6120b",
+                "quantity": "1.8 L",
+                "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
+            },
+            {
+                "name": "Frooti Soft Drink Bottle",
                 "price": 228,
                 "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/5f1e61f9446a7f5c67e2028ef9143be1",
                 "quantity": "6 pieces",
@@ -124,31 +131,35 @@
             },
             {
                 "name": "Frooti Soft Drink Bottle",
-                "price": 69,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/5987050f-5e83-4449-a8de-34c975c3b38d_softdrinks-juiceandsoda_GJPCXX5271_MN.png",
-                "quantity": "1.2 L",
-                "url": "https://www.swiggy.com/instamart/item/3X0YDUXSQ7?storeId=867466"
-            },
-            {
-                "name": "Frooti Soft Drink Bottle",
-                "price": 164,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/2ce584ad-b98c-4f7b-b2c4-c8d2f241ca8d_softdrinks-juiceandsoda_7BV6NTTTFS_MN.png",
-                "quantity": "2 pieces",
-                "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
-            },
-            {
-                "name": "Frooti Soft Drink Bottle",
-                "price": 83,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/63d381a04a2e44ed73c36b027db6120b",
-                "quantity": "1.8 L",
-                "url": "https://www.swiggy.com/instamart/item/Y4KM9RAE2V?storeId=867466"
-            },
-            {
-                "name": "Frooti Soft Drink Bottle",
                 "price": 160,
                 "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/1/22/cbbc8586-1dd8-438b-aab6-0b3341cf57af_266318.png",
                 "quantity": "8 pieces",
                 "url": "https://www.swiggy.com/instamart/item/0Q0QCKU48R?storeId=867466"
+            }
+        ],
+        "appy apple drink": [
+            {
+                "name": "Appy Apple Drink",
+                "price": 95,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/6/26/6bfad725-86ac-43d4-a32c-b84cb7d5bab1_softdrinksjuiceandsoda_0Y4V3M2444_MN.png",
+                "quantity": "10 pieces",
+                "url": "https://www.swiggy.com/instamart/item/5JGJ9TNE1T?storeId=867466"
+            },
+            {
+                "name": "Appy Apple Drink",
+                "price": 10,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/bf97e97d-d7f2-4419-a0ad-8221f79331c4_softdrinks-juiceandsoda_FKT1BY41FN_MN.png",
+                "quantity": "125 ml",
+                "url": "https://www.swiggy.com/instamart/item/5JGJ9TNE1T?storeId=867466"
+            }
+        ],
+        "paper boat aamras fruit drink": [
+            {
+                "name": "Paper Boat Aamras Fruit Drink",
+                "price": 38,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/155f093141d60633d76be408f518431f",
+                "quantity": "200 ml",
+                "url": "https://www.swiggy.com/instamart/item/4T7LYOWQFA?storeId=867466"
             }
         ],
         "frooti soft drink": [
@@ -195,40 +206,6 @@
                 "url": "https://www.swiggy.com/instamart/item/3XPAOKB6I7?storeId=867466"
             }
         ],
-        "frooti cp pack": [
-            {
-                "name": "Frooti CP Pack",
-                "price": 100,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/7/31/949eabf0-c23c-4643-9fde-a5d958831d0c_softdrinks-juiceandsoda_9GGAO0NB06_MN.png",
-                "quantity": "125 ml",
-                "url": "https://www.swiggy.com/instamart/item/ZQAS1LNRZX?storeId=867466"
-            }
-        ],
-        "appy apple drink": [
-            {
-                "name": "Appy Apple Drink",
-                "price": 95,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/6/26/6bfad725-86ac-43d4-a32c-b84cb7d5bab1_softdrinksjuiceandsoda_0Y4V3M2444_MN.png",
-                "quantity": "10 pieces",
-                "url": "https://www.swiggy.com/instamart/item/5JGJ9TNE1T?storeId=867466"
-            },
-            {
-                "name": "Appy Apple Drink",
-                "price": 10,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/5/10/bf97e97d-d7f2-4419-a0ad-8221f79331c4_softdrinks-juiceandsoda_FKT1BY41FN_MN.png",
-                "quantity": "125 ml",
-                "url": "https://www.swiggy.com/instamart/item/5JGJ9TNE1T?storeId=867466"
-            }
-        ],
-        "paper boat aamras fruit drink": [
-            {
-                "name": "Paper Boat Aamras Fruit Drink",
-                "price": 38,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/155f093141d60633d76be408f518431f",
-                "quantity": "200 ml",
-                "url": "https://www.swiggy.com/instamart/item/4T7LYOWQFA?storeId=867466"
-            }
-        ],
         "real fruit juice": [
             {
                 "name": "Real Fruit Juice, Alphonso Mango",
@@ -245,29 +222,13 @@
                 "url": "https://www.swiggy.com/instamart/item/SZVL9FCQAL?storeId=867466"
             }
         ],
-        "slice mango drink": [
+        "utopian orange superrr juice with honey": [
             {
-                "name": "Slice Mango Drink",
-                "price": 172,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/7/20/6adaf224-fca2-47e1-93fc-18f4389a8f8d_softdrinks-juiceandsoda_UZ0U5KJ6HP_MN.png",
-                "quantity": "2 pack",
-                "url": "https://www.swiggy.com/instamart/item/80LB6NHWRU?storeId=867466"
-            },
-            {
-                "name": "Slice Mango Drink",
-                "price": 87,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/7/20/216a7c76-229b-4e89-9871-6e63d33a243d_softdrinks-juiceandsoda_XBACOZOO2J_MN.png",
-                "quantity": "1.75 L",
-                "url": "https://www.swiggy.com/instamart/item/80LB6NHWRU?storeId=867466"
-            }
-        ],
-        "real fruit power mango juice": [
-            {
-                "name": "Real Fruit Power Mango Juice (Tetra Pack)",
-                "price": 103,
-                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/8/2/75a5c499-beea-4e5b-8a93-36a823226186_1413_1.png",
-                "quantity": "1 L",
-                "url": "https://www.swiggy.com/instamart/item/1S6GC9VTJM?storeId=867466"
+                "name": "Utopian Orange Superrr Juice With Honey",
+                "price": 50,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/1/12/05e996a0-ba20-4107-aaf7-c692489cfd2d_214556_1.png",
+                "quantity": "200 ml",
+                "url": "https://www.swiggy.com/instamart/item/ST93INO8Q8?storeId=867466"
             }
         ],
         "paper boat aamras mango drink": [
@@ -285,11 +246,38 @@
                 "quantity": "1 L",
                 "url": "https://www.swiggy.com/instamart/item/MLBEJ140H1?storeId=867466"
             }
+        ],
+        "utopian mango superrr juice with honey": [
+            {
+                "name": "Utopian Mango Superrr Juice With Honey",
+                "price": 50,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2025/1/12/f52310cc-796a-44d1-8029-8a5a5a6b3559_793407_1.png",
+                "quantity": "200 ml",
+                "url": "https://www.swiggy.com/instamart/item/ZAYBM8DVB1?storeId=867466"
+            }
+        ],
+        "frooti cp pack": [
+            {
+                "name": "Frooti CP Pack",
+                "price": 100,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/7/31/949eabf0-c23c-4643-9fde-a5d958831d0c_softdrinks-juiceandsoda_9GGAO0NB06_MN.png",
+                "quantity": "125 ml",
+                "url": "https://www.swiggy.com/instamart/item/ZQAS1LNRZX?storeId=867466"
+            }
+        ],
+        "tropicana mango delight juice": [
+            {
+                "name": "Tropicana Mango Delight Juice (Tetra Pack)",
+                "price": 85,
+                "image": "https://instamart-media-assets.swiggy.com/swiggy/image/upload/NI_CATALOG/IMAGES/CIW/2024/10/23/8835b133-e31a-4ab2-aa88-33e5b59cceec_219_1.png",
+                "quantity": "1 L",
+                "url": "https://www.swiggy.com/instamart/item/SKUETR5V2Y?storeId=867466"
+            }
         ]
     },
     "credentials": {
         "INSTAMART": {
-            "cookies": "deviceId=s%3Ac5a591f5-dfd7-4989-b9ce-3de1d6f38311.W2rHRTK4QKShBPL%2FNIwymFdBNKzbjHQp37VCMOpkjNA; tid=s%3A68cffa11-78dd-4515-8293-a78a6eb412f1.LeNRvz0FgkmVrteyqHOtA%2F9jeCNIYJAzhdIWPz4v2qM; sid=s%3Ajmua1dd7-0a6c-469b-aece-86b7a662c8a6.m6gkX0U59EQd%2BMXXPb8AdN1iZLOmy%2F0uKz0u6N2J7oM; versionCode=1200; platform=web; subplatform=dweb; statusBarHeight=0; bottomOffset=0; genieTrackOn=false; ally-on=false; isNative=false; strId=; openIMHP=false; webBottomBarHeight=0; imOrderAttribution={%22entryId%22:%22BANNER-undefined%22%2C%22entryName%22:%22store-menu-items-instamart%22}; userLocation=%7B%27lat%27%3A%2022.6288304%2C%20%27lng%27%3A%2088.4311275%2C%20%27address%27%3A%20%27Kaikhali%2C%20Kolkata%2C%20West%20Bengal%2C%20India%27%2C%20%27id%27%3A%20%27%27%2C%20%27annotation%27%3A%20%27Kaikhali%2C%20Kolkata%2C%20West%20Bengal%2C%20India%27%2C%20%27name%27%3A%20%27%27%7D",
+            "cookies": "deviceId=s%3A8ce5c23c-1705-46c8-9a65-f32f8151d48f.jSeriHSfhxDqesgkOSVbTSwKA5qOTK8KF%2FNhg7JKWgI; tid=s%3A849e10fe-93bc-4533-9485-9060bc036543.cDZZvPSlsiWsMDgaFo3qChvSL0%2BrAnj1eI1TwzwkufY; sid=s%3Ajo25a9d9-b0c4-463d-9534-26ad702a7f1e.kY%2Fy42ekln4RiwtF1M8t4x97Oe%2ByNeVaaeIyJxq5kKw; versionCode=1200; platform=web; subplatform=dweb; statusBarHeight=0; bottomOffset=0; genieTrackOn=false; ally-on=false; isNative=false; strId=; openIMHP=false; webBottomBarHeight=0; imOrderAttribution={%22entryId%22:%22BANNER-undefined%22%2C%22entryName%22:%22store-menu-items-instamart%22}; userLocation=%7B%27lat%27%3A%2022.6288304%2C%20%27lng%27%3A%2088.4311275%2C%20%27address%27%3A%20%27Kaikhali%2C%20Kolkata%2C%20West%20Bengal%2C%20India%27%2C%20%27id%27%3A%20%27%27%2C%20%27annotation%27%3A%20%27Kaikhali%2C%20Kolkata%2C%20West%20Bengal%2C%20India%27%2C%20%27name%27%3A%20%27%27%7D",
             "primary_store": "867466",
             "secondary_store": ""
         }

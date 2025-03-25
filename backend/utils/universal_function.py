@@ -12,11 +12,11 @@ load_dotenv()
 
 
 # Log level configurations
-DEBUG = False
-ERROR = False
-SUCCESS = False
-INFO = False
-WARNING = False
+DEBUG = True
+ERROR = True
+SUCCESS = True
+INFO = True
+WARNING = True
 
 def log_debug(data, name=None, level="DEBUG"):
     # Check the appropriate flag based on the log level

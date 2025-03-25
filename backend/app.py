@@ -1,39 +1,57 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import os
 from pyngrok import ngrok
-import uvicorn
 
 # LOCAL IMPORTS
-from utils.main_functions import get_api_key
+from utils.main_functions import *
 
 load_dotenv()
 
-app = FastAPI()
 
-@app.post("/send-otp")
-async def send_otp():
+
+app = Flask(__name__)
+
+@app.route("/send-otp", methods=["POST"])
+def send_otp():
     pass
 
-@app.post("/confirm-otp")
-async def confirm_otp():
+@app.route("/confirm-otp", methods=["POST"])
+def confirm_otp():
     pass
 
-@app.post("/get-search-results")
-async def get_search_results():
-    pass
+@app.route("/get-search-results", methods=["POST"])
+def get_search_results():
+    data = request.get_json()
+    item_name = data.get("item_name")
+    lat = data.get("lat")
+    lon = data.get("lon")
+    credentials = data.get("credentials", {})
+    
+    print(f"Received search request:")
+    print(f"Item name: {item_name}")
+    print(f"Latitude: {lat}")
+    print(f"Longitude: {lon}")
+    print(f"Credentials: {credentials}")
 
-@app.post("/get-api-key")
-async def get_api_key():
-    return JSONResponse(content={"api_key": get_api_key()})
+    data = get_compared_results(item_name, lat, lon, credentials)
+    print(data)
+    
+    return jsonify({"status": "success", "data": data})
+
+@app.route("/get-api-key", methods=["POST"])
+def get_api_key_route():
+    print("Entering get_api_key_route handler")
+    key = get_api_key()
+    return jsonify(key)
 
 def main():
-    ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))  # Replace with your Ngrok auth token
-    ngrok_tunnel = ngrok.connect(addr='8000', proto="http", hostname="noble-raven-entirely.ngrok-free.app")
+    kill_ngrok_processes()
+    ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
+    ngrok_tunnel = ngrok.connect(addr='5000', proto="http", hostname="noble-raven-entirely.ngrok-free.app")
     print("Public URL:", ngrok_tunnel.public_url)
-
-    uvicorn.run(app, port=8000)
-
+    
+    app.run(port=5000, debug=True)  
+    
 if __name__ == "__main__":
     main()
