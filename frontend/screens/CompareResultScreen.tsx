@@ -16,13 +16,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useNavigation, NavigationProp, useRoute, RouteProp } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import comparisonData from '../JSONfiles/comparison.json';
 import { useLocation } from '../contexts/LocationContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCart } from '../contexts/CartContext';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -50,7 +50,7 @@ interface CompareResultItem {
 const ComparisonCard: React.FC<{
   item: CompareResultItem;
   opacity: Animated.Value;
-  onAddToCart: (shopName: string, price: string, remove: boolean) => void;
+  onAddToCart: (item: CompareResultItem, shopName: string, price: string, remove: boolean) => void;
   isInCart: (shopId: string) => boolean;
   style?: any;
 }> = ({ item, opacity, onAddToCart, isInCart, style }) => {
@@ -59,7 +59,7 @@ const ComparisonCard: React.FC<{
   const handleAddAllItems = () => {
     const shouldRemove = areAllItemsInCart;
     item.shops.forEach(shop => {
-      onAddToCart(shop.name, shop.price, shouldRemove);
+      onAddToCart(item, shop.name, shop.price, shouldRemove);
     });
   };
 
@@ -99,7 +99,7 @@ const ComparisonCard: React.FC<{
                   <Text style={styles.price}>₹{shop.price}</Text>
                   {isInCart(`${item.id}-${shop.name}`) ? (
                     <TouchableOpacity
-                      onPress={() => onAddToCart(shop.name, shop.price, true)}
+                      onPress={() => onAddToCart(item, shop.name, shop.price, true)}
                       style={styles.button}
                     >
                       <LinearGradient
@@ -113,7 +113,7 @@ const ComparisonCard: React.FC<{
                     </TouchableOpacity>
                   ) : (
                     <TouchableOpacity
-                      onPress={() => onAddToCart(shop.name, shop.price, false)}
+                      onPress={() => onAddToCart(item, shop.name, shop.price, false)}
                       style={styles.button}
                     >
                       <LinearGradient
@@ -160,6 +160,7 @@ const getShopLogo = (shopName: string): ImageSourcePropType => {
 
 export default function CompareResultScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'CompareResult'>>();
   const { currentLocation, updateLocation, autoLocate } = useLocation();
   const { addToCart, removeFromCart, isInCart } = useCart();
   const [compareData, setCompareData] = useState<CompareResultItem[]>([]);
@@ -169,25 +170,76 @@ export default function CompareResultScreen() {
   const [activeTab, setActiveTab] = useState('');
 
   useEffect(() => {
-    fetchComparisonData();
-  }, []);
+    console.log('Initiating comparison data fetch...');
+    fetchComparisonData().catch(err => {
+      console.error('Failed to fetch comparison data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setLoading(false);
+    });
+  }, [route.params?.query]); // Re-fetch when search query changes
 
-  const fetchComparisonData = () => {
+  useEffect(() => {
+    if (compareData.length > 0 && route.params?.onSearchComplete) {
+      const firstProductImage = compareData[0].image;
+      route.params.onSearchComplete(firstProductImage);
+    }
+  }, [compareData, route.params?.onSearchComplete]);
+
+  const fetchComparisonData = async () => {
     try {
-      setCompareData(comparisonData.map((item, index) => ({
+      setLoading(true);
+      setError(null);
+
+      // Get coordinates from AsyncStorage
+      const lat = await AsyncStorage.getItem('pricely_lat') || '22.6382939';
+      const lon = await AsyncStorage.getItem('pricely_lon') || '88.448261';
+      const item_name = route.params?.query || '';
+
+      // Prepare request payload
+      const payload = {
+        item_name,
+        lat,
+        lon,
+        credentials: null
+      };
+
+      // Make API call
+      const response = await fetch('https://noble-raven-entirely.ngrok-free.app/get-search-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.status !== 'success' || !result.data?.data) {
+        throw new Error('Invalid response format from server');
+      }
+
+      // Transform API response to match expected format
+      const transformedData = result.data.data.map((item: any, index: number) => ({
         id: index.toString(),
-        image: item.data.image,
-        name: item.data.name,
-        quantity: item.data.quantity,
-        shops: Object.entries(item.data.buy_button)
-          .filter(([_, shopData]) => shopData !== undefined)
-          .map(([shopName, shopData]) => ({
-            name: shopName,
-            price: shopData!.price,
-            link: shopData!.url
+        image: item.image_url,
+        name: item.name,
+        quantity: item.quantity,
+        shops: Object.entries(item.buy_button)
+          .filter(([_, shopData]) => shopData !== undefined && shopData !== null)
+          .map(([shopName, shopData]: [string, any]) => ({
+            name: shopName.toLowerCase(),
+            price: shopData.price.toString(),
+            link: shopData.url
           }))
-      })));
+      }));
+
+      setCompareData(transformedData);
     } catch (err) {
+      console.error('Error fetching comparison data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load data');
     } finally {
       setLoading(false);
@@ -204,12 +256,20 @@ export default function CompareResultScreen() {
         position: 'bottom',
       });
     } else {
+      // Capitalize shop name to match Cart screen's vendor names
+      let capitalizedShopName = shopName.charAt(0).toUpperCase() + shopName.slice(1);
+      // Fix case for special vendor names
+      if (capitalizedShopName === "Dmart") {
+        capitalizedShopName = "DMart";
+      } else if (capitalizedShopName === "Bigbasket") {
+        capitalizedShopName = "BigBasket";
+      }
       addToCart({
         id: `${item.id}-${shopName}`,
         name: item.name,
         image: item.image,
         quantity: item.quantity,
-        shopName: shopName,
+        shopName: capitalizedShopName,
         price: price,
         url: item.shops.find(shop => shop.name === shopName)?.link || ''
       });
@@ -251,7 +311,7 @@ export default function CompareResultScreen() {
           <ComparisonCard
             item={compareData[i]}
             opacity={fadeAnims[i] || new Animated.Value(1)}
-            onAddToCart={(shopName, price, remove) => handleCartAction(compareData[i], shopName, price, remove)}
+            onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
             isInCart={isInCart}
             style={cardStyle}
           />
@@ -259,7 +319,7 @@ export default function CompareResultScreen() {
             <ComparisonCard
               item={compareData[i + 1]}
               opacity={fadeAnims[i + 1] || new Animated.Value(1)}
-              onAddToCart={(shopName, price, remove) => handleCartAction(compareData[i + 1], shopName, price, remove)}
+              onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
               isInCart={isInCart}
               style={cardStyle}
             />
