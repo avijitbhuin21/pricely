@@ -160,12 +160,12 @@ const Header: React.FC<HeaderProps> = ({
           <Ionicons
             name={currentLocation === 'Detecting location...' ? "locate" : "location"}
             size={18}
-            color={currentLocation === 'Detecting location...' ? "#007AFF" : "#80e5ff"}
+            color={currentLocation === 'Detecting location...' ? "#000" : "#fff"}
           />
           <Text
             style={[
               styles.locationText,
-              currentLocation === 'Detecting location...' && { color: '#007AFF' }
+              currentLocation === 'Detecting location...' && { color: '#000' }
             ]}
             numberOfLines={1}
           >
@@ -315,21 +315,21 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   pulsingLocationButton: {
-    backgroundColor: 'rgba(0, 122, 255, 0.15)',
-    borderColor: 'rgba(0, 122, 255, 0.3)',
+    backgroundColor: 'rgb(255, 255, 255)',
+    borderColor: 'rgba(225, 0, 255, 0.71)',
   },
   locationText: {
     marginHorizontal: 6,
     fontSize: 14,
     color: '#ffffff',
     maxWidth: WINDOW_WIDTH * 0.25,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowColor: 'rgba(255, 255, 255, 0.75)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {

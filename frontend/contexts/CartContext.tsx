@@ -16,6 +16,8 @@ interface CartContextType {
   removeFromCart: (id: string) => void;
   clearCart: () => void;
   isInCart: (id: string) => boolean;
+  getItemsByVendor: (vendor: string) => CartItem[];
+  calculateVendorTotal: (vendor: string) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -41,8 +43,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return cartItems.some(item => item.id === id);
   };
 
+  const getItemsByVendor = (vendor: string) => {
+    return cartItems.filter(item => item.shopName === vendor);
+  };
+
+  const calculateVendorTotal = (vendor: string) => {
+    return getItemsByVendor(vendor)
+      .reduce((total, item) => total + parseFloat(item.price), 0);
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, isInCart }}>
+    <CartContext.Provider value={{ 
+      cartItems, 
+      addToCart, 
+      removeFromCart, 
+      clearCart, 
+      isInCart,
+      getItemsByVendor,
+      calculateVendorTotal
+    }}>
       {children}
     </CartContext.Provider>
   );
