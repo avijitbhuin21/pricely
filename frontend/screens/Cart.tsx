@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Platform,
   Alert,
   Linking,
 } from 'react-native';
@@ -32,87 +33,6 @@ interface CartItemProps {
   onRemove: (id: string) => void;
 }
 
-interface VendorCartSectionProps {
-  vendor: string;
-  items: CartItemProps['item'][];
-  onRemove: (id: string) => void;
-  total: number;
-}
-
-const shopLogos: { [key: string]: any } = {
-  Instamart: require('../assets/logos/instamart.png'),
-  BigBasket: require('../assets/logos/bigbasket.png'),
-  Blinkit: require('../assets/logos/blinkit.png'),
-  DMart: require('../assets/logos/d-mart.png'),
-  Zepto: require('../assets/logos/zepto.png'),
-};
-
-const vendorUrls = require('../JSONfiles/vendor_app_url.json');
-
-const VendorCartSection: React.FC<VendorCartSectionProps> = ({ vendor, items, onRemove, total }) => {
-  if (items.length === 0) {
-    return null;
-  }
-
-  const handleOpenApp = async () => {
-    try {
-      const vendorKey = vendor === 'DMart' ? 'Dmart' : vendor;
-      const url = vendorUrls[vendorKey];
-      
-      if (url) {
-        const canOpen = await Linking.canOpenURL(url);
-        if (canOpen) {
-          await Linking.openURL(url);
-        } else {
-          Alert.alert('Error', `Cannot open ${vendor} app/website`);
-        }
-      } else {
-        Alert.alert('Error', `Could not find URL for ${vendor}`);
-      }
-    } catch (error) {
-      Alert.alert('Error', `Failed to open ${vendor} app/website`);
-    }
-  };
-
-  return (
-    <View style={styles.vendorSection}>
-      <LinearGradient
-        colors={['#ffffff', '#f8f9fa']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.sectionGradient}
-      >
-        {/* Vendor Header with Logo and Price Info */}
-        <View style={styles.vendorHeader}>
-          <View style={styles.vendorInfoContainer}>
-            <Image source={shopLogos[vendor]} style={styles.vendorLogo} resizeMode="contain" />
-            <View style={styles.priceInfo}>
-              <Text style={styles.itemsCount}>{items.length} item{items.length > 1 ? 's' : ''}</Text>
-              <Text style={styles.totalPrice}>₹{total.toFixed(0)}</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.openAppButton} onPress={handleOpenApp}>
-            <Text style={styles.openAppText}>Open App</Text>
-            <Ionicons name="arrow-forward" size={16} color="#E8099C" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Items List */}
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          style={styles.itemsScroll}
-          contentContainerStyle={styles.itemsScrollContent}
-        >
-          {items.map((item) => (
-            <CartItem key={item.id} item={item} onRemove={onRemove} />
-          ))}
-        </ScrollView>
-      </LinearGradient>
-    </View>
-  );
-};
-
 const CartItem: React.FC<CartItemProps> = ({ item, onRemove }) => {
   const handleBuyNow = async () => {
     if (item.url) {
@@ -128,24 +48,39 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove }) => {
       <View style={styles.itemDetails}>
         <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
         <Text style={styles.itemQuantity}>{item.quantity}</Text>
-        <View style={styles.priceRow}>
-          <Text style={styles.itemPrice}>₹{item.price}</Text>
-          <TouchableOpacity style={styles.removeButton} onPress={() => onRemove(item.id)}>
-            <Ionicons name="trash-outline" size={18} color="#ff6b6b" />
+        <Text style={styles.shopName}>{item.shopName}</Text>
+      </View>
+      <View style={styles.priceContainer}>
+        <Text style={styles.price}>₹{item.price}</Text>
+        <View style={styles.buttonGroup}>
+          <TouchableOpacity
+            style={styles.buyButton}
+            onPress={handleBuyNow}
+          >
+            <LinearGradient
+              colors={['#2196F3', '#1976D2']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.buttonGradient}
+            >
+              <Text style={styles.buttonText}>Buy</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={() => onRemove(item.id)}
+          >
+            <LinearGradient
+              colors={['#ff6b6b', '#ee5253']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.buttonGradient}
+            >
+              <Ionicons name="close" size={18} color="#fff" />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </View>
-      <TouchableOpacity style={styles.buyButton} onPress={handleBuyNow}>
-        <LinearGradient
-          colors={['#FF7BEA', '#E8099C']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.buyButtonGradient}
-        >
-          <Text style={styles.buyButtonText}>Buy Now</Text>
-          <Ionicons name="flash" size={16} color="#fff" style={styles.buyButtonIcon} />
-        </LinearGradient>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -153,7 +88,36 @@ const CartItem: React.FC<CartItemProps> = ({ item, onRemove }) => {
 const CartScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { currentLocation, updateLocation, autoLocate } = useLocation();
-  const { cartItems, removeFromCart, getItemsByVendor, calculateVendorTotal } = useCart();
+  const { cartItems, removeFromCart, clearCart } = useCart();
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + parseFloat(item.price), 0);
+  };
+
+  const calculateDiscount = () => {
+    // 10% discount
+    return calculateTotal() * 0.1;
+  };
+
+  const handleBuyNow = (shopName: string, itemName: string) => {
+    Alert.alert(
+      'Buy Item',
+      `Would you like to purchase ${itemName} from ${shopName}?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Buy',
+          onPress: () => {
+            Alert.alert('Success', 'Purchase initiated successfully!');
+          },
+        },
+      ]
+    );
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -164,34 +128,69 @@ const CartScreen = () => {
         onAutoLocate={autoLocate}
       />
       <View style={styles.content}>
-        <ScrollView
-          style={styles.cartItemsContainer}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.cartItemsContent}
-        >
-          {cartItems.length === 0 ? (
-            <View style={styles.emptyCart}>
-              <MaterialCommunityIcons name="cart-outline" size={64} color="#d1d5db" />
-              <Text style={styles.emptyCartText}>Your cart is empty</Text>
-              <Text style={styles.emptyCartSubtext}>Add some items to get started</Text>
+        <Text style={styles.title}>Your Cart</Text>
+
+        {/* Cart Items Section */}
+        <View style={styles.cartSection}>
+          <LinearGradient
+            colors={['rgba(255,255,255,0.95)', 'rgba(255,255,255,0.85)']}
+            style={styles.sectionGradient}
+          >
+            <ScrollView
+              style={styles.cartItemsContainer}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.cartItemsContent}
+            >
+              {cartItems.length === 0 ? (
+                <View style={styles.emptyCart}>
+                  <MaterialCommunityIcons name="cart-outline" size={48} color="#666" />
+                  <Text style={styles.emptyCartText}>Your cart is empty</Text>
+                </View>
+              ) : (
+                cartItems.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    onRemove={removeFromCart}
+                  />
+                ))
+              )}
+            </ScrollView>
+          </LinearGradient>
+        </View>
+
+        {/* Order Summary Section */}
+        <View style={styles.summarySection}>
+          <LinearGradient
+            colors={['rgba(255,255,255,0.95)', 'rgba(255,255,255,0.85)']}
+            style={styles.sectionGradient}
+          >
+            <Text style={styles.summaryTitle}>Order Summary</Text>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Total Amount</Text>
+              <Text style={styles.summaryValue}>₹{calculateTotal().toFixed(2)}</Text>
             </View>
-          ) : (
-            <>
-              {['Blinkit', 'Instamart', 'Zepto', 'BigBasket', 'DMart'].map((vendor) => (
-                <VendorCartSection
-                  key={vendor}
-                  vendor={vendor}
-                  items={getItemsByVendor(vendor)}
-                  onRemove={removeFromCart}
-                  total={calculateVendorTotal(vendor)}
-                />
-              ))}
-            </>
-          )}
-        </ScrollView>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Discount (10%)</Text>
+              <Text style={[styles.summaryValue, styles.discountText]}>
+                -₹{calculateDiscount().toFixed(2)}
+              </Text>
+            </View>
+            <View style={[styles.summaryRow, styles.totalRow]}>
+              <Text style={styles.totalLabel}>Final Amount</Text>
+              <Text style={styles.totalValue}>
+                ₹{(calculateTotal() - calculateDiscount()).toFixed(2)}
+              </Text>
+            </View>
+          </LinearGradient>
+        </View>
       </View>
 
-      <Footer navigation={navigation} activeTab="cart" setActiveTab={() => {}} />
+      <Footer
+        navigation={navigation}
+        activeTab="cart"
+        setActiveTab={(tab) => {}} // Since Cart screen doesn't manage active tab state
+      />
     </SafeAreaView>
   );
 };
@@ -199,169 +198,190 @@ const CartScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'snow',
   },
   content: {
     flex: 1,
-    padding: 20,
-    paddingBottom: 100,
-    position: 'relative'
+    padding: 12,
+    paddingBottom: 100, // Account for bottom navigation
   },
-  vendorSection: {
-    marginBottom: 20,
+  title: {
+    fontFamily: 'ARCHIVE',
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  cartSection: {
+    flex: 1,
+    marginVertical: 16,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+  },
+  cartItemsContainer: {
+    minHeight: 100,
+    maxHeight: '100%',
+  },
+  cartItemsContent: {
+    flexGrow: 1,
   },
   sectionGradient: {
     padding: 16,
-  },
-  vendorHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  vendorInfoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  vendorLogo: {
-    width: 60,
-    height: 30,
-    marginRight: 12,
-  },
-  priceInfo: {
-    marginLeft: 8,
-  },
-  itemsCount: {
-    fontFamily: 'Poppins-Regular',
-    fontSize: 13,
-    color: '#64748b',
-  },
-  totalPrice: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 18,
-    color: '#1e293b',
-  },
-  openAppButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fce4f1',
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  openAppText: {
-    fontFamily: 'Poppins-Medium',
-    fontSize: 14,
-    color: '#E8099C',
-    marginRight: 4,
-  },
-  itemsScroll: {
-    marginHorizontal: -16,
-  },
-  itemsScrollContent: {
-    paddingHorizontal: 16,
-  },
-  cartItem: {
-    width: 160,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    marginRight: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  itemImage: {
-    width: '100%',
-    height: 100,
-    borderRadius: 8,
-    backgroundColor: '#f1f5f9',
-    marginBottom: 8,
-  },
-  itemDetails: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  itemName: {
-    fontFamily: 'Poppins-Medium',
-    fontSize: 14,
-    color: '#334155',
-    marginBottom: 4,
-  },
-  itemQuantity: {
-    fontFamily: 'Poppins-Regular',
-    fontSize: 12,
-    color: '#64748b',
-    marginBottom: 8,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  itemPrice: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 15,
-    color: '#1e293b',
-  },
-  removeButton: {
-    padding: 4,
-  },
-  buyButton: {
-    marginTop: 8,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  buyButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  buyButtonText: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 14,
-    color: '#fff',
-  },
-  buyButtonIcon: {
-    marginLeft: 6,
-  },
-  cartItemsContainer: {
-    flex: 1,
-  },
-  cartItemsContent: {
-    paddingBottom: 20,
+    borderRadius: 16,
   },
   emptyCart: {
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginTop: 40,
+    padding: 32,
   },
   emptyCartText: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: 18,
-    color: '#1e293b',
-    marginTop: 16,
+    fontFamily: 'Poppins',
+    fontSize: 16,
+    color: '#fff',
+    marginTop: 12,
   },
-  emptyCartSubtext: {
-    fontFamily: 'Poppins-Regular',
+  cartItem: {
+    flexDirection: 'row',
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+    alignItems: 'center',
+  },
+  itemImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+  },
+  itemDetails: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
+  itemName: {
+    fontFamily: 'Poppins',
     fontSize: 14,
-    color: '#64748b',
+    fontWeight: '600',
+    color: '#fff',
+  },
+  itemQuantity: {
+    fontFamily: 'Poppins',
+    fontSize: 12,
+    color: '#fff',
+    marginTop: 2,
+  },
+  shopName: {
+    fontFamily: 'Poppins',
+    fontSize: 12,
+    color: '#fff',
+    marginTop: 2,
+  },
+  priceContainer: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    marginLeft: 8,
+    minWidth: 100,
+  },
+  price: {
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  buyButton: {
+    overflow: 'hidden',
+    borderRadius: 16,
+    marginRight: 8,
+  },
+  removeButton: {
+    overflow: 'hidden',
+    borderRadius: 16,
+  },
+  buttonGradient: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    fontFamily: 'Poppins',
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 12,
+  },
+  summarySection: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginTop: 'auto', // Push to bottom of available space
+    marginBottom: 16,
+  },
+  summaryTitle: {
+    fontFamily: 'ARCHIVE',
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 16,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  summaryLabel: {
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    color: '#fff',
+  },
+  summaryValue: {
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  discountText: {
+    color: '#fff',
+  },
+  totalRow: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
     marginTop: 8,
+    paddingTop: 12,
+  },
+  totalLabel: {
+    fontFamily: 'Poppins',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  totalValue: {
+    fontFamily: 'Poppins',
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  orderButton: {
+    marginTop: 20,
+    borderRadius: 25,
+    overflow: 'hidden',
+  },
+  orderButtonGradient: {
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  orderButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
 });
 

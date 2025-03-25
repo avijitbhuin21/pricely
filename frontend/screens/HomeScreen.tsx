@@ -14,12 +14,7 @@ import SearchHistory from '../components/SearchHistory';
 const PROMO_IMAGE_URL = 'https://images.unsplash.com/photo-1606787366850-de6330128bfc';
 
 export default function HomeScreen() {
-  interface SearchItem {
-    query: string;
-    imageUrl?: string;
-  }
-
-  const [searchHistory, setSearchHistory] = useState<SearchItem[]>([]);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   // Load search history from storage on mount
   useEffect(() => {
@@ -27,19 +22,7 @@ export default function HomeScreen() {
       try {
         const storedHistory = await AsyncStorage.getItem('searchHistory');
         if (storedHistory) {
-          const parsedHistory = JSON.parse(storedHistory);
-          // Convert old format to new format if needed
-          const formattedHistory = Array.isArray(parsedHistory) ? 
-            parsedHistory.map((item: string | SearchItem) => {
-              if (typeof item === 'string') {
-                return {
-                  query: item,
-                  timestamp: new Date().toLocaleString(),
-                };
-              }
-              return item;
-            }) : [];
-          setSearchHistory(formattedHistory);
+          setSearchHistory(JSON.parse(storedHistory));
         }
       } catch (error) {
         console.error('Error loading search history:', error);
@@ -78,13 +61,13 @@ export default function HomeScreen() {
     };
   }, []);
 
-  const addToSearchHistory = async (query: string, imageUrl?: string) => {
+  const addToSearchHistory = async (query: string) => {
     if (!query.trim()) return;
 
     try {
       const newHistory = [...searchHistory];
       // Remove if query already exists
-      const index = newHistory.findIndex(item => item.query === query.trim());
+      const index = newHistory.indexOf(query.trim());
       if (index !== -1) {
         newHistory.splice(index, 1);
       }
@@ -93,10 +76,7 @@ export default function HomeScreen() {
         newHistory.shift();
       }
       // Add new search query at the end
-      newHistory.push({
-        query: query.trim(),
-        imageUrl,
-      });
+      newHistory.push(query.trim());
 
       // Update state and storage
       setSearchHistory(newHistory);
@@ -115,9 +95,9 @@ export default function HomeScreen() {
     }
   };
 
-  const handleDeleteSearch = async (query: string) => {
+  const handleDeleteSearch = async (item: string) => {
     try {
-      const newHistory = searchHistory.filter(item => item.query !== query);
+      const newHistory = searchHistory.filter(search => search !== item);
       setSearchHistory(newHistory);
       await AsyncStorage.setItem('searchHistory', JSON.stringify(newHistory));
     } catch (error) {
@@ -136,12 +116,7 @@ export default function HomeScreen() {
     navigation.dispatch(
       CommonActions.navigate({
         name: 'CompareResult',
-        params: { 
-          query: searchQuery,
-          onSearchComplete: async (imageUrl: string) => {
-            await addToSearchHistory(searchQuery, imageUrl);
-          }
-        },
+        params: { query: searchQuery },
       })
     );
   };
@@ -193,22 +168,18 @@ export default function HomeScreen() {
                 <View style={styles.historySection}>
                   <SearchHistory
                     searches={searchHistory}
-                    onSearchPress={async (query) => {
-                      setSearchQuery(query);
-                      // Find existing search item to preserve its imageUrl
-                      const existingSearch = searchHistory.find(item => item.query === query);
+                    onSearchPress={async (item) => {
+                      setSearchQuery(item);
+                      await addToSearchHistory(item);
                       navigation.dispatch(
                         CommonActions.navigate({
                           name: 'CompareResult',
-                          params: { 
-                            query,
-                            onSearchComplete: async (imageUrl: string) => {
-                              await addToSearchHistory(query, imageUrl);
-                            }
-                          },
+                          params: { query: item },
                         })
                       );
                     }}
+                    onClearHistory={handleClearHistory}
+                    onDeleteSearch={handleDeleteSearch}
                   />
                 </View>
               )}
