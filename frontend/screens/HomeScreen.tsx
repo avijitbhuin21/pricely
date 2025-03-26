@@ -52,7 +52,7 @@ export default function HomeScreen() {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isKeyboardActive, setIsKeyboardActive] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
-  const [userName] = useState('Sagnik'); // In a real app, this would come from authentication
+  const [userName] = useState('Demo'); // In a real app, this would come from authentication
   const { currentLocation, updateLocation, autoLocate } = useLocation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 

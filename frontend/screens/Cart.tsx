@@ -158,7 +158,7 @@ const CartScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        userName="Sagnik"
+        userName="Demo"
         currentLocation={currentLocation}
         onLocationSelect={updateLocation}
         onAutoLocate={autoLocate}

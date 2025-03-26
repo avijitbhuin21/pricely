@@ -44,6 +44,7 @@ interface CompareResultItem {
     name: string;
     price: string;
     link: string;
+    quantity: string;
   }[];
 }
 
@@ -54,6 +55,7 @@ const ComparisonCard: React.FC<{
   isInCart: (shopId: string) => boolean;
   style?: any;
 }> = ({ item, opacity, onAddToCart, isInCart, style }) => {
+  const displayQuantity = item.shops.length > 0 ? item.shops[0].quantity : item.quantity;
   const areAllItemsInCart = item.shops.every(shop => isInCart(`${item.id}-${shop.name}`));
 
   const handleAddAllItems = () => {
@@ -87,7 +89,6 @@ const ComparisonCard: React.FC<{
         <View style={styles.cardContent}>
           <View style={styles.topContent}>
             <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-            <Text style={styles.quantity}>{item.quantity}</Text>
             <View style={styles.shopsContainer}>
               {item.shops.map((shop, index) => (
                 <View key={index} style={styles.shopItem}>
@@ -96,7 +97,10 @@ const ComparisonCard: React.FC<{
                     style={styles.shopIcon}
                     resizeMode="contain"
                   />
-                  <Text style={styles.price}>₹{shop.price}</Text>
+                  <View style={styles.priceContainer}>
+                    <Text style={styles.price}>₹{shop.price}</Text>
+                    <Text style={styles.shopQuantity}>{shop.quantity}</Text>
+                  </View>
                   {isInCart(`${item.id}-${shop.name}`) ? (
                     <TouchableOpacity
                       onPress={() => onAddToCart(item, shop.name, shop.price, true)}
@@ -217,25 +221,39 @@ export default function CompareResultScreen() {
       }
 
       const result = await response.json();
+      console.log('API Response:', JSON.stringify(result, null, 2));
       
-      if (result.status !== 'success' || !result.data?.data) {
-        throw new Error('Invalid response format from server');
+      if (!result.data?.data || !Array.isArray(result.data.data)) {
+        throw new Error('Invalid response format: expected data.data array');
       }
 
       // Transform API response to match expected format
-      const transformedData = result.data.data.map((item: any, index: number) => ({
-        id: index.toString(),
-        image: item.image_url,
-        name: item.name,
-        quantity: item.quantity,
-        shops: Object.entries(item.buy_button)
-          .filter(([_, shopData]) => shopData !== undefined && shopData !== null)
-          .map(([shopName, shopData]: [string, any]) => ({
-            name: shopName.toLowerCase(),
-            price: shopData.price.toString(),
-            link: shopData.url
-          }))
-      }));
+      const transformedData = result.data.data.map((item: any, index: number) => {
+        if (!item) {
+          console.error('Invalid item format:', item);
+          return null;
+        }
+
+        // Create shops array from price array
+        const shops = (item.price || []).map((priceData: any) => ({
+          name: priceData.store.toLowerCase(),
+          price: priceData.price.toString(),
+          link: priceData.url,
+          quantity: priceData.quantity
+        }));
+
+        return {
+          id: index.toString(),
+          image: item.image,
+          name: item.name,
+          quantity: shops[0]?.quantity || '', // Use quantity from first price entry
+          shops: shops
+        };
+      }).filter(Boolean);
+
+      if (transformedData.length === 0) {
+        throw new Error('No valid items found in response');
+      }
 
       setCompareData(transformedData);
     } catch (err) {
@@ -333,7 +351,7 @@ export default function CompareResultScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        userName="Sagnik"
+        userName="Demo"
         currentLocation={currentLocation}
         onLocationSelect={updateLocation}
         onAutoLocate={autoLocate}
@@ -473,19 +491,28 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     opacity: 0.95,
   },
+  priceContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    flexGrow: 1,
+    paddingHorizontal: Dimensions.get('window').width * 0.008,
+  },
   price: {
     fontFamily: 'Poppins',
     fontSize: Dimensions.get('window').width * 0.034,
     fontWeight: '700',
     color: '#2ecc71',
-    flexGrow: 1,
-    textAlign: 'center',
-    paddingHorizontal: Dimensions.get('window').width * 0.008,
-    minWidth: Dimensions.get('window').width * 0.14,
     letterSpacing: 0.2,
     textShadowColor: 'rgba(46,204,113,0.1)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
+  },
+  shopQuantity: {
+    fontFamily: 'Poppins',
+    fontSize: Dimensions.get('window').width * 0.026,
+    color: '#666',
+    marginTop: 2,
+    opacity: 0.9,
   },
   button: {
     overflow: 'hidden',
