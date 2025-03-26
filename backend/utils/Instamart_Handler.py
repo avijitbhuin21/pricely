@@ -233,54 +233,73 @@ def get_instamart_credentials(location_data: Dict[str, Any]) -> Dict[str, Any]:
         return {"status": "failed", "reason": f"Unexpected error: {str(e)}"}
 
 
-def format_instamart_data(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Format Instamart search results into a standardized structure."""
-    with open('insta_temp.json', 'w') as f:
-        json.dump(data, f, indent=4)
+def format_instamart_data(data):
+    final_data = {'data': {}, 'credentials': data['credentials']}
+    results_list = []
     try:
-        final_data = {'data': {}, 'credentials': data['credentials']}
+        store_id = data.get('data', {}).get('data', {}).get('storeDetails', {}).get('id', 'Unknown Store')
+        widgets = data.get('data', {}).get('data', {}).get('widgets', [])
         
-        if not data.get('data') or not data['data'].get('data') or not data['data']['data'].get('widgets') or not data['data']['data']['widgets'][0].get('data'):
-            log_debug("Invalid data structure for formatting", name="format_instamart_data", level="ERROR")
-            return final_data
+        if not widgets:
+             return {"results": []}
+             
+        products = widgets[0].get('data', [])
         
-        for i in data['data']['data']['widgets'][0]['data']:
-            try:
-                all_variations = i.get('variations', [])
-                product_id = i.get('product_id', '')
-                
-                for m in all_variations:
-                    try:
-                        if not m.get('display_name') or not m.get('price') or not m.get('images') or not m.get('quantity'):
-                            continue
-                            
-                        item = {
-                            'name': m['display_name'],
-                            'price': m['price'].get('offer_price', 0),
-                            'image': f'https://instamart-media-assets.swiggy.com/swiggy/image/upload/{m["images"][0]}',
-                            'quantity': m['quantity'],
-                            'url': f'https://www.swiggy.com/instamart/item/{product_id}?storeId={m.get("store_id", "")}'
-                        }
-                        
-                        formatted_name = format_name(m['display_name'])
-                        
-                        if m.get('inventory', {}).get('in_stock', False):
-                            if formatted_name in final_data['data']:
-                                final_data['data'][formatted_name].append(item)
-                            else:
-                                final_data['data'][formatted_name] = [item]
-                    except Exception as e:
-                        log_debug(f"Error processing variation: {str(e)}", name="format_instamart_data", level="ERROR")
-                        continue
-            except Exception as e:
-                log_debug(f"Error processing product: {str(e)}", name="format_instamart_data", level="ERROR")
-                continue
+        if not products:
+            return {"results": []}
+
+    except (IndexError, AttributeError, TypeError):
+        return {"results": []}
+
+    image_base_url = "https://media-assets.swiggy.com/swiggy/image/upload/"
+
+    for product in products:
+        if not product.get('available', False):
+            continue
+
+        variations = product.get('variations')
+        if not variations:
+            continue
         
-        return final_data
+        # Assuming the first variation is the primary one to display
+        variation = variations[0]
+
+        name = product.get('display_name', 'N/A')
+        product_id = product.get('product_id', 'N/A')
+
+        price_info = variation.get('price', {})
+        offer_price = price_info.get('offer_price')
         
-    except Exception as e:
-        log_debug(f"Error formatting data: {str(e)}", name="format_instamart_data", level="ERROR")
-        return {'data': {}, 'credentials': data.get('credentials', {})}
+        price_str = 'N/A'
+        if offer_price is not None:
+             price_str = offer_price
+
+        images = variation.get('images', [])
+        image_url = 'N/A'
+        if images:
+            relative_image_path = images[0]
+            if relative_image_path and not relative_image_path.startswith(('http://', 'https://')):
+                 image_url = image_base_url + relative_image_path
+            elif relative_image_path:
+                image_url = relative_image_path
+
+        quantity = variation.get('sku_quantity_with_combo', 'N/A')
+
+        product_url = 'N/A'
+        if product_id != 'N/A' and store_id != 'Unknown Store':
+            product_url = f"https://www.swiggy.com/instamart/item/{product_id}?storeId={store_id}"
+
+
+        results_list.append({
+            "platform": "Instamart",
+            "name": name,
+            "price": price_str,
+            "image_url": image_url,
+            "product_url": product_url,
+            "quantity": quantity,
+        })
+    final_data['data'] = results_list
+    return final_data
 
 
 def search_instamart(item_name: str, location_data: Dict[str, Any], credentials: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

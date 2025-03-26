@@ -2207,28 +2207,34 @@ def get_Bigbasket_Credentials(location_data):
     return data
         
 def format_bigbasket_data(data):
-    products = data['data']['pageProps']['SSRData']['tabs'][0]['product_info']['products']
     final_data = {'data': {}, 'credentials': data['credentials']}
-    for i in products:
-        ans = []
-        name = i['desc']
-        price = i['pricing']['discount']['subscription_price']
-        quantity = i['w']
-        image = i['images'][0]['l']
-        url = f'https://www.bigbasket.com{i['absolute_url']}'
-        if i['availability']['button'] == 'Add':
-            ans.append({'name': name, 'price': price, 'quantity': quantity, 'image': image, 'url': url})
-        if i['children'] != []:
-            for j in i['children']:
-                name = j['desc']
-                price = j['pricing']['discount']['subscription_price']
-                quantity = j['w']
-                image = j['images'][0]['l']
-                url = f'https://www.bigbasket.com/{j['absolute_url']}'
-                if j['availability']['button'] == 'Add':
-                    ans.append({'name': name, 'price': price, 'quantity': quantity, 'image': image, 'url': url})
-        if ans != []:
-            final_data['data'][format_name(i['desc'])] = ans
+    results = []
+    products = data["data"]["pageProps"]["SSRData"]["tabs"][0]["product_info"]["products"]
+    
+    for product in products:
+        if product["availability"]["avail_status"] == "001":
+            result = {
+                "platform": "bigbasket",
+                "name": product["desc"],
+                "price": product["pricing"]["discount"]["prim_price"]["sp"],
+                "image_url": product["images"][0]["s"],
+                "product_url": f"https://www.bigbasket.com{product['absolute_url']}",
+                "quantity": product["w"]
+            }
+            results.append(result)
+        
+        for child in product.get("children", []):
+            if child["availability"]["avail_status"] == "001":
+                result = {
+                    "platform": "bigbasket",
+                    "name": child["desc"],
+                    "price": child["pricing"]["discount"]["prim_price"]["sp"],
+                    "image_url": child["images"][0]["s"],
+                    "product_url": f"https://www.bigbasket.com{child['absolute_url']}",
+                    "quantity": child["w"]
+                }
+                results.append(result)
+        final_data['data'] = results
     return final_data
 
 def search_bigbasket(item_name, location_data, credentials = None):

@@ -61,23 +61,54 @@ def get_blinkit_credentials(location_data):
 
 def format_blinkit_data(data):
     final_data = {'data': {}, 'credentials': data['credentials']}
-    if'objects' not in data['data']:
-        return final_data
-    for i in data['data']['objects'][1:]:
-        name = i['tracking']['widget_meta']['title']
-        log_debug(name, 'name')
-        item = {
-            'name': format_name(name, original=True),  
-            'price': i['tracking']['widget_meta']['custom_data']['price'],
-            'url': f'https://blinkit.com/prn/{blinkit_clean_string(name)}/prid/{i["tracking"]["widget_meta"]["id"]}',
-            'quantity': i['data']['product']['unit'],
-            'image': i['data']['product']['rfc_actions_v2']['default'][0]['remove_from_cart']['cart_item']['image_url']
-        }
-        formatted_name = format_name(name)
-        if formatted_name in final_data['data']:
-            final_data['data'][formatted_name].append(item)
-        else:
-            final_data['data'][formatted_name] = [item]
+    results = []
+    product_objects = data.get('data', {}).get('objects', [])
+
+    if len(product_objects) > 1:
+        for item_outer in product_objects[1:]:
+            try:
+                tracking_meta = item_outer.get('tracking', {}).get('widget_meta', {})
+                product_data = item_outer.get('data', {}).get('product', {})
+
+                if not tracking_meta or not product_data:
+                    continue
+
+                # Check for availability via inventory
+                inventory = product_data.get('inventory')
+                if inventory is None or inventory <= 0:
+                    continue # Skip if inventory is 0 or less
+
+                name = tracking_meta.get('title')
+                price = tracking_meta.get('custom_data', {}).get('price')
+                product_id = tracking_meta.get('id')
+                quantity = product_data.get('unit')
+
+                image_url = None
+                rfc_actions = product_data.get('rfc_actions_v2', {}).get('default', [])
+                if rfc_actions and isinstance(rfc_actions, list) and len(rfc_actions) > 0:
+                    cart_item = rfc_actions[0].get('remove_from_cart', {}).get('cart_item', {})
+                    image_url = cart_item.get('image_url')
+
+                product_url = None
+                if name and product_id:
+                   product_url = f'https://blinkit.com/prn/{blinkit_clean_string(name)}/prid/{product_id}'
+
+
+                if name and price is not None and image_url and quantity and product_url:
+                    results.append({
+                        "platform": "Blinkit",
+                        "name": name,
+                        "price": str(price),
+                        "image_url": image_url,
+                        "product_url": product_url,
+                        "quantity": quantity
+                    })
+
+            except (KeyError, IndexError, TypeError) as e:
+                # Skip item if expected data structure is not found or error occurs
+                continue
+
+    final_data['data'] = results
     return final_data
 
 
