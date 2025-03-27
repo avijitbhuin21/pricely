@@ -1,402 +1,249 @@
+# Removed comments and docstrings
+
 import re
-from difflib import SequenceMatcher
+import math
+import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from sentence_transformers import util # Keep for potential cosine similarity calculation if numpy method fails
+import numpy as np
+import sys
+# Use only the specified import as requested
+from mistralai import Mistral
 
-from utils.Blinkit_Handler import search_blinkit
-from utils.BigBasket_Handler import search_bigbasket
-from utils.Dmart_Handler import search_dmart
-from utils.Instamart_Handler import search_instamart
-from utils.Zepto_Handler import search_zepto
+MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
+MISTRAL_EMBED_MODEL = "mistral-embed"
 
-import asyncio
-import time
-from typing import Dict, Any
+PRICE_TOLERANCE = 0.20
+NAME_SIMILARITY_THRESHOLD = 0.90
+QUANTITY_TOLERANCE = 0.10
 
-from utils.universal_function import *
+def parse_quantity(quantity_str):
+    if not isinstance(quantity_str, str):
+        quantity_str = str(quantity_str)
 
-def compare_grocery_products(data, search_query):
-    """
-    Compare products from different grocery stores based on name similarity and quantity.
-    
-    Args:
-        data (dict): Data from different grocery stores
-        search_query (str): Search query to filter relevant products
-    
-    Returns:
-        dict: Formatted data with grouped products and store comparisons
-    """
-    # Extract all products and credentials from different stores
-    all_products = []
-    store_credentials = {}
-    
-    # Process BigBasket data
-    if 'bigbasket' in data:
-        store_credentials['BIGBASKET'] = data['bigbasket'].get('credentials', {}).get('BigBasket', {})
-        for query, products in data['bigbasket'].get('data', {}).items():
-            for product in products:
-                all_products.append({
-                    'store': 'bigbasket',
-                    'name': product.get('name', ''),
-                    'price': parse_price(product.get('price', '0')),
-                    'quantity': product.get('quantity', ''),
-                    'image': product.get('image', ''),
-                    'url': product.get('url', '')
-                })
-    
-    # Process Blinkit data
-    if 'Blinkit' in data:
-        store_credentials['BLINKIT'] = data['Blinkit'].get('credentials', {}).get('BLINKIT', {})
-        for query, products in data['Blinkit'].get('data', {}).items():
-            for product in products:
-                all_products.append({
-                    'store': 'blinkit',
-                    'name': product.get('name', ''),
-                    'price': parse_price(product.get('price', '0')),
-                    'quantity': product.get('quantity', ''),
-                    'image': product.get('image', ''),
-                    'url': product.get('url', '')
-                })
-    
-    # Process Dmart data
-    if 'Dmart' in data:
-        store_credentials['DMART'] = data['Dmart'].get('credentials') or {}
-        for query, products in data['Dmart'].get('data', {}).items():
-            for product in products:
-                all_products.append({
-                    'store': 'dmart',
-                    'name': product.get('name', ''),
-                    'price': parse_price(product.get('price', '0')),
-                    'quantity': product.get('quantity', ''),
-                    'image': product.get('image', ''),
-                    'url': product.get('url', '')
-                })
-    
-    # Process Instamart data - deduplicate entries with same name but different quantities
-    if 'Instamart' in data:
-        store_credentials['INSTAMART'] = data['Instamart'].get('credentials', {}).get('INSTAMART', {})
-        instamart_products = []
-        seen_product_names = set()
-        
-        for query, products in data['Instamart'].get('data', {}).items():
-            for product in products:
-                product_name = product.get('name', '').lower().strip()
-                # Only add the first instance of each product name from Instamart
-                if product_name not in seen_product_names:
-                    seen_product_names.add(product_name)
-                    instamart_products.append({
-                        'store': 'instamart',
-                        'name': product.get('name', ''),
-                        'price': parse_price(product.get('price', '0')),
-                        'quantity': product.get('quantity', ''),
-                        'image': product.get('image', ''),
-                        'url': product.get('url', '')
-                    })
-        
-        all_products.extend(instamart_products)
-    
-    # Process Zepto data
-    if 'Zepto' in data:
-        store_credentials['ZEPTO'] = data['Zepto'].get('credentials', {}).get('ZEPTO', {})
-        for query, products in data['Zepto'].get('data', {}).items():
-            for product in products:
-                all_products.append({
-                    'store': 'zepto',
-                    'name': product.get('name', ''),
-                    'price': parse_price(product.get('price', '0')),
-                    'quantity': product.get('quantity', ''),
-                    'image': product.get('image', ''),
-                    'url': product.get('url', '')
-                })
-    
-    # Filter products by relevance to search query
-    filtered_products = filter_by_relevance(all_products, search_query)
-    
-    # Normalize product names and quantities
-    normalized_products = [normalize_product(product) for product in filtered_products]
-    
-    # Group similar products
-    grouped_products = group_similar_products(normalized_products)
-    
-    # Format the output
-    result = format_output(grouped_products, store_credentials)
-    
-    return result
-
-def parse_price(price):
-    """Convert price to integer regardless of input format."""
-    if isinstance(price, int):
-        return price
-    if isinstance(price, str):
-        # Extract digits from the string
-        digits = re.findall(r'\d+', price)
-        if digits:
-            return int(digits[0])
-    return 0
-
-def normalize_product(product):
-    """Normalize product information for better comparison."""
-    normalized = product.copy()
-    
-    # Normalize name: lowercase, remove extra spaces
-    name = product['name'].lower().strip()
-    
-    # Keep original name for display
-    normalized['original_name'] = product['name']
-    normalized['name'] = name
-    
-    # Normalize quantity
-    normalized['original_quantity'] = product['quantity']
-    normalized['normalized_quantity'] = normalize_quantity(product['quantity'])
-    
-    return normalized
-
-def normalize_quantity(quantity_str):
-    """Normalize quantity to a standard format for comparison."""
-    if not quantity_str:
-        return ""
-    
     quantity_str = quantity_str.lower().strip()
-    
-    # Define conversion chart
-    conversions = {
-        '750ml': '0.75l', '1500ml': '1.5l', '2000ml': '2l', '2l': '2000ml',
-        '1.75l': '1750ml', '1750ml': '1.75l', '1.5l': '1500ml', '0.75l': '750ml',
-        '1l': '1000ml', '1000ml': '1l', '500ml': '0.5l', '0.5l': '500ml',
-        '200ml': '0.2l', '0.2l': '200ml', '600ml': '0.6l', '0.6l': '600ml',
-        '300ml': '0.3l', '0.3l': '300ml', '125ml': '0.125l', '0.125l': '125ml',
-        '1.8l': '1800ml', '1800ml': '1.8l', '1.2l': '1200ml', '1200ml': '1.2l',
-        # Weight conversions
-        '1kg': '1000g', '1000g': '1kg', '500g': '0.5kg', '0.5kg': '500g',
-        '200g': '0.2kg', '0.2kg': '200g', '250g': '0.25kg', '0.25kg': '250g',
-        '750g': '0.75kg', '0.75kg': '750g', '1.5kg': '1500g', '1500g': '1.5kg',
-        '2kg': '2000g', '2000g': '2kg',
-        # Pack equivalents
-        '2pcs': '2 pieces', '2pieces': '2 pcs', '2pack': '2 pcs',
-        '4pcs': '4 pieces', '4pieces': '4 pcs', '4pack': '4 pcs',
-        '6pcs': '6 pieces', '6pieces': '6 pcs', '6pack': '6 pcs',
-        '8pcs': '8 pieces', '8pieces': '8 pcs', '8pack': '8 pcs',
-        '10pcs': '10 pieces', '10pieces': '10 pcs', '10pack': '10 pcs',
-        '10 x 125ml': '10pcs', '10pieces': '10 x 125ml',
-        '4 x 150ml': '4pcs', '4pieces': '4 x 150ml',
-    }
-    
-    # Remove spaces between number and unit
-    quantity_str = re.sub(r'(\d+)\s+([a-zA-Z]+)', r'\1\2', quantity_str)
-    
-    # Check for direct conversion
-    if quantity_str in conversions:
-        return conversions[quantity_str]
-    
-    # Check for multi-pack notation (e.g., "2 x 1.2 ltr")
-    multi_pack_match = re.match(r'(\d+)\s*(?:x|pack|pcs|pieces|pc)\s*(?:(\d+(?:\.\d+)?)\s*([a-zA-Z]+))?', quantity_str)
-    if multi_pack_match:
-        count = multi_pack_match.group(1)
-        
-        # If it's a format like "2 x 1.2 ltr"
-        if multi_pack_match.group(2) and multi_pack_match.group(3):
-            value = multi_pack_match.group(2)
-            unit = multi_pack_match.group(3)
-            return f"{count} x {value}{unit}"
-        
-        # If it's just "2 pack" or "2 pieces"
-        return f"{count} pieces"
-    
-    # If no conversion needed, return as is
-    return quantity_str
+    quantity_str = re.sub(r'\bltr\b', 'l', quantity_str)
+    quantity_str = re.sub(r'\bgm\b', 'g', quantity_str)
+    quantity_str = re.sub(r'\bkg\b', 'kg', quantity_str)
+    quantity_str = re.sub(r'\b(\d)\s*([a-z])', r'\1\2', quantity_str)
 
-def calculate_name_similarity(name1, name2):
-    """Calculate similarity between two product names."""
-    return SequenceMatcher(None, name1, name2).ratio()
+    value = None
+    unit = None
 
-def extract_keywords(text):
-    """Extract important keywords from text."""
-    text = text.lower()
-    # Remove common stopwords
-    stopwords = ['and', 'the', 'a', 'an', 'in', 'on', 'at', 'of', 'for', 'with', 'by']
-    words = text.split()
-    keywords = [word for word in words if word not in stopwords]
-    return keywords
+    match_pack = re.match(r'(\d+)\s*x\s*([\d.]+)\s*([a-z]+)', quantity_str) or \
+                 re.match(r'([\d.]+)\s*([a-z]+)\s*x\s*(\d+)', quantity_str)
+    if match_pack:
+        groups = match_pack.groups()
+        if len(groups) == 3:
+            try:
+                if groups[0].isdigit():
+                    count = int(groups[0]); val = float(groups[1]); unit = groups[2]
+                else:
+                    val = float(groups[0]); unit = groups[1]; count = int(groups[2])
+                value = count * val
+            except ValueError: pass
 
-def filter_by_relevance(products, search_query):
-    """Filter products based on relevance to search query."""
-    if not search_query:
-        return products
-    
-    query_keywords = extract_keywords(search_query.lower())
-    if not query_keywords:
-        return products
-    
-    # Extract brand names from the query if present
-    potential_brands = ['frooti', 'slice', 'maaza', 'appy', 'real', 'paper boat']
-    query_brands = [brand for brand in potential_brands if brand in search_query.lower()]
-    
-    relevant_products = []
-    for product in products:
-        product_name = product['name'].lower()
-        
-        # Calculate keyword presence score
-        keyword_score = sum(1 for keyword in query_keywords if keyword in product_name) / max(1, len(query_keywords))
-        
-        # Calculate overall similarity score
-        similarity_score = calculate_name_similarity(search_query.lower(), product_name)
-        
-        # Brand match bonus
-        brand_bonus = 0
-        if query_brands:
-            for brand in query_brands:
-                if brand in product_name:
-                    brand_bonus = 0.2
-                    break
-        
-        # Combined relevance score (weighted average)
-        relevance_score = 0.6 * keyword_score + 0.2 * similarity_score + brand_bonus
-        
-        # Add product if above threshold
-        if relevance_score >= 0.4:  # Threshold for relevance
-            relevant_products.append(product)
-    
-    return relevant_products
+    if value is None:
+        match_simple = re.match(r'([\d.]+)\s*([a-z]+)', quantity_str)
+        if match_simple:
+            try:
+                value = float(match_simple.group(1)); unit = match_simple.group(2)
+            except ValueError: pass
 
-def group_similar_products(products):
-    """Group similar products based on name and quantity."""
-    groups = []
-    
-    for product in products:
-        matched = False
-        
-        for group in groups:
-            representative = group[0]
-            
-            # Check if quantity matches exactly
-            if product['normalized_quantity'] == representative['normalized_quantity']:
-                # Check name similarity
-                similarity = calculate_name_similarity(product['name'], representative['name'])
-                if similarity >= 0.8:  # 80% similarity threshold
-                    group.append(product)
-                    matched = True
-                    break
-        
-        if not matched:
-            # Create a new group
-            groups.append([product])
-    
-    return groups
+    if value is None:
+         match_count = re.match(r'^([\d.]+)$', quantity_str)
+         if match_count:
+             try:
+                 value = int(match_count.group(1)); unit = 'count'
+             except ValueError:
+                  try:
+                      f_val = float(match_count.group(1))
+                      if f_val.is_integer(): value = int(f_val); unit = 'count'
+                  except ValueError: pass
 
-def format_output(grouped_products, store_credentials):
-    """Format the output as required."""
-    # Process each group and calculate the platform count
-    product_groups_with_count = []
-    
-    for group in grouped_products:
-        if not group:
-            continue
-        
-        # Use the first product's name and image for the group
-        group_representative = group[0]
-        
-        # Create the product entry
-        product_entry = {
-            "name": group_representative['original_name'],
-            "quantity": group_representative['original_quantity'],
-            "image_url": group_representative['image'],
-            "buy_button": {}
-        }
-        
-        # Count unique platforms and add buy buttons for each store
-        unique_platforms = set()
-        for product in group:
-            store_name = product['store'].lower()
-            unique_platforms.add(store_name)
-            
-            formatted_store_name = store_name.capitalize() if store_name != 'instamart' else 'Instamart'
-            if store_name == 'bigbasket':
-                formatted_store_name = 'BIGBASKET'
-            elif store_name == 'blinkit':
-                formatted_store_name = 'blinkit'
-            elif store_name == 'dmart':
-                formatted_store_name = 'DMART'
-            elif store_name == 'zepto':
-                formatted_store_name = 'ZEPTO'
-            
-            product_entry["buy_button"][formatted_store_name] = {
-                "price": product['price'],
-                "url": product['url']
-            }
-        
-        # Add the group with its platform count
-        product_groups_with_count.append((product_entry, len(unique_platforms)))
-    
-    # Sort groups by platform count (descending)
-    product_groups_with_count.sort(key=lambda x: x[1], reverse=True)
-    
-    # Take only the top 30 items
-    top_30_products = [item[0] for item in product_groups_with_count[:30]]
-    
-    # Ensure all stores have credentials in the output, even if empty
-    all_credentials = {
-        "ZEPTO": store_credentials.get("ZEPTO", {}),
-        "BIGBASKET": store_credentials.get("BIGBASKET", {}),
-        "BLINKIT": store_credentials.get("BLINKIT", {}),
-        "INSTAMART": store_credentials.get("INSTAMART", {}),
-        "DMART": store_credentials.get("DMART", {})
-    }
-    
-    return {
-        "data": top_30_products,
-        "credentials": all_credentials
-    }
+    if value is not None and unit is not None:
+        if unit == 'l': value *= 1000; unit = 'ml'
+        elif unit == 'kg': value *= 1000; unit = 'g'
+        return {'value': value, 'unit': unit}
+    return None
 
-async def get_compared_data_with_timing(search_query: str, location_data, credentials = None) -> tuple:
-    # Define the search functions and their respective platforms
-    search_tasks = {
-        'blinkit': search_blinkit,
-        'instamart': search_instamart,
-        'bigbasket': search_bigbasket,
-        'dmart': search_dmart,
-        'zepto': search_zepto
-    }
-    
-    # Store the results and timing information
-    results = {}
-    
-    async def process_platform(platform, search_function, query):
-        """Asynchronous wrapper for each platform's search function"""
-        start = time.time()
+def are_prices_close(price1, price2, tolerance):
+    if price1 is None or price2 is None: return False
+    if price1 == 0 and price2 == 0: return True
+    if price1 == 0 or price2 == 0: return False
+    # Ensure max() is not zero before division, although covered by previous checks
+    max_price = max(abs(price1), abs(price2))
+    if max_price == 0: return True # Should be covered by price1==0 and price2==0
+    return abs(price1 - price2) / max_price <= tolerance
+
+
+def are_quantities_similar(q1, q2, tolerance):
+    if q1 is None or q2 is None: return False
+    if q1['unit'] != q2['unit']: return False
+    value1, value2 = q1['value'], q2['value']
+    if value1 == 0 and value2 == 0: return True
+    if value1 == 0 or value2 == 0: return False
+    # Ensure max() is not zero before division
+    max_val = max(abs(value1), abs(value2))
+    if max_val == 0: return True # Should be covered by value1==0 and value2==0
+    return abs(value1 - value2) / max_val <= tolerance
+
+
+def group_and_sort_products(products_data, search_query):
+    if not MISTRAL_API_KEY:
+        raise ValueError("MISTRAL_API_KEY environment variable not set.")
+
+    print("Initializing Mistral client...")
+    # Use the specific import requested by the user
+    client = Mistral(api_key=MISTRAL_API_KEY)
+    print("Client initialized.")
+
+    print("Generating query embedding...")
+    try:
+        # Assuming 'Mistral' class uses '.embeddings.create'
+        query_embedding_response = client.embeddings.create(
+            model=MISTRAL_EMBED_MODEL,
+            inputs=[search_query] # Use 'inputs' for list
+        )
+        query_embedding_np = np.array(query_embedding_response.data[0].embedding)
+        print(f"Query embedding generated ({query_embedding_response.usage.total_tokens} tokens used).")
+    except Exception as e:
+        print(f"Error getting query embedding: {e}")
+        raise
+
+    processed_products = []
+    print("Preprocessing products...")
+    for i, p in enumerate(products_data):
         try:
-            # Run the synchronous function in a thread pool
-            result = await asyncio.to_thread(search_function, query, location_data, credentials)
-            elapsed = time.time() - start
-            
-            results[platform] = result
-            
-        except Exception as exc:
-            print(f"{platform} search generated an exception: {exc}")
-            results[platform] = {}
-    
-    # Create tasks for all platforms
-    tasks = []
-    for platform, search_function in search_tasks.items():
-        tasks.append(process_platform(platform, search_function, search_query))
-    
-    # Wait for all search operations to complete
-    await asyncio.gather(*tasks)
-    
-    log_debug(results, "get_compared_data_with_timing", "INFO")
-    
-    # Format data for comparison algorithm
-    formatted_data = {
-        'Blinkit': results.get('blinkit', {}),
-        'Instamart': results.get('instamart', {}),
-        'bigbasket': results.get('bigbasket', {}),
-        'Dmart': results.get('dmart', {}),
-        'Zepto': results.get('zepto', {})
-    }
-    
-    # Use our comparison algorithm
-    compared_data = compare_grocery_products(formatted_data, search_query)
-    
-    # Ensure all required store credentials are present
-    for store in ['ZEPTO', 'INSTAMART', 'BLINKIT', 'BIGBASKET', 'DMART']:
-        if store not in compared_data['credentials']:
-            compared_data['credentials'][store] = {}
-    
-    return compared_data
+            price_str = str(p.get('price', 'NaN'))
+            price = float(price_str.replace(',', '')) if price_str != 'NaN' else None
+        except ValueError: price = None
+        quantity_str = p.get('quantity', ''); parsed_qty = parse_quantity(quantity_str)
+        processed_products.append({
+            'original_data': p, 'id': i, 'name': p.get('name', ''),
+            'price': price, 'parsed_quantity': parsed_qty, 'embedding': None
+        })
+
+    print(f"Generating name embeddings using {MISTRAL_EMBED_MODEL}...")
+    product_names = [p['name'] for p in processed_products if p['name']]
+    original_indices_with_names = [i for i, p in enumerate(processed_products) if p['name']]
+
+    if not product_names:
+        print("Warning: No valid product names found to generate embeddings.")
+        embeddings_np = []
+        usage_tokens = 0
+    else:
+        try:
+             # Assuming 'Mistral' class uses '.embeddings.create'
+            embeddings_response = client.embeddings.create(
+                 model=MISTRAL_EMBED_MODEL,
+                 inputs=product_names # Use 'inputs' for list
+            )
+            usage_tokens = embeddings_response.usage.total_tokens
+
+            # Map embeddings back using index - assuming response order matches input order
+            if len(embeddings_response.data) != len(product_names):
+                print(f"Warning: Mismatch in embedding response length. Expected {len(product_names)}, got {len(embeddings_response.data)}")
+                # Handle mismatch - basic approach: pad or trim (less safe)
+                # Safer: Use index if available and reliable
+                embedding_map = {data.index: data.embedding for data in embeddings_response.data}
+                temp_embeddings_np = [np.array(embedding_map.get(i, None)) for i in range(len(product_names))]
+
+            else:
+                 # Assume order matches if length is correct
+                 temp_embeddings_np = [np.array(data.embedding) for data in embeddings_response.data]
+
+            full_embeddings_np = [None] * len(processed_products)
+            for original_idx, emb in zip(original_indices_with_names, temp_embeddings_np):
+                 if emb is not None:
+                     full_embeddings_np[original_idx] = emb
+            embeddings_np = full_embeddings_np
+
+        except Exception as e:
+            print(f"Error calling Mistral API for product embeddings: {e}")
+            raise
+
+    for i, p in enumerate(processed_products):
+        if i < len(embeddings_np): p['embedding'] = embeddings_np[i]
+        else: p['embedding'] = None # Fallback if something went wrong with length
+
+    print(f"Embeddings generated ({usage_tokens} tokens used).")
+
+    groups = []
+    grouped_ids = set()
+
+    print("Grouping products...")
+    for i, product1 in enumerate(processed_products):
+        if product1['id'] in grouped_ids: continue
+        current_group_items = [product1]; grouped_ids.add(product1['id'])
+
+        for j in range(i + 1, len(processed_products)):
+            product2 = processed_products[j]
+            if product2['id'] in grouped_ids: continue
+            if product1['embedding'] is None or product2['embedding'] is None: continue
+
+            price_match = are_prices_close(product1['price'], product2['price'], PRICE_TOLERANCE)
+            quantity_match = are_quantities_similar(product1['parsed_quantity'], product2['parsed_quantity'], QUANTITY_TOLERANCE)
+
+            emb1, emb2 = product1['embedding'], product2['embedding']
+            norm1, norm2 = np.linalg.norm(emb1), np.linalg.norm(emb2)
+            name_sim = np.dot(emb1, emb2) / (norm1 * norm2) if norm1 > 0 and norm2 > 0 else 0.0
+            name_match = name_sim >= NAME_SIMILARITY_THRESHOLD
+
+            if price_match and quantity_match and name_match:
+                current_group_items.append(product2)
+                grouped_ids.add(product2['id'])
+
+        representative_product = current_group_items[0]['original_data']
+        representative_embedding = current_group_items[0]['embedding']
+
+        query_sim_score = -1.0
+        if representative_embedding is not None and query_embedding_np is not None:
+            rep_norm = np.linalg.norm(representative_embedding); query_norm = np.linalg.norm(query_embedding_np)
+            if rep_norm > 0 and query_norm > 0:
+                 query_sim_score = np.dot(representative_embedding, query_embedding_np) / (rep_norm * query_norm)
+
+        output_group = {
+            "name": representative_product['name'], "image": representative_product.get('image_url'),
+            "_internal_items": current_group_items, "_query_similarity": query_sim_score, "price": []
+        }
+        min_price = float('inf'); min_quantity_value = float('inf')
+
+        for item in current_group_items:
+            orig_data = item['original_data']
+            output_group["price"].append({
+                "store": orig_data.get('platform'), "price": item['price'],
+                "quantity": orig_data.get('quantity', ''), "url": orig_data.get('product_url')
+            })
+            if item['price'] is not None: min_price = min(min_price, item['price'])
+            if item['parsed_quantity'] is not None: min_quantity_value = min(min_quantity_value, item['parsed_quantity']['value'])
+
+        output_group["_min_price"] = min_price if min_price != float('inf') else None
+        output_group["_min_quantity_value"] = min_quantity_value if min_quantity_value != float('inf') else None
+
+        groups.append(output_group)
+
+    print(f"Grouping complete. Found {len(groups)} groups.")
+
+    print("Sorting groups...")
+    def sort_key(group):
+        query_similarity = group.get('_query_similarity', -1.0)
+        num_stores = len(group['price'])
+        min_price = group.get('_min_price', float('inf'))
+        if min_price is None: min_price = float('inf')
+        min_qty = group.get('_min_quantity_value', float('inf'))
+        if min_qty is None: min_qty = float('inf')
+        return (-query_similarity, -num_stores, min_price, min_qty)
+
+    groups.sort(key=sort_key)
+    print("Sorting complete.")
+
+    final_result = []
+    for group in groups:
+        del group['_internal_items']; del group['_min_price']
+        del group['_min_quantity_value']; del group['_query_similarity']
+        final_result.append(group)
+
+    return final_result[:35] #Max 35 results

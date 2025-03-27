@@ -171,7 +171,7 @@ def dict_to_cookie_string(cookie_dict):
 def blinkit_clean_string(string):
     cleaned_string = re.sub(r"[^a-zA-Z0-9 ]", "", string)
     cleaned_string = re.sub(r" +", " ", cleaned_string)
-    return cleaned_string.replace(" ","-").lower()
+    return cleaned_string.replace(" ","-").lower().strip('-')
 
 def format_name(input_string, original = False):
     split_parts = re.split(r'[^a-zA-Z0-9\s]', input_string)
@@ -184,5 +184,20 @@ def convert_to_image_url_zepto(path, name):
         import re
         result = re.sub(r'[^a-zA-Z0-9]', '-', input_string)
         result = re.sub(r'-+', '-', result)
-        return result
-    return f'https://cdn.zeptonow.com/production/ik-seo/{path.split(".")[0]}/{zepto_format_string(name)}.{path.split(".")[-1]}'
+        # Ensure it doesn't start or end with a hyphen, common in URL slugs
+        result = result.strip('-')
+        return result.lower() # Usually slugs are lowercase
+
+    if not path or '.' not in path:
+        return "" # Return empty string if path is invalid
+
+    path_parts = path.split('.')
+    filename = path_parts[0]
+    extension = path_parts[-1]
+    formatted_name = zepto_format_string(name)
+
+    # Handle potential empty formatted_name after cleaning
+    if not formatted_name:
+        formatted_name = "product" # Default name if cleaning removes everything
+
+    return f'https://cdn.zeptonow.com/production/ik-seo/{filename}/{formatted_name}.{extension}'

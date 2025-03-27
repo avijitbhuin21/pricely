@@ -47,19 +47,28 @@ def check_location_service_status(location_data):
 def format_dmart_data(data):
     final_data = {'data': {}, 'credentials': data['credentials']}
 
-    for i in data['data']['products']:
+    results = []
+    
+    for i in data.get("data", {}).get("products", []):
+        # Skip if product is not available
+        if i.get("availabilityType") != "A" or i.get("buyable") != "true" or not i.get("sKUs"):
+            continue
+            
+        # Skip if the first SKU is not available
+        if i["sKUs"][0].get("availabilityType") != "A" or i["sKUs"][0].get("buyable") != "true" or i["sKUs"][0].get("invType") == "OOS":
+            continue
+            
         item = {
-            'name': i['name'],
-            'price': i['sKUs'][0]['priceSALE'],
-            'image': f'https://cdn.dmart.in/images/products/{i['sKUs'][0]['productImageKey']}_{i['sKUs'][0]['imgCode']}_B.jpg',
-            'url': f'https://www.dmart.in/product/{i['seo_token_ntk']}',
-            'quantity': i['sKUs'][0]['variantTextValue'],
+            "platform": "DMart",
+            "name": i["name"],
+            "price": i["sKUs"][0]["priceSALE"],
+            "image_url": f"https://cdn.dmart.in/images/products/{i['sKUs'][0]['productImageKey']}_{i['sKUs'][0]['imgCode']}_B.jpg",
+            "product_url": f"https://www.dmart.in/product/{i['seo_token_ntk']}",
+            "quantity": i["sKUs"][0]["variantTextValue"],
         }
-        formatted_name = format_name(i['name'])
-        if formatted_name in final_data['data']:
-            final_data['data'][formatted_name].append(item)
-        else:
-            final_data['data'][formatted_name] = [item]
+        results.append(item)
+    
+    final_data['data'] = results
 
     return final_data
 

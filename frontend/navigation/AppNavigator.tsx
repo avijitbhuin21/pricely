@@ -14,7 +14,10 @@ import OffersScreen from '../screens/OffersScreen';
 // Define the root stack parameter list
 export type RootStackParamList = {
   Home: undefined;
-  CompareResult: { query: string };
+  CompareResult: { 
+    query: string;
+    onSearchComplete?: (imageUrl: string) => void;
+  };
   Profile: undefined;
   Cart: undefined;
   Offers: undefined;

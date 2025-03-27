@@ -50,14 +50,14 @@ export default function ProfileScreen() {
 
   // Demo profile details
   const userId = 'USER12345';
-  const [email, setEmail] = useState('sagnik@example.com');
+  const [email, setEmail] = useState('Demo@example.com');
   const phoneNumber = '+91 98765 43210';
   const memberSince = 'May 2023';
 
   const [avatarUri, setAvatarUri] = useState('https://source.unsplash.com/random/300x300?face');
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [tempName, setTempName] = useState("Sagnik");
+  const [tempName, setTempName] = useState("Demo");
 
   useEffect(() => {
     setTempName(userName);

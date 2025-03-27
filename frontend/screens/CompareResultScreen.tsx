@@ -16,13 +16,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useNavigation, NavigationProp, useRoute, RouteProp } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import comparisonData from '../JSONfiles/comparison.json';
 import { useLocation } from '../contexts/LocationContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCart } from '../contexts/CartContext';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -44,22 +44,24 @@ interface CompareResultItem {
     name: string;
     price: string;
     link: string;
+    quantity: string;
   }[];
 }
 
 const ComparisonCard: React.FC<{
   item: CompareResultItem;
   opacity: Animated.Value;
-  onAddToCart: (shopName: string, price: string, remove: boolean) => void;
+  onAddToCart: (item: CompareResultItem, shopName: string, price: string, remove: boolean) => void;
   isInCart: (shopId: string) => boolean;
   style?: any;
 }> = ({ item, opacity, onAddToCart, isInCart, style }) => {
+  const displayQuantity = item.shops.length > 0 ? item.shops[0].quantity : item.quantity;
   const areAllItemsInCart = item.shops.every(shop => isInCart(`${item.id}-${shop.name}`));
 
   const handleAddAllItems = () => {
     const shouldRemove = areAllItemsInCart;
     item.shops.forEach(shop => {
-      onAddToCart(shop.name, shop.price, shouldRemove);
+      onAddToCart(item, shop.name, shop.price, shouldRemove);
     });
   };
 
@@ -87,7 +89,6 @@ const ComparisonCard: React.FC<{
         <View style={styles.cardContent}>
           <View style={styles.topContent}>
             <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-            <Text style={styles.quantity}>{item.quantity}</Text>
             <View style={styles.shopsContainer}>
               {item.shops.map((shop, index) => (
                 <View key={index} style={styles.shopItem}>
@@ -96,10 +97,13 @@ const ComparisonCard: React.FC<{
                     style={styles.shopIcon}
                     resizeMode="contain"
                   />
-                  <Text style={styles.price}>₹{shop.price}</Text>
+                  <View style={styles.priceContainer}>
+                    <Text style={styles.price}>₹{shop.price}</Text>
+                    <Text style={styles.shopQuantity}>{shop.quantity}</Text>
+                  </View>
                   {isInCart(`${item.id}-${shop.name}`) ? (
                     <TouchableOpacity
-                      onPress={() => onAddToCart(shop.name, shop.price, true)}
+                      onPress={() => onAddToCart(item, shop.name, shop.price, true)}
                       style={styles.button}
                     >
                       <LinearGradient
@@ -113,7 +117,7 @@ const ComparisonCard: React.FC<{
                     </TouchableOpacity>
                   ) : (
                     <TouchableOpacity
-                      onPress={() => onAddToCart(shop.name, shop.price, false)}
+                      onPress={() => onAddToCart(item, shop.name, shop.price, false)}
                       style={styles.button}
                     >
                       <LinearGradient
@@ -160,6 +164,7 @@ const getShopLogo = (shopName: string): ImageSourcePropType => {
 
 export default function CompareResultScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'CompareResult'>>();
   const { currentLocation, updateLocation, autoLocate } = useLocation();
   const { addToCart, removeFromCart, isInCart } = useCart();
   const [compareData, setCompareData] = useState<CompareResultItem[]>([]);
@@ -169,25 +174,90 @@ export default function CompareResultScreen() {
   const [activeTab, setActiveTab] = useState('');
 
   useEffect(() => {
-    fetchComparisonData();
-  }, []);
+    console.log('Initiating comparison data fetch...');
+    fetchComparisonData().catch(err => {
+      console.error('Failed to fetch comparison data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setLoading(false);
+    });
+  }, [route.params?.query]); // Re-fetch when search query changes
 
-  const fetchComparisonData = () => {
+  useEffect(() => {
+    if (compareData.length > 0 && route.params?.onSearchComplete) {
+      const firstProductImage = compareData[0].image;
+      route.params.onSearchComplete(firstProductImage);
+    }
+  }, [compareData, route.params?.onSearchComplete]);
+
+  const fetchComparisonData = async () => {
     try {
-      setCompareData(comparisonData.map((item, index) => ({
-        id: index.toString(),
-        image: item.data.image,
-        name: item.data.name,
-        quantity: item.data.quantity,
-        shops: Object.entries(item.data.buy_button)
-          .filter(([_, shopData]) => shopData !== undefined)
-          .map(([shopName, shopData]) => ({
-            name: shopName,
-            price: shopData!.price,
-            link: shopData!.url
-          }))
-      })));
+      setLoading(true);
+      setError(null);
+
+      // Get coordinates from AsyncStorage
+      const lat = await AsyncStorage.getItem('pricely_lat') || '22.6382939';
+      const lon = await AsyncStorage.getItem('pricely_lon') || '88.448261';
+      const item_name = route.params?.query || '';
+
+      // Prepare request payload
+      const payload = {
+        item_name,
+        lat,
+        lon,
+        credentials: null
+      };
+
+      // Make API call
+      const response = await fetch('https://noble-raven-entirely.ngrok-free.app/get-search-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('API Response:', JSON.stringify(result, null, 2));
+      
+      if (!result.data?.data || !Array.isArray(result.data.data)) {
+        throw new Error('Invalid response format: expected data.data array');
+      }
+
+      // Transform API response to match expected format
+      const transformedData = result.data.data.map((item: any, index: number) => {
+        if (!item) {
+          console.error('Invalid item format:', item);
+          return null;
+        }
+
+        // Create shops array from price array
+        const shops = (item.price || []).map((priceData: any) => ({
+          name: priceData.store.toLowerCase(),
+          price: priceData.price.toString(),
+          link: priceData.url,
+          quantity: priceData.quantity
+        }));
+
+        return {
+          id: index.toString(),
+          image: item.image,
+          name: item.name,
+          quantity: shops[0]?.quantity || '', // Use quantity from first price entry
+          shops: shops
+        };
+      }).filter(Boolean);
+
+      if (transformedData.length === 0) {
+        throw new Error('No valid items found in response');
+      }
+
+      setCompareData(transformedData);
     } catch (err) {
+      console.error('Error fetching comparison data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load data');
     } finally {
       setLoading(false);
@@ -204,12 +274,20 @@ export default function CompareResultScreen() {
         position: 'bottom',
       });
     } else {
+      // Capitalize shop name to match Cart screen's vendor names
+      let capitalizedShopName = shopName.charAt(0).toUpperCase() + shopName.slice(1);
+      // Fix case for special vendor names
+      if (capitalizedShopName === "Dmart") {
+        capitalizedShopName = "DMart";
+      } else if (capitalizedShopName === "Bigbasket") {
+        capitalizedShopName = "BigBasket";
+      }
       addToCart({
         id: `${item.id}-${shopName}`,
         name: item.name,
         image: item.image,
         quantity: item.quantity,
-        shopName: shopName,
+        shopName: capitalizedShopName,
         price: price,
         url: item.shops.find(shop => shop.name === shopName)?.link || ''
       });
@@ -251,7 +329,7 @@ export default function CompareResultScreen() {
           <ComparisonCard
             item={compareData[i]}
             opacity={fadeAnims[i] || new Animated.Value(1)}
-            onAddToCart={(shopName, price, remove) => handleCartAction(compareData[i], shopName, price, remove)}
+            onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
             isInCart={isInCart}
             style={cardStyle}
           />
@@ -259,7 +337,7 @@ export default function CompareResultScreen() {
             <ComparisonCard
               item={compareData[i + 1]}
               opacity={fadeAnims[i + 1] || new Animated.Value(1)}
-              onAddToCart={(shopName, price, remove) => handleCartAction(compareData[i + 1], shopName, price, remove)}
+              onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
               isInCart={isInCart}
               style={cardStyle}
             />
@@ -273,7 +351,7 @@ export default function CompareResultScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Header
-        userName="Sagnik"
+        userName="Demo"
         currentLocation={currentLocation}
         onLocationSelect={updateLocation}
         onAutoLocate={autoLocate}
@@ -413,19 +491,28 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     opacity: 0.95,
   },
+  priceContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    flexGrow: 1,
+    paddingHorizontal: Dimensions.get('window').width * 0.008,
+  },
   price: {
     fontFamily: 'Poppins',
     fontSize: Dimensions.get('window').width * 0.034,
     fontWeight: '700',
     color: '#2ecc71',
-    flexGrow: 1,
-    textAlign: 'center',
-    paddingHorizontal: Dimensions.get('window').width * 0.008,
-    minWidth: Dimensions.get('window').width * 0.14,
     letterSpacing: 0.2,
     textShadowColor: 'rgba(46,204,113,0.1)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 1,
+  },
+  shopQuantity: {
+    fontFamily: 'Poppins',
+    fontSize: Dimensions.get('window').width * 0.026,
+    color: '#666',
+    marginTop: 2,
+    opacity: 0.9,
   },
   button: {
     overflow: 'hidden',
