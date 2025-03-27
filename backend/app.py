@@ -55,3 +55,27 @@ def main():
     
 if __name__ == "__main__":
     main()
+
+
+# remove the logo in the home page
+#  so update the name and the location section similer to zepto  name pricely- compare it
+# add the hamburger menu
+# app opening animation, they will send
+# in the sign in page add a drop shadow to the white secction.
+# password hide and show button
+# instead of the solid pink colour add the gradient colour they provided
+# make the recent search logos a little smaller.
+# in the searchbar add changing names. like provided
+# add slider in the home page.
+# recommended daily needs also needs a animation
+# remove the borders from the recent search and keep them small
+
+
+# web analytics
+# edit offer prices from the admin panel
+# add the sliding thingy
+# normal anaytics
+# in the admin panel we need to update slideshow images as well
+# the daily needs sections should be updated from the admin panel
+# add push notifications as well.
+
