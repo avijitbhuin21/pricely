@@ -1,0 +1,46 @@
+[
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 100
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 200
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 300
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 400
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 500
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 600
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 700
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 800
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 900
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 1000
+    },
+    {
+        "image_url": "https://picsum.photos/1920/1080",
+        "price": 250.0
+    }
+]
