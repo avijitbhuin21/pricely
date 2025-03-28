@@ -1,0 +1,1872 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Pricely Admin Panel</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #10B981;
+            --accent: #F43F5E;
+            --dark: #1E293B;
+            --light: #F8FAFC;
+            --gray-light: #CBD5E1;
+            --gray: #94A3B8;
+            --gray-dark: #64748B;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --card-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            color: var(--text-primary);
+            background-color: #111;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Simplified background */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+        
+        /* Main layout */
+        .wrapper {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: transparent;
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            color: white;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 50px;
+            cursor: pointer;
+        }
+        
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .user-name {
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .logout-btn {
+            color: var(--gray-light);
+            font-size: 1.1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .logout-btn:hover {
+            color: white;
+        }
+        
+        .container {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .page-title {
+            color: white;
+            margin-bottom: 2rem;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .card:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        
+        .card-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(79, 70, 229, 0.2);
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .card h2 {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card p {
+            color: var(--gray-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        
+        .card .button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            justify-content: center;
+            margin-top: auto;
+        }
+        
+        .card .button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-container {
+            background-color: rgba(15, 23, 42, 0.95);
+            border-radius: 1rem;
+            width: 95%;
+            max-width: 1400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-close:hover {
+            color: white;
+        }
+        
+        /* Item Cards Grid (Generic for Offers, Slideshow, Daily Needs) */
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(25rem, 1fr)); /* Increased minimum size to 25rem */
+            gap: 1.5rem;
+        }
+        
+        .item-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+        
+        .item-image-container {
+            width: 100%;
+            height: auto; /* Changed from fixed height to auto for better proportions */
+            min-height: 250px;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        .item-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .item-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            min-height: 250px;
+            background-color: rgba(31, 41, 55, 0.5);
+            color: var(--gray-light);
+        }
+        
+        .item-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .item-placeholder span {
+            font-size: 0.9rem;
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+        
+        .item-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+        }
+        
+        .item-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+        }
+        
+        .item-field label {
+            color: var(--gray-light);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-left: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .item-field label i {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .item-field input {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            position: relative;
+        }
+        
+        .item-actions button {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-update {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-update:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-delete {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background-color: #E11D48; /* Darker accent */
+        }
+        
+        .btn-preview {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            z-index: 5;
+        }
+        
+        /* ADD ITEM CARD */
+        .add-item-card {
+            background-color: rgba(16, 185, 129, 0.05);
+            border: 2px dashed rgba(16, 185, 129, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            min-height: 350px; /* Reduced height */
+        }
+        
+        .add-item-card i {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 1.25rem;
+        }
+        
+        .add-item-card span {
+            color: var(--gray-light);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .add-item-form {
+            display: none;
+            flex-direction: column;
+            gap: 1.25rem;
+            width: 100%;
+            padding: 1.5rem;
+        }
+        
+        .add-item-form.active {
+            display: flex;
+        }
+        
+        .add-item-form h3 {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .add-item-form label {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        .add-item-form input {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.85rem 1rem;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        
+        .add-item-form button {
+            padding: 0.85rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .add-item-form button[type="submit"] {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .cancel-add {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: var(--gray-light) !important;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            z-index: 9999;
+            max-width: 450px;
+        }
+        
+        .notification.success {
+            background-color: var(--secondary);
+        }
+        
+        .notification.error {
+            background-color: var(--accent);
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification i {
+            font-size: 1.4rem;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-message {
+            line-height: 1.4;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.25rem;
+            margin-left: 0.5rem;
+        }
+        
+        /* SPINNER */
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* RESPONSIVE STYLES */
+        @media (max-width: 1024px) {
+            .item-grid {
+                grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .user-info {
+                gap: 0.75rem;
+            }
+            
+            .container {
+                padding: 1.5rem 1rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-profile {
+                padding: 0.5rem;
+            }
+            
+            .user-name {
+                display: none;
+            }
+            
+            .modal-container {
+                width: 95%;
+                max-height: 95vh;
+            }
+            
+            .item-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .notification {
+                left: 1rem;
+                right: 1rem;
+                max-width: calc(100% - 2rem);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .item-actions {
+                flex-direction: column;
+            }
+        }
+        
+        /* -------------------------------------------------- */
+        /* SCROLLBAR STYLING */
+        /* Custom Scrollbar Styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(79, 70, 229, 0.5);
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(79, 70, 229, 0.7);
+        }
+        
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(79, 70, 229, 0.5) rgba(15, 23, 42, 0.6);
+        }
+        
+        /* Special styling for the modal container scrollbar */
+        .modal-container::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .modal-container::-webkit-scrollbar-thumb {
+            background: rgba(79, 70, 229, 0.4);
+            border-radius: 5px;
+            border: 2px solid rgba(15, 23, 42, 0.8);
+        }
+        
+        .modal-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(79, 70, 229, 0.6);
+        }
+        /* ------------------------------------------------- */
+    </style>
+    <script>
+        // IIFE (Immediately Invoked Function Expression) to run auth check immediately
+        (async function checkAuth() {
+            const username = localStorage.getItem('pricely_uname');
+            const password = localStorage.getItem('pricely_pwd');
+            const loginUrl = "{{ url_for('admin_login') }}"; // Get login URL from Flask
+            
+            if (!username || !password) {
+                console.log('Credentials not found in localStorage. Redirecting to login.');
+                window.location.replace(loginUrl); // Use replace to avoid history entry
+                return; // Stop script execution
+            }
+            
+            try {
+                const response = await fetch("{{ url_for('verify_admin_session') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username: username, password: password })
+                });
+                
+                // If response is not OK (e.g., 401 Unauthorized, 500 Server Error) or JSON indicates invalid
+                if (!response.ok) {
+                    console.log('Server verification failed (non-OK response). Redirecting to login.');
+                    localStorage.removeItem('pricely_uname'); // Clear invalid creds
+                    localStorage.removeItem('pricely_pwd');
+                    window.location.replace(loginUrl);
+                    return;
+                }
+                
+                const result = await response.json();
+                if (!result.valid) {
+                    console.log('Server verification failed (invalid credentials). Redirecting to login.');
+                    localStorage.removeItem('pricely_uname'); // Clear invalid creds
+                    localStorage.removeItem('pricely_pwd');
+                    window.location.replace(loginUrl);
+                    return;
+                }
+                
+                // If we reach here, credentials are valid. Proceed with loading the page.
+                console.log('Credentials verified successfully.');
+                
+                // Hide the loader
+                const loader = document.getElementById('auth-loader');
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+                
+                // Update avatar initial and username display once DOM is ready
+                document.addEventListener('DOMContentLoaded', () => {
+                    try {
+                        // Wrap main DOMContentLoaded logic
+                        const avatar = document.querySelector('.avatar');
+                        if (avatar && username) {
+                            avatar.textContent = username.charAt(0).toUpperCase();
+                        }
+                        
+                        const userNameDisplay = document.querySelector('.user-name');
+                        if (userNameDisplay) {
+                            userNameDisplay.textContent = username;
+                        }
+                    } catch (error) {
+                        console.error("Error updating user info in DOM:", error);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error during session verification fetch:', error);
+                // Redirect to login on network or other fetch errors
+                window.location.replace(loginUrl);
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Add a simple loader that will be hidden once auth passes -->
+    <div id="auth-loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+        <p style="color: white; font-size: 1.2em;">Verifying session...</p>
+    </div>
+    
+    <div class="background">
+        <div class="stars" id="stars"></div>
+    </div>
+    
+    <div class="wrapper">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <h1>Pricely Dashboard</h1>
+                </div>
+                <div class="user-info">
+                    <div class="user-profile">
+                        <div class="avatar">A</div>
+                        <div class="user-name">{{ username }}</div>
+                    </div>
+                    <button class="logout-btn" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <main class="container">
+            <h1 class="page-title">Admin Controls</h1>
+            <div class="card-grid">
+                <!-- Card 1: Manage Offers -->
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h2>Manage Offers</h2>
+                    <p>Update promotional offers, discounts, and special prices for items in your catalog.</p>
+                    <button id="manage-offers-btn" class="button">
+                        <span>Manage Offers</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Card 2: Update Slideshow -->
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <h2>Update Slideshow</h2>
+                    <p>Change the images displayed in the home page slideshow banner for better engagement.</p>
+                    <button id="manage-slideshow-btn" class="button">
+                        <span>Manage Slideshow</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Card 3: Daily Needs Section -->
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-shopping-basket"></i>
+                    </div>
+                    <h2>Daily Needs Section</h2>
+                    <p>Modify the items featured in the 'Recommended Daily Needs' section for higher conversions.</p>
+                    <button id="edit-daily-needs-btn" class="button">
+                        <span>Edit Daily Needs</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Card 4 -->
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h2>View Analytics</h2>
+                    <p>Access website usage statistics, conversion rates, and detailed user behavior data.</p>
+                    <a href="#" class="button">
+                        <span>View Analytics</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Offers Modal -->
+    <div id="offers-modal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-tags"></i> Manage Promotional Offers</h2>
+                <button class="modal-close" data-modal-id="offers-modal" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="item-grid" id="offers-grid">
+                    <!-- Offer cards will be generated by JS -->
+                    <div class="item-card add-item-card" data-modal-id="offers-modal" data-item-type="offer">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Add New Offer</span>
+                    </div>
+                    <div class="item-card add-item-form-container" data-modal-id="offers-modal" data-item-type="offer" style="display: none;">
+                        <form class="add-item-form" data-item-type="offer">
+                            <h3><i class="fas fa-plus-circle"></i> Add New Offer</h3>
+                            <div class="item-field">
+                                <label for="new-offer-url"><i class="fas fa-link"></i> Image URL</label>
+                                <input type="text" id="new-offer-url" name="image_url" placeholder="https://example.com/image.jpg" required>
+                            </div>
+                            <div class="item-field">
+                                <label for="new-offer-price"><i class="fas fa-tag"></i> Price</label>
+                                <input type="number" id="new-offer-price" name="price" placeholder="99.99" step="any" required>
+                            </div>
+                            <div class="item-actions">
+                                <button type="button" class="cancel-add" data-modal-id="offers-modal" data-item-type="offer">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <button type="submit" class="save-new-item" data-item-type="offer">
+                                    <i class="fas fa-save"></i> Save Offer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slideshow Modal -->
+    <div id="slideshow-modal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-images"></i> Manage Slideshow Images</h2>
+                <button class="modal-close" data-modal-id="slideshow-modal" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="item-grid" id="slideshow-grid">
+                    <!-- Slideshow cards will be generated by JS -->
+                    <div class="item-card add-item-card" data-modal-id="slideshow-modal" data-item-type="slideshow">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Add New Slide</span>
+                    </div>
+                    <div class="item-card add-item-form-container" data-modal-id="slideshow-modal" data-item-type="slideshow" style="display: none;">
+                        <form class="add-item-form" data-item-type="slideshow">
+                            <h3><i class="fas fa-plus-circle"></i> Add New Slide</h3>
+                            <div class="item-field">
+                                <label for="new-slideshow-url"><i class="fas fa-link"></i> Image URL</label>
+                                <input type="text" id="new-slideshow-url" name="image_url" placeholder="https://example.com/slide.jpg" required>
+                            </div>
+                            <div class="item-field">
+                                <label for="new-slideshow-price"><i class="fas fa-tag"></i> Price (Optional)</label>
+                                <input type="number" id="new-slideshow-price" name="price" placeholder="e.g., 49.99" step="any">
+                            </div>
+                            <div class="item-actions">
+                                <button type="button" class="cancel-add" data-modal-id="slideshow-modal" data-item-type="slideshow">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <button type="submit" class="save-new-item" data-item-type="slideshow">
+                                    <i class="fas fa-save"></i> Save Slide
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Daily Needs Modal -->
+    <div id="daily-needs-modal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-shopping-basket"></i> Manage Daily Needs Items</h2>
+                <button class="modal-close" data-modal-id="daily-needs-modal" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="item-grid" id="daily-needs-grid">
+                    <!-- Daily Needs cards will be generated by JS -->
+                    <div class="item-card add-item-card" data-modal-id="daily-needs-modal" data-item-type="daily_needs">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Add New Item</span>
+                    </div>
+                    <div class="item-card add-item-form-container" data-modal-id="daily-needs-modal" data-item-type="daily_needs" style="display: none;">
+                        <form class="add-item-form" data-item-type="daily_needs">
+                            <h3><i class="fas fa-plus-circle"></i> Add New Daily Needs Item</h3>
+                            <div class="item-field">
+                                <label for="new-daily_needs-url"><i class="fas fa-link"></i> Image URL</label>
+                                <input type="text" id="new-daily_needs-url" name="image_url" placeholder="https://example.com/item.jpg" required>
+                            </div>
+                            <div class="item-field">
+                                <label for="new-daily_needs-price"><i class="fas fa-tag"></i> Price</label>
+                                <input type="number" id="new-daily_needs-price" name="price" placeholder="19.99" step="any" required>
+                            </div>
+                            <div class="item-actions">
+                                <button type="button" class="cancel-add" data-modal-id="daily-needs-modal" data-item-type="daily_needs">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <button type="submit" class="save-new-item" data-item-type="daily_needs">
+                                    <i class="fas fa-save"></i> Save Item
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div class="notification-content">
+            <div class="notification-message" id="notification-message">Operation successful!</div>
+        </div>
+        <button class="notification-close" id="notification-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <script>
+        // Main application logic runs after DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wrap main logic in try...catch to prevent script halting on error
+            try {
+                console.log("DOM fully loaded and parsed. Initializing admin panel script.");
+                
+                // --- Star Animation ---
+                const starsContainer = document.getElementById('stars');
+                if (starsContainer) {
+                    try {
+                        const starCount = 150; // Number of stars
+                        for (let i = 0; i < starCount; i++) {
+                            const star = document.createElement('div');
+                            star.style.position = 'absolute';
+                            star.style.backgroundColor = 'white';
+                            star.style.borderRadius = '50%';
+                            star.style.opacity = Math.random();
+                            star.style.animation = `twinkle var(--duration) infinite alternate ease-in-out var(--delay)`;
+                            
+                            const size = Math.random() * 2 + 1;
+                            star.style.width = `${size}px`;
+                            star.style.height = `${size}px`;
+                            star.style.top = `${Math.random() * 100}%`;
+                            star.style.left = `${Math.random() * 100}%`;
+                            
+                            const duration = `${Math.random() * 3 + 2}s`;
+                            const delay = `${Math.random() * 5}s`;
+                            star.style.setProperty('--duration', duration);
+                            star.style.setProperty('--delay', delay);
+                            
+                            starsContainer.appendChild(star);
+                        }
+                        
+                        // Add keyframes for twinkle animation robustly
+                        let styleSheet = null;
+                        for (let i = 0; i < document.styleSheets.length; i++) {
+                            // Find the stylesheet associated with this document (not external potentially restricted ones)
+                            if (document.styleSheets[i].href === null || document.styleSheets[i].href.startsWith(window.location.origin)) {
+                                styleSheet = document.styleSheets[i];
+                                break;
+                            }
+                        }
+                        
+                        if (styleSheet) {
+                            let ruleExists = false;
+                            try {
+                                ruleExists = [...styleSheet.cssRules].some(rule => 
+                                    rule.type === CSSRule.KEYFRAMES_RULE && rule.name === 'twinkle');
+                            } catch (e) {
+                                console.warn("Could not check CSS rules (possibly due to browser security restrictions):", e);
+                                // Assume rule doesn't exist to be safe, or handle differently
+                            }
+                            
+                            if (!ruleExists) {
+                                styleSheet.insertRule(`
+                                    @keyframes twinkle {
+                                        0% { opacity: 0.2; transform: scale(0.8); }
+                                        100% { opacity: 1; transform: scale(1); }
+                                    }
+                                `, styleSheet.cssRules.length);
+                                console.log("Twinkle animation keyframes added.");
+                            }
+                        } else {
+                            console.warn("Could not find a suitable stylesheet to add keyframes.");
+                        }
+                    } catch (animError) {
+                        console.error("Error during star animation setup:", animError);
+                    }
+                } else {
+                    console.warn("Stars container not found.");
+                }
+                
+                // --- General Elements ---
+                const notification = document.getElementById('notification');
+                const notificationMessage = document.getElementById('notification-message');
+                const notificationClose = document.getElementById('notification-close');
+                
+                // --- Modal Management ---
+                const modals = {
+                    offer: document.getElementById('offers-modal'),
+                    slideshow: document.getElementById('slideshow-modal'),
+                    daily_needs: document.getElementById('daily-needs-modal')
+                };
+                
+                const grids = {
+                    offer: document.getElementById('offers-grid'),
+                    slideshow: document.getElementById('slideshow-grid'),
+                    daily_needs: document.getElementById('daily-needs-grid')
+                };
+                
+                // Ensure all modals and grids were found
+                for (const type in modals) {
+                    if (!modals[type]) console.error(`Modal element not found for type: ${type}`);
+                    if (!grids[type]) console.error(`Grid element not found for type: ${type}`);
+                }
+                
+                // Updated API endpoints using Flask's url_for function
+                const apiEndpoints = {
+                    offer: {
+                        get: "{{ url_for('get_offers') }}",
+                        add: "{{ url_for('add_offer') }}",
+                        update: "/api/offers/", // We'll append the ID in the handler functions
+                        delete: "/api/offers/"  // We'll append the ID in the handler functions
+                    },
+                    slideshow: {
+                        get: "{{ url_for('get_slideshow_items') }}",
+                        add: "{{ url_for('add_slideshow_item') }}",
+                        update: "/api/slideshow/", // We'll append the ID in the handler functions
+                        delete: "/api/slideshow/"  // We'll append the ID in the handler functions
+                    },
+                    daily_needs: {
+                        get: "{{ url_for('get_daily_needs_items') }}",
+                        add: "{{ url_for('add_daily_needs_item') }}",
+                        update: "/api/daily_needs/", // We'll append the ID in the handler functions
+                        delete: "/api/daily_needs/"  // We'll append the ID in the handler functions
+                    }
+                };
+                
+                const itemNames = {
+                    offer: "Offer",
+                    slideshow: "Slide",
+                    daily_needs: "Daily Needs Item"
+                };
+                
+                // --- Event Listeners ---
+                console.log("Attaching event listeners...");
+                
+                // Open Modals
+                document.getElementById('manage-offers-btn')?.addEventListener('click', () => openModal('offer'));
+                document.getElementById('manage-slideshow-btn')?.addEventListener('click', () => openModal('slideshow'));
+                document.getElementById('edit-daily-needs-btn')?.addEventListener('click', () => openModal('daily_needs'));
+                
+                console.log("Modal open listeners attached.");
+                
+                // Delegated Listeners (for dynamically added content and general interactions)
+                document.addEventListener('click', (event) => {
+                    try {
+                        // Add try-catch within delegated listener
+                        
+                        // Close button
+                        const closeButton = event.target.closest('.modal-close');
+                        if (closeButton) {
+                            const modalId = closeButton.dataset.modalId;
+                            console.log(`Close button clicked for modal: ${modalId}`);
+                            closeModalById(modalId);
+                            return; // Prevent other checks if close button was clicked
+                        }
+                        
+                        // Click outside modal
+                        if (event.target.classList.contains('modal-overlay')) {
+                            const modalId = event.target.id;
+                            console.log(`Clicked outside modal: ${modalId}`);
+                            closeModalById(modalId);
+                            return;
+                        }
+                        
+                        // Show Add Form Trigger
+                        const addCard = event.target.closest('.add-item-card');
+                        if (addCard) {
+                            const modalId = addCard.dataset.modalId;
+                            const itemType = addCard.dataset.itemType;
+                            console.log(`Add item trigger clicked for type: ${itemType} in modal: ${modalId}`);
+                            showAddForm(modalId, itemType);
+                            return;
+                        }
+                        
+                        // Cancel Add Form
+                        const cancelBtn = event.target.closest('.cancel-add');
+                        if (cancelBtn) {
+                            const modalId = cancelBtn.dataset.modalId;
+                            const itemType = cancelBtn.dataset.itemType;
+                            console.log(`Cancel add clicked for type: ${itemType} in modal: ${modalId}`);
+                            hideAddForm(modalId, itemType);
+                            return;
+                        }
+                        
+                        // Update Item
+                        const updateBtn = event.target.closest('.btn-update');
+                        if (updateBtn && !updateBtn.classList.contains('retry-fetch')) { // Exclude retry button
+                            console.log("Update button clicked.");
+                            handleUpdateItem(event); // Pass the event object
+                            return;
+                        }
+                        
+                        // Delete Item
+                        const deleteBtn = event.target.closest('.btn-delete');
+                        if (deleteBtn) {
+                            console.log("Delete button clicked.");
+                            handleDeleteItem(event); // Pass the event object
+                            return;
+                        }
+                        
+                        // Retry Fetch (specific handler for error card button)
+                        const retryBtn = event.target.closest('.retry-fetch');
+                        if (retryBtn) {
+                            const itemType = retryBtn.dataset.itemType;
+                            console.log(`Retry fetch clicked for type: ${itemType}`);
+                            const errorCard = retryBtn.closest('.error-state-card');
+                            if(errorCard) errorCard.remove();
+                            fetchAndDisplayItems(itemType);
+                            return;
+                        }
+                        
+                    } catch (delegateError) {
+                        console.error("Error in delegated click listener:", delegateError);
+                    }
+                });
+                
+                console.log("Delegated click listener attached.");
+                
+                // Submit Add Form (using event delegation)
+                document.addEventListener('submit', (event) => {
+                    if (event.target.classList.contains('add-item-form')) {
+                        event.preventDefault();
+                        console.log("Add item form submitted.");
+                        handleAddItem(event); // Pass the event object
+                    }
+                });
+                
+                console.log("Delegated submit listener attached.");
+                
+                // Close notification
+                notificationClose?.addEventListener('click', () => {
+                    notification?.classList.remove('show');
+                });
+                
+                // Close modal with escape key
+                window.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        const activeModal = document.querySelector('.modal-overlay.active');
+                        if (activeModal) {
+                            console.log(`Escape key pressed, closing modal: ${activeModal.id}`);
+                            closeModalById(activeModal.id);
+                        }
+                    }
+                });
+                
+                console.log("Escape key listener attached.");
+                
+                // --- Logout Button Setup ---
+                try {
+                    console.log('Attempting to find logout button (main DOM listener)...');
+                    const logoutButton = document.querySelector('.logout-btn');
+                    console.log('Logout button found (main DOM listener):', logoutButton);
+                    if (logoutButton) {
+                        logoutButton.addEventListener('click', () => {
+                            console.log('Logout button clicked!'); // Log click
+                            localStorage.removeItem('pricely_uname');
+                            localStorage.removeItem('pricely_pwd');
+                            // Reload the page. The auth check will redirect to login if credentials are missing.
+                            window.location.reload();
+                        });
+                        console.log('Logout event listener added (main DOM listener).');
+                    } else {
+                        console.warn("Logout button not found (main DOM listener).");
+                    }
+                } catch (error) {
+                    console.error("Error setting up logout button (main DOM listener):", error);
+                }
+                
+                // --- Core Functions ---
+                function openModal(itemType) {
+                    console.log(`Attempting to open modal for type: ${itemType}`);
+                    const modal = modals[itemType];
+                    if (modal) {
+                        modal.classList.add('active');
+                        console.log(`Modal ${modal.id} activated.`);
+                        
+                        // Reset add form state before fetching
+                        hideAddForm(modal.id, itemType);
+                        
+                        // Fetch data
+                        fetchAndDisplayItems(itemType);
+                    } else {
+                        console.error(`Modal element not found for item type: ${itemType}`);
+                        showNotification(`Error: UI component for ${itemType} is missing.`, 'error');
+                    }
+                }
+                
+                function closeModalById(modalId) {
+                    const modal = document.getElementById(modalId);
+                    if (modal) {
+                        modal.classList.remove('active');
+                        console.log(`Modal ${modalId} deactivated.`);
+                    } else {
+                        console.warn(`Attempted to close non-existent modal: ${modalId}`);
+                    }
+                }
+                
+                function showAddForm(modalId, itemType) {
+                    const modal = document.getElementById(modalId);
+                    const addTrigger = modal?.querySelector(`.add-item-card[data-item-type="${itemType}"]`);
+                    const formContainer = modal?.querySelector(`.add-item-form-container[data-item-type="${itemType}"]`);
+                    const form = formContainer?.querySelector('form');
+                    
+                    if (addTrigger) addTrigger.style.display = 'none';
+                    if (formContainer) formContainer.style.display = 'block';
+                    if (form) form.classList.add('active');
+                    
+                    console.log(`Add form shown for type: ${itemType}`);
+                }
+                
+                function hideAddForm(modalId, itemType) {
+                    const modal = document.getElementById(modalId);
+                    const addTrigger = modal?.querySelector(`.add-item-card[data-item-type="${itemType}"]`);
+                    const formContainer = modal?.querySelector(`.add-item-form-container[data-item-type="${itemType}"]`);
+                    const form = formContainer?.querySelector('form');
+                    
+                    if (formContainer) formContainer.style.display = 'none';
+                    if (addTrigger) addTrigger.style.display = 'flex'; // Use flex for centering
+                    if (form) form.reset();
+                    
+                    console.log(`Add form hidden/reset for type: ${itemType}`);
+                }
+                
+                // Create item card element (Generic)
+                function createItemCard(item, itemType) {
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.dataset.id = item.id;
+                    card.dataset.itemType = itemType; // Add itemType for context
+                    
+                    const imageContainer = document.createElement('div');
+                    imageContainer.className = 'item-image-container';
+                    
+                    const img = document.createElement('img');
+                    img.className = 'item-image';
+                    img.alt = `${itemNames[itemType]} ${item.id}`;
+                    img.onerror = function() {
+                        this.onerror = null; // Prevent infinite loop
+                        this.style.display = 'none'; // Clear container and add placeholder
+                        imageContainer.innerHTML = ''; // Clear previous content if any
+                        
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'item-placeholder';
+                        placeholder.innerHTML = `
+                            <i class="fas fa-image"></i>
+                            <span>Image not available or URL is invalid</span>
+                        `;
+                        imageContainer.appendChild(placeholder);
+                        
+                        // Disable preview button if image fails
+                        const previewBtn = card.querySelector('.btn-preview');
+                        if (previewBtn) previewBtn.style.display = 'none';
+                    };
+                    img.src = item.image_url || ''; // Handle potentially null URL
+                    imageContainer.appendChild(img);
+                    
+                    // Preview button (opens image in a new tab)
+                    const previewBtn = document.createElement('button');
+                    previewBtn.className = 'btn-preview';
+                    previewBtn.innerHTML = '<i class="fas fa-external-link-alt"></i>';
+                    previewBtn.title = 'Preview Image';
+                    previewBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (item.image_url) {
+                            window.open(item.image_url, '_blank');
+                        } else {
+                            showNotification('No image URL available for preview.', 'error');
+                        }
+                    });
+                    
+                    if (!item.image_url) {
+                        previewBtn.style.display = 'none'; // Hide if no URL initially
+                    }
+                    imageContainer.appendChild(previewBtn);
+                    
+                    const details = document.createElement('div');
+                    details.className = 'item-details';
+                    
+                    // URL field
+                    const urlField = document.createElement('div');
+                    urlField.className = 'item-field';
+                    const urlLabel = document.createElement('label');
+                    urlLabel.innerHTML = '<i class="fas fa-link"></i> Image URL';
+                    const urlInput = document.createElement('input');
+                    urlInput.type = 'text';
+                    urlInput.value = item.image_url || '';
+                    urlInput.className = 'item-url-input';
+                    urlField.appendChild(urlLabel);
+                    urlField.appendChild(urlInput);
+                    
+                    // Price field
+                    const priceField = document.createElement('div');
+                    priceField.className = 'item-field';
+                    const priceLabel = document.createElement('label');
+                    priceLabel.innerHTML = `<i class="fas fa-tag"></i> Price ${itemType === 'slideshow' ? '(Optional)' : ''}`; // Optional label for slideshow
+                    const priceInput = document.createElement('input');
+                    priceInput.type = 'number';
+                    // Use nullish coalescing for potentially null price
+                    priceInput.value = item.price ?? '';
+                    priceInput.step = 'any';
+                    priceInput.className = 'item-price-input';
+                    
+                    // Make price optional for slideshow
+                    if (itemType === 'slideshow') {
+                        priceInput.required = false;
+                    } else {
+                        priceInput.required = true;
+                    }
+                    
+                    priceField.appendChild(priceLabel);
+                    priceField.appendChild(priceInput);
+                    
+                    details.appendChild(urlField);
+                    details.appendChild(priceField);
+                    
+                    // Action buttons
+                    const actions = document.createElement('div');
+                    actions.className = 'item-actions';
+                    
+                    const updateBtn = document.createElement('button');
+                    updateBtn.className = 'btn-update';
+                    updateBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                    // updateBtn listener added via delegation
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-delete';
+                    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
+                    // deleteBtn listener added via delegation
+                    
+                    actions.appendChild(updateBtn);
+                    actions.appendChild(deleteBtn);
+                    
+                    // Update image preview when URL changes
+                    urlInput.addEventListener('change', () => {
+                        const newUrl = urlInput.value.trim();
+                        img.src = newUrl;
+                        
+                        // Re-enable preview button if URL is valid, hide if empty
+                        previewBtn.style.display = newUrl ? 'flex' : 'none';
+                        
+                        // Reset error state if user changes URL
+                        img.onerror = function() { /* original onerror handler */ };
+                        
+                        if (imageContainer.querySelector('.item-placeholder')) {
+                            imageContainer.querySelector('.item-placeholder').remove();
+                            imageContainer.insertBefore(img, imageContainer.firstChild); // Ensure img is back
+                            img.style.display = 'block';
+                        }
+                    });
+                    
+                    card.appendChild(imageContainer);
+                    card.appendChild(details);
+                    card.appendChild(actions);
+                    
+                    return card;
+                }
+                
+                // Fetch and display items (Generic)
+                async function fetchAndDisplayItems(itemType) {
+                    const grid = grids[itemType];
+                    const getUrl = apiEndpoints[itemType].get;
+                    const addTrigger = grid?.querySelector(`.add-item-card[data-item-type="${itemType}"]`);
+                    
+                    if (!grid || !getUrl || !addTrigger) {
+                        console.error(`fetchAndDisplayItems: Grid, URL, or Add Trigger not found for item type: ${itemType}`);
+                        showNotification(`Error: UI components missing for ${itemType}.`, 'error');
+                        return;
+                    }
+                    
+                    console.log(`Fetching items for type: ${itemType} from ${getUrl}`);
+                    
+                    // Clear existing items and show loading state
+                    grid.querySelectorAll('.item-card:not(.add-item-card):not(.add-item-form-container)').forEach(card => card.remove());
+                    grid.querySelectorAll('.loading-card, .empty-state-card, .error-state-card').forEach(card => card.remove());
+                    
+                    // Clear previous states
+                    const loadingCard = document.createElement('div');
+                    loadingCard.className = 'item-card loading-card';
+                    loadingCard.style.cssText = 'display: flex; align-items: center; justify-content: center; grid-column: 1 / -1;';
+                    loadingCard.innerHTML = `<div class="spinner"></div><span style="color: var(--gray-300); margin-left: 1rem; font-weight: 500;">Loading ${itemNames[itemType].toLowerCase()}s...</span>`;
+                    grid.insertBefore(loadingCard, addTrigger);
+                    
+                    try {
+                        const response = await fetch(getUrl);
+                        console.log(`Fetch response status for ${itemType}: ${response.status}`);
+                        
+                        // Remove loading indicator regardless of outcome (error state will replace it)
+                        loadingCard.remove();
+                        
+                        if (!response.ok) {
+                            if (response.status === 401) {
+                                showNotification('Session expired. Please log in again.', 'error');
+                                setTimeout(() => window.location.replace("{{ url_for('admin_login') }}"), 2000);
+                                return; // Stop further processing
+                            }
+                            
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        let items = await response.json();
+                        
+                        if (!Array.isArray(items)) {
+                            throw new Error(`Invalid data format received for ${itemType}. Expected an array.`);
+                        }
+                        
+                        console.log(`Received ${items.length} items for ${itemType}.`);
+                        
+                        if (items.length === 0) {
+                            const emptyState = document.createElement('div');
+                            emptyState.className = 'item-card empty-state-card';
+                            emptyState.style.cssText = 'display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; grid-column: 1 / -1; text-align: center;';
+                            emptyState.innerHTML = `
+                                <i class="fas fa-info-circle" style="font-size: 2.5rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                                <span style="color: var(--gray-300); font-size: 1.1rem;">No ${itemNames[itemType].toLowerCase()}s found</span>
+                                <p style="color: var(--gray-400); max-width: 80%;">Click the "+" button to add the first ${itemNames[itemType].toLowerCase()}.</p>
+                            `;
+                            grid.insertBefore(emptyState, addTrigger);
+                            console.log(`Displayed empty state for ${itemType}.`);
+                        } else {
+                            items.forEach(item => {
+                                const card = createItemCard(item, itemType);
+                                grid.insertBefore(card, addTrigger);
+                            });
+                            console.log(`Displayed ${items.length} item cards for ${itemType}.`);
+                        }
+                    } catch (error) {
+                        console.error(`Error during fetch or display for ${itemType}:`, error);
+                        
+                        // Ensure loading card is removed if it somehow still exists
+                        grid.querySelectorAll('.loading-card').forEach(card => card.remove());
+                        
+                        const errorCard = document.createElement('div');
+                        errorCard.className = 'item-card error-state-card';
+                        errorCard.style.cssText = 'display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; grid-column: 1 / -1; text-align: center;';
+                        errorCard.innerHTML = `
+                            <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                            <span style="color: white; font-size: 1.1rem;">Unable to Load ${itemNames[itemType]}s</span>
+                            <p style="color: var(--gray-400); max-width: 80%;">There was a problem connecting to the server (${error.message}). Please try again.</p>
+                            <button class="btn-update retry-fetch" data-item-type="${itemType}" style="margin-top: 1rem; padding: 0.75rem 1.5rem;">
+                                <i class="fas fa-redo"></i> Retry
+                            </button>
+                        `;
+                        grid.insertBefore(errorCard, addTrigger);
+                        console.log(`Displayed error state for ${itemType}.`);
+                    }
+                }
+                
+                // Handle item update (Generic)
+                async function handleUpdateItem(event) {
+                    const updateBtn = event.target.closest('.btn-update');
+                    if (!updateBtn) return; // Should not happen if called from listener
+                    
+                    const card = updateBtn.closest('.item-card');
+                    const itemId = card?.dataset.id;
+                    const itemType = card?.dataset.itemType;
+                    
+                    if (!itemId || !itemType || !card) {
+                        console.error("handleUpdateItem: Missing data attributes on card.");
+                        return;
+                    }
+                    
+                    console.log(`Attempting update for ${itemType} ID: ${itemId}`);
+                    
+                    const urlInput = card.querySelector('.item-url-input');
+                    const priceInput = card.querySelector('.item-price-input');
+                    
+                    // Build the update URL with the item ID
+                    const updateUrl = apiEndpoints[itemType].update + itemId;
+                    
+                    // Basic Validation
+                    const imageUrl = urlInput.value.trim();
+                    const priceValue = priceInput.value.trim();
+                    let price = null; // Default to null
+                    
+                    if (!imageUrl) {
+                        // URL required for all item types
+                        showNotification('Please enter a valid image URL', 'error');
+                        urlInput.focus();
+                        return;
+                    }
+                    
+                    // Price validation (required for offer/daily_needs, optional for slideshow)
+                    if (priceValue !== '') {
+                        price = parseFloat(priceValue);
+                        if (isNaN(price) || price < 0) {
+                            showNotification('Please enter a valid non-negative price, or leave it empty if optional.', 'error');
+                            priceInput.focus();
+                            return;
+                        }
+                    } else if (itemType !== 'slideshow') {
+                        showNotification('Price is required for this item type.', 'error');
+                        priceInput.focus();
+                        return;
+                    }
+                    
+                    const updatedItem = {
+                        image_url: imageUrl,
+                        price: price // Send null if price was empty/invalid for optional field
+                    };
+                    
+                    console.log("Update data:", updatedItem);
+                    
+                    const originalBtnContent = updateBtn.innerHTML;
+                    updateBtn.disabled = true;
+                    updateBtn.innerHTML = '<div class="spinner"></div> Saving...';
+                    
+                    try {
+                        const response = await fetch(updateUrl, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(updatedItem)
+                        });
+                        
+                        console.log(`Update response status for ${itemType} ID ${itemId}: ${response.status}`);
+                        
+                        if (!response.ok) {
+                            if (response.status === 401) throw new Error('Session expired. Please log in again.');
+                            
+                            const errorData = await response.json().catch(() => ({ message: `HTTP error! status: ${response.status}` }));
+                            throw new Error(errorData.message || `Failed to update ${itemNames[itemType]}.`);
+                        }
+                        
+                        // Update image src in case it changed
+                        const img = card.querySelector('.item-image');
+                        if (img && img.src !== imageUrl) {
+                            img.src = imageUrl;
+                        }
+                        
+                        showNotification(`${itemNames[itemType]} updated successfully!`, 'success');
+                        
+                        // Highlight the card briefly to indicate success
+                        card.style.boxShadow = '0 0 0 2px var(--primary)';
+                        setTimeout(() => card.style.boxShadow = '', 2000);
+                        
+                    } catch (error) {
+                        console.error(`Error updating ${itemType} ID ${itemId}:`, error);
+                        showNotification(`Error: ${error.message}`, 'error');
+                        
+                        if (error.message.includes('Session expired')) {
+                            setTimeout(() => window.location.replace("{{ url_for('admin_login') }}"), 2000);
+                        }
+                    } finally {
+                        updateBtn.disabled = false;
+                        updateBtn.innerHTML = originalBtnContent;
+                    }
+                }
+                
+                // Handle item deletion (Generic)
+                async function handleDeleteItem(event) {
+                    const deleteBtn = event.target.closest('.btn-delete');
+                    if (!deleteBtn) return;
+                    
+                    const card = deleteBtn.closest('.item-card');
+                    const itemId = card?.dataset.id;
+                    const itemType = card?.dataset.itemType;
+                    
+                    if (!itemId || !itemType || !card) {
+                        console.error("handleDeleteItem: Missing data attributes on card.");
+                        return;
+                    }
+                    
+                    console.log(`Attempting delete for ${itemType} ID: ${itemId}`);
+                    
+                    if (!confirm(`Are you sure you want to delete ${itemNames[itemType]} #${itemId}?`)) {
+                        console.log("Delete cancelled by user.");
+                        return;
+                    }
+                    
+                    // Build the delete URL with the item ID
+                    const deleteUrl = apiEndpoints[itemType].delete + itemId;
+                    
+                    const originalBtnContent = deleteBtn.innerHTML;
+                    deleteBtn.disabled = true;
+                    
+                    // Disable the update button too while deleting
+                    const updateBtn = card.querySelector('.btn-update');
+                    if(updateBtn) updateBtn.disabled = true;
+                    
+                    deleteBtn.innerHTML = '<div class="spinner"></div> Deleting...';
+                    
+                    try {
+                        const response = await fetch(deleteUrl, {
+                            method: 'DELETE'
+                        });
+                        
+                        console.log(`Delete response status for ${itemType} ID ${itemId}: ${response.status}`);
+                        
+                        if (!response.ok) {
+                            if (response.status === 401) throw new Error('Session expired. Please log in again.');
+                            
+                            const errorData = await response.json().catch(() => ({ message: `HTTP error! status: ${response.status}` }));
+                            throw new Error(errorData.message || `Failed to delete ${itemNames[itemType]}.`);
+                        }
+                        
+                        // Animate removal
+                        card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.9) translateY(20px)';
+                        
+                        setTimeout(() => {
+                            card.remove();
+                            showNotification(`${itemNames[itemType]} deleted successfully!`, 'success');
+                            
+                            // Check if grid is empty and show empty state if needed
+                            const grid = grids[itemType];
+                            const remainingCards = grid?.querySelectorAll('.item-card:not(.add-item-card):not(.add-item-form-container)').length;
+                            
+                            if (grid && remainingCards === 0) {
+                                console.log(`Grid for ${itemType} is empty after deletion, re-fetching to show empty state.`);
+                                fetchAndDisplayItems(itemType); // Re-fetch to show empty state correctly
+                            }
+                        }, 300);
+                        
+                    } catch (error) {
+                        console.error(`Error deleting ${itemType} ID ${itemId}:`, error);
+                        showNotification(`Error: ${error.message}`, 'error');
+                        
+                        // Restore buttons only on error
+                        deleteBtn.disabled = false;
+                        deleteBtn.innerHTML = originalBtnContent;
+                        if(updateBtn) updateBtn.disabled = false; // Re-enable update button on error too
+                        
+                        if (error.message.includes('Session expired')) {
+                            setTimeout(() => window.location.replace("{{ url_for('admin_login') }}"), 2000);
+                        }
+                    }
+                }
+                
+                // Handle adding a new item (Generic)
+                async function handleAddItem(event) {
+                    const form = event.target; // The form element itself
+                    const itemType = form.dataset.itemType;
+                    const modalId = form.closest('.modal-overlay')?.id;
+                    
+                    if (!itemType || !modalId) {
+                        console.error("handleAddItem: Missing data attributes on form or modal.");
+                        return;
+                    }
+                    
+                    console.log(`Attempting to add new ${itemType}`);
+                    
+                    const urlInput = form.querySelector('input[name="image_url"]');
+                    const priceInput = form.querySelector('input[name="price"]');
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    
+                    const addUrl = apiEndpoints[itemType].add;
+                    
+                    // Validation
+                    const imageUrl = urlInput.value.trim();
+                    const priceValue = priceInput.value.trim();
+                    let price = null;
+                    
+                    if (!imageUrl) {
+                        // URL required for all types
+                        showNotification('Please enter a valid image URL', 'error');
+                        urlInput.focus();
+                        return;
+                    }
+                    
+                    // Price validation (required for offer/daily_needs, optional for slideshow)
+                    if (priceValue !== '') {
+                        price = parseFloat(priceValue);
+                        if (isNaN(price) || price < 0) {
+                            showNotification('Please enter a valid non-negative price, or leave it empty if optional.', 'error');
+                            priceInput.focus();
+                            return;
+                        }
+                    } else if (itemType !== 'slideshow') {
+                        showNotification('Price is required for this item type.', 'error');
+                        priceInput.focus();
+                        return;
+                    }
+                    
+                    const newItem = {
+                        image_url: imageUrl,
+                        price: price
+                    };
+                    
+                    console.log("New item data:", newItem);
+                    
+                    const originalBtnContent = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<div class="spinner"></div> Adding...';
+                    
+                    try {
+                        const response = await fetch(addUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(newItem)
+                        });
+                        
+                        console.log(`Add item response status for ${itemType}: ${response.status}`);
+                        
+                        if (!response.ok) {
+                            if (response.status === 401) throw new Error('Session expired. Please log in again.');
+                            
+                            const errorData = await response.json().catch(() => ({ message: `HTTP error! status: ${response.status}` }));
+                            throw new Error(errorData.message || `Failed to add ${itemNames[itemType]}.`);
+                        }
+                        
+                        hideAddForm(modalId, itemType); // Hide form on success
+                        fetchAndDisplayItems(itemType); // Refresh list
+                        showNotification(`New ${itemNames[itemType]} added successfully!`, 'success');
+                        
+                    } catch (error) {
+                        console.error(`Error adding ${itemType}:`, error);
+                        showNotification(`Error: ${error.message}`, 'error');
+                        
+                        if (error.message.includes('Session expired')) {
+                            setTimeout(() => window.location.replace("{{ url_for('admin_login') }}"), 2000);
+                        }
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnContent;
+                    }
+                }
+                
+                // Show notification helper
+                let notificationTimeout;
+                function showNotification(message, type = 'success') {
+                    if (!notification || !notificationMessage || !notificationClose) {
+                        console.error("Notification elements not found. Message:", message);
+                        alert(`${type.toUpperCase()}: ${message}`); // Fallback alert
+                        return;
+                    }
+                    
+                    console.log(`Showing notification (${type}): ${message}`);
+                    
+                    clearTimeout(notificationTimeout); // Clear previous timeout if any
+                    
+                    notificationMessage.textContent = message;
+                    notification.className = `notification ${type}`; // Base classes + type
+                    notification.classList.add('show');
+                    
+                    const icon = notification.querySelector('i');
+                    if (icon) {
+                        icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+                    }
+                    
+                    notificationTimeout = setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 4000);
+                    
+                    // Ensure close button works correctly
+                    notificationClose.onclick = () => {
+                        // Use onclick to override previous if necessary
+                        clearTimeout(notificationTimeout);
+                        notification.classList.remove('show');
+                    };
+                }
+                
+                console.log("Admin panel script initialization complete.");
+                
+            } catch (error) {
+                // Catch errors during the main DOMContentLoaded setup
+                console.error("Critical error during script initialization:", error);
+                
+                // Display a user-friendly error message on the page
+                const body = document.querySelector('body');
+                if (body) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.style.cssText = 'position: fixed; top: 10px; left: 10px; right: 10px; background-color: var(--accent, #F43F5E); color: white; padding: 1rem; border-radius: 8px; z-index: 10000; font-family: sans-serif;';
+                    errorDiv.innerHTML = `<strong>Initialization Error:</strong> The admin panel encountered a problem and may not function correctly. Please check the console for details. <br><small>${error.message}</small>`;
+                    body.prepend(errorDiv);
+                }
+            }
+        }); // End DOMContentLoaded
+    </script>
+</body>
+</html>
