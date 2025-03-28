@@ -27,11 +27,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import Footer from '../components/Footer';
+import { useLocation } from '../contexts/LocationContext'; // Import useLocation
 
 const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
-  const { userName, location, setLocation, setUserName } = useContext(UserContext) as UserContextType;
+  const { userName, setUserName } = useContext(UserContext) as UserContextType; // Keep UserContext for userName
+  const { currentLocation, updateLocation, autoLocate } = useLocation(); // Get location data from useLocation
   const navigation = useNavigation<NavigationProp<RootStackParamList, 'Profile'>>();
 
   // Animation values
@@ -235,9 +237,9 @@ export default function ProfileScreen() {
         >
           <Header
             userName={userName}
-            currentLocation={location}
-            onLocationSelect={setLocation}
-            onAutoLocate={() => {}}
+            currentLocation={currentLocation} // Use currentLocation from useLocation
+            onLocationSelect={updateLocation} // Use updateLocation from useLocation
+            onAutoLocate={autoLocate} // Use autoLocate from useLocation
           />
 
           {/* Profile card with animation */}

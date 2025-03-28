@@ -5,9 +5,9 @@ import { Ionicons } from '@expo/vector-icons';
 
 // Style constants
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const VISIBLE_ITEMS = 3;
-const ITEM_WIDTH = Math.floor((SCREEN_WIDTH - 65) / VISIBLE_ITEMS);
-const ITEM_MARGIN = 4;
+const VISIBLE_ITEMS = 5; // Show 5 items at a time
+const ITEM_WIDTH = Math.floor((SCREEN_WIDTH - 10) / VISIBLE_ITEMS); // Reduced overall margin
+const ITEM_MARGIN = 1; // Reduced spacing between items
 
 export interface SearchHistoryProps {
   searches: Array<{
@@ -27,10 +27,8 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress }
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.carouselContainer}
-        snapToInterval={ITEM_WIDTH}
         decelerationRate="fast"
-        pagingEnabled
-      >
+     >
         {[...searches].reverse().map((item, index) => (
           <Pressable
             key={index}
@@ -67,64 +65,62 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
+    padding: 4,
     backgroundColor: '#fff',
     borderRadius: 12,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     marginHorizontal: 4,
+    marginBottom: 0, // Remove bottom margin
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#333',
-    marginBottom: 20,
-    marginLeft: 8,
+    marginBottom: 8, // Further reduced margin
+    marginLeft: 6,
   },
   carouselContainer: {
-    paddingHorizontal: 4,
+    paddingHorizontal: ITEM_MARGIN, // Match item margin
   },
   historyItem: {
     alignItems: 'center',
-    padding: 8,
-    marginHorizontal: 4,
-    backgroundColor: 'transparent',
-    borderRadius: 16,
+    marginHorizontal: ITEM_MARGIN,
+    backgroundColor: '#fff',
+    borderRadius: 8, // Smaller border radius
+    padding: 0, // Minimal padding
   },
   imageContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'transparent',
+    width: 70, // Smaller size to fit 5 items
+    height: 70, // Smaller size to fit 5 items
+    borderRadius: 35, // Half of width/height
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    marginVertical: 10,
-    borderWidth: 2,
-    borderColor: '#E8099C',
+    marginBottom: 8, // Reduced margin
+    borderWidth: 1, // Add border width
+    borderColor: 'rgba(0, 0, 0, 0.2)', // Light black border for better visibility
   },
   placeholderImage: {
     width: '100%',
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#transparent',
+    backgroundColor: '#fff', // White background
   },
   historyImage: {
     width: '100%',
     height: '100%',
+    justifyContent: 'flex-end',
+    borderColor: '#00000010', // Lighter border color
   },
   textContainer: {
     alignItems: 'center',
     width: '100%',
   },
   historyText: {
-    fontSize: 16,
+    fontSize: 12, // Smaller font size to match smaller items
     color: '#333',
-    fontWeight: '600',
+    fontWeight: '700',
     textAlign: 'center',
   },
 });

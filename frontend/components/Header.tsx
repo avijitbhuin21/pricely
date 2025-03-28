@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,9 @@ import {
   Dimensions,
   ListRenderItem,
   Image,
+  ViewStyle,
+  TextStyle,
+  Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HeaderProps, Location } from '../types';
@@ -97,6 +100,28 @@ const Header: React.FC<HeaderProps> = ({
     navigation.navigate('Profile');
   };
 
+  const [isMenuVisible, setMenuVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(-300)).current;
+
+  const handleMenuPress = () => {
+    setMenuVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleMenuClose = () => {
+    Animated.timing(slideAnim, {
+      toValue: -300,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setMenuVisible(false);
+    });
+  };
+
   const renderLocationItem: ListRenderItem<Location> = ({ item }) => (
     <TouchableOpacity
       style={styles.locationItem}
@@ -124,32 +149,23 @@ const Header: React.FC<HeaderProps> = ({
   );
 
   return (
-    <View style={styles.header}>
-      <View style={styles.leftContainer}>
+    <View style={styles.container}>
+      <View style={styles.contentContainer}>
         <TouchableOpacity
-          style={styles.profileButton}
-          onPress={handleProfilePress}
+          onPress={handleMenuPress}
+          style={[styles.hamburgerIconContainer, { width: 60 }]}
         >
-          <Ionicons name="person-circle-outline" size={36} color="#ffffff" />
+          <View style={[styles.hamburgerLine, { width: 45 }]} aria-label="Menu button top line" />
+          <View style={[styles.hamburgerLine, { width: 45 }]} aria-label="Menu button middle line" />
+          <View style={[styles.hamburgerLine, { width: 45 }]} aria-label="Menu button bottom line" />
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.centerContainer}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('../assets/Pricely_app_icon.png')}
-            style={styles.logo}
-          />
-        </View>
-      </View>
-
-      <View style={styles.rightContainer}>
-
-        <TouchableOpacity
-          style={[
-            styles.locationButton,
-            currentLocation === 'Detecting location...' && styles.pulsingLocationButton
-          ]}
+        <View style={styles.textAndLocationContainer}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleText}>PRICELY</Text>
+              <Text style={styles.compareText}>compare it</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.locationButton}
           onPress={() => {
             if (currentLocation !== 'Detecting location...') {
               setLocationModalVisible(true);
@@ -157,24 +173,17 @@ const Header: React.FC<HeaderProps> = ({
           }}
           disabled={currentLocation === 'Detecting location...'}
         >
-          <Ionicons
-            name={currentLocation === 'Detecting location...' ? "locate" : "location"}
-            size={18}
-            color={currentLocation === 'Detecting location...' ? "#000" : "#fff"}
-          />
           <Text
-            style={[
-              styles.locationText,
-              currentLocation === 'Detecting location...' && { color: '#000' }
-            ]}
+            style={styles.locationText}
             numberOfLines={1}
           >
             {currentLocation}
           </Text>
           {currentLocation !== 'Detecting location...' && (
-            <Ionicons name="chevron-down" size={16} color="#80e5ff" />
+            <Ionicons name="chevron-down" size={18} color="#fff" />
           )}
         </TouchableOpacity>
+      </View>
       </View>
 
       <Modal
@@ -227,105 +236,123 @@ const Header: React.FC<HeaderProps> = ({
           </View>
         </View>
       </Modal>
+
+      <Modal
+        visible={isMenuVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={handleMenuClose}
+      >
+        <TouchableOpacity
+          style={styles.menuOverlay}
+          activeOpacity={1}
+          onPress={handleMenuClose}
+        >
+          <Animated.View style={[
+            styles.menuContent,
+            {
+              transform: [{ translateX: slideAnim }]
+            }
+          ]}>
+            <View style={styles.menuHeader}>
+              <View style={styles.menuTitleContainer}>
+                <Text style={styles.menuTitleText}>PRICELY</Text>
+                <Text style={styles.menuCompareText}>compare it</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.menuCloseButton}
+                onPress={handleMenuClose}
+              >
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.menuItems}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                activeOpacity={0.7}
+                onPress={() => {
+                  handleProfilePress();
+                  handleMenuClose();
+                }}
+              >
+                <Ionicons name="person-outline" size={22} color="#C60053" />
+                <Text style={styles.menuItemText}>Profile</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.menuItem}
+                activeOpacity={0.7}
+                onPress={() => {
+                  // TODO: Implement contact us functionality
+                  handleMenuClose();
+                }}
+              >
+                <Ionicons name="mail-outline" size={22} color="#C60053" />
+                <Text style={styles.menuItemText}>Contact Us</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
 
-const WINDOW_WIDTH = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
+  container: {
     backgroundColor: '#C60053',
+    minHeight: 80,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
   },
-  centerContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    zIndex: 1,
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center', // Changed alignment
   },
-  leftContainer: {
+  textAndLocationContainer: {
+    marginLeft: 10, // Increased margin
+    justifyContent: 'flex-start',
+  },
+  titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    zIndex: 2,
-    width: 44,
+    marginBottom: 4,
   },
-  rightContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    zIndex: 2,
-  },
-  profileButton: {
-    padding: 4,
-    marginLeft: -8,
-  },
-  logoContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  userInfo: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  welcomeText: {
-    fontSize: 12,
-    color: '#80e5ff',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: '600',
+  titleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
     color: '#ffffff',
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    fontFamily: 'ARCHIVE',
+  },
+  compareText: {
+    fontSize: 16,
+    color: '#ffffff',
+    fontFamily: 'ARCHIVE',
+    marginLeft: 4,
   },
   locationButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    backgroundColor: 'transparent', // Transparent background
     borderRadius: 20,
-    maxWidth: WINDOW_WIDTH * 0.4,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  pulsingLocationButton: {
-    backgroundColor: 'rgb(255, 255, 255)',
-    borderColor: 'rgba(225, 0, 255, 0.71)',
   },
   locationText: {
-    marginHorizontal: 6,
-    fontSize: 14,
+    fontSize: 16, // Increased font size
     color: '#ffffff',
-    maxWidth: WINDOW_WIDTH * 0.25,
-    textShadowColor: 'rgba(255, 255, 255, 0.75)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+  },
+  hamburgerIconContainer: {
+    justifyContent: 'space-between', // Change to space-between for better line distribution
+    height: 40, // Increased container height
+    width: 45, // Increased container width
+    alignSelf: 'center',
+    alignItems: 'flex-start',
+    paddingVertical: 2, // Add vertical padding
+  },
+  hamburgerLine: {
+    height: 4, // Increased line height
+    backgroundColor: '#ffffff',
+    borderRadius: 3, // Increased border radius
   },
   modalOverlay: {
     flex: 1,
@@ -403,6 +430,89 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 14,
     color: '#666',
+  },
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  menuContent: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: '80%',
+    height: '100%',
+    backgroundColor: '#fff',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 2,
+      height: 0,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+  },
+  menuHeader: {
+    padding: 20,
+    paddingTop: 40,
+    backgroundColor: '#C60053',
+  },
+  menuTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+    paddingBottom: 8,
+  },
+  menuTitleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    fontFamily: 'ARCHIVE',
+    letterSpacing: 1,
+  },
+  menuCompareText: {
+    fontSize: 14,
+    color: '#ffffff',
+    fontFamily: 'ARCHIVE',
+    marginLeft: 6,
+    opacity: 0.9,
+  },
+  menuCloseButton: {
+    position: 'absolute',
+    right: 16,
+    top: 40,
+    padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
+  },
+  menuItems: {
+    paddingTop: 24,
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    backgroundColor: '#fff',
+    marginVertical: 6,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    transform: [{scale: 1}],
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: '#333',
+    marginLeft: 16,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
 });
 

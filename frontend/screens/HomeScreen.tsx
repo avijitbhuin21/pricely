@@ -106,25 +106,6 @@ export default function HomeScreen() {
     }
   };
 
-  const handleClearHistory = async () => {
-    try {
-      await AsyncStorage.removeItem('searchHistory');
-      setSearchHistory([]);
-    } catch (error) {
-      console.error('Error clearing search history:', error);
-    }
-  };
-
-  const handleDeleteSearch = async (query: string) => {
-    try {
-      const newHistory = searchHistory.filter(item => item.query !== query);
-      setSearchHistory(newHistory);
-      await AsyncStorage.setItem('searchHistory', JSON.stringify(newHistory));
-    } catch (error) {
-      console.error('Error deleting search item:', error);
-    }
-  };
-
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
   
@@ -308,7 +289,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: 'relative',
     width: '100%',
-    height: 180,
+    height: 220,
     marginTop: -1, // Remove gap between header and image
   },
   promoImage: {
@@ -325,9 +306,9 @@ const styles = StyleSheet.create({
   },
   historySection: {
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: 2,
     backgroundColor: '#fff',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   recommendationsSection: {
     width: '100%',
