@@ -7,6 +7,7 @@ import SignUp from '../screens/SignUp';
 import SignUpVerification from '../screens/singUpVerification';
 import SignIn from '../screens/SignIn';
 import CompareResultScreen from '../screens/CompareResultScreen';
+import ResetPassword from '../screens/ResetPassword';
 import ProfileScreen from '../screens/ProfileScreen';
 import CartScreen from '../screens/Cart';
 import OffersScreen from '../screens/OffersScreen';
@@ -14,7 +15,7 @@ import OffersScreen from '../screens/OffersScreen';
 // Define the root stack parameter list
 export type RootStackParamList = {
   Home: undefined;
-  CompareResult: { 
+  CompareResult: {
     query: string;
     onSearchComplete?: (imageUrl: string) => void;
   };
@@ -24,10 +25,13 @@ export type RootStackParamList = {
   SignUp: undefined;
   SignUpVerification: {
     phoneNumber: string;
-    name: string;
-    password: string;
+    name?: string;
+    password?: string;
+    newPassword?: string;
+    isResettingPassword?: boolean;
   };
   SignIn: undefined;
+  ResetPassword: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -39,6 +43,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="SignIn"
           component={SignIn}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPassword}
           options={{ headerShown: false }}
         />
         <Stack.Screen

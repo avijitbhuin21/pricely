@@ -101,7 +101,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const [isMenuVisible, setMenuVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(-300)).current;
+  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
 
   const handleMenuPress = () => {
     setMenuVisible(true);
@@ -114,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleMenuClose = () => {
     Animated.timing(slideAnim, {
-      toValue: -300,
+      toValue: screenWidth,
       duration: 300,
       useNativeDriver: true,
     }).start(() => {
@@ -129,7 +129,7 @@ const Header: React.FC<HeaderProps> = ({
     >
       <Ionicons
         name={item.isAutoLocate ? "navigate" : "location-outline"}
-        size={20}
+        size={iconSizeSmall} // Dynamic size
         color={item.isAutoLocate ? "#007AFF" : "#333"}
       />
       <View style={styles.locationTextContainer}>
@@ -150,40 +150,45 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <View style={styles.container}>
+      {/* Main content area */}
       <View style={styles.contentContainer}>
+        {/* Text and Location section (now on the left) */}
+        <View style={styles.textAndLocationContainer}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleText}>PRICELY</Text>
+            <Text style={styles.compareText}>-compare it</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={() => {
+              if (currentLocation !== 'Detecting location...') {
+                setLocationModalVisible(true);
+              }
+            }}
+            disabled={currentLocation === 'Detecting location...'}
+          >
+            {/* Location Icon (moved to the left) */}
+            {currentLocation !== 'Detecting location...' && (
+              <Ionicons name="chevron-down" size={iconSizeSmall} color="#fff" style={styles.locationIconLeft} />
+            )}
+            <Text
+              style={styles.locationText}
+              numberOfLines={1}
+            >
+              {currentLocation}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Hamburger Menu (now on the right) */}
         <TouchableOpacity
           onPress={handleMenuPress}
-          style={[styles.hamburgerIconContainer, { width: 60 }]}
+          style={styles.hamburgerIconContainer} // Removed inline width
         >
-          <View style={[styles.hamburgerLine, { width: 45 }]} aria-label="Menu button top line" />
-          <View style={[styles.hamburgerLine, { width: 45 }]} aria-label="Menu button middle line" />
-          <View style={[styles.hamburgerLine, { width: 45 }]} aria-label="Menu button bottom line" />
+          <View style={styles.hamburgerLine} aria-label="Menu button top line" />
+          <View style={styles.hamburgerLine} aria-label="Menu button middle line" />
+          <View style={styles.hamburgerLine} aria-label="Menu button bottom line" />
         </TouchableOpacity>
-        <View style={styles.textAndLocationContainer}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.titleText}>PRICELY</Text>
-              <Text style={styles.compareText}>compare it</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.locationButton}
-          onPress={() => {
-            if (currentLocation !== 'Detecting location...') {
-              setLocationModalVisible(true);
-            }
-          }}
-          disabled={currentLocation === 'Detecting location...'}
-        >
-          <Text
-            style={styles.locationText}
-            numberOfLines={1}
-          >
-            {currentLocation}
-          </Text>
-          {currentLocation !== 'Detecting location...' && (
-            <Ionicons name="chevron-down" size={18} color="#fff" />
-          )}
-        </TouchableOpacity>
-      </View>
       </View>
 
       <Modal
@@ -200,12 +205,12 @@ const Header: React.FC<HeaderProps> = ({
                 onPress={() => setLocationModalVisible(false)}
                 style={styles.closeButton}
               >
-                <Ionicons name="close" size={24} color="#333" />
+                <Ionicons name="close" size={iconSizeMedium} color="#333" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.searchContainer}>
-              <Ionicons name="search" size={20} color="#757575" />
+              <Ionicons name="search" size={iconSizeSmall} color="#757575" />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search location..."
@@ -215,7 +220,7 @@ const Header: React.FC<HeaderProps> = ({
               />
               {isLoading && (
                 <View style={styles.loadingContainer}>
-                  <Ionicons name="sync" size={20} color="#757575" />
+                  <Ionicons name="sync" size={iconSizeSmall} color="#757575" />
                 </View>
               )}
             </View>
@@ -263,7 +268,7 @@ const Header: React.FC<HeaderProps> = ({
                 style={styles.menuCloseButton}
                 onPress={handleMenuClose}
               >
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={iconSizeMedium} color="#fff" />
               </TouchableOpacity>
             </View>
             
@@ -276,7 +281,7 @@ const Header: React.FC<HeaderProps> = ({
                   handleMenuClose();
                 }}
               >
-                <Ionicons name="person-outline" size={22} color="#C60053" />
+                <Ionicons name="person-outline" size={iconSizeMedium} color="#C60053" />
                 <Text style={styles.menuItemText}>Profile</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -287,7 +292,7 @@ const Header: React.FC<HeaderProps> = ({
                   handleMenuClose();
                 }}
               >
-                <Ionicons name="mail-outline" size={22} color="#C60053" />
+                <Ionicons name="mail-outline" size={iconSizeMedium} color="#C60053" />
                 <Text style={styles.menuItemText}>Contact Us</Text>
               </TouchableOpacity>
             </View>
@@ -298,61 +303,90 @@ const Header: React.FC<HeaderProps> = ({
   );
 };
 
+// Get screen dimensions
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
+// Define base sizes/scaling factors (adjust as needed)
+const headerMinHeight = screenHeight * 0.1; // e.g., 10% of screen height
+const headerPaddingVertical = screenHeight * 0.015;
+const headerPaddingHorizontal = screenWidth * 0.04;
+const titleFontSize = screenWidth * 0.07;
+const compareFontSize = screenWidth * 0.055;
+const locationFontSize = screenWidth * 0.04;
+const iconSizeSmall = screenWidth * 0.05;
+const iconSizeMedium = screenWidth * 0.06;
+const hamburgerWidth = screenWidth * 0.09;
+const hamburgerHeight = hamburgerWidth * 0.8;
+const hamburgerLineHeight = hamburgerHeight * 0.1;
+const modalTitleSize = screenWidth * 0.045;
+const searchInputSize = screenWidth * 0.04;
+const locationItemSize = screenWidth * 0.04;
+const menuItemSize = screenWidth * 0.04;
+
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#C60053',
-    minHeight: 80,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    minHeight: headerMinHeight, // Dynamic min height
+    paddingVertical: headerPaddingVertical, // Dynamic padding
+    paddingHorizontal: headerPaddingHorizontal, // Dynamic padding
   },
   contentContainer: {
     flexDirection: 'row',
-    alignItems: 'center', // Changed alignment
+    alignItems: 'center',
+    justifyContent: 'space-between', // Space out items for right alignment of hamburger
   },
   textAndLocationContainer: {
-    marginLeft: 10, // Increased margin
+    // Removed marginLeft, let space-between handle spacing
     justifyContent: 'flex-start',
+    flexShrink: 1, // Allow text container to shrink if needed
+    marginRight: 10, // Add some margin to the right of the text block
   },
   titleContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
+    alignItems: 'baseline', // Align text based on baseline
+    marginBottom: 2, // Reduced margin
   },
   titleText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: titleFontSize, // Dynamic font size
+    fontWeight: 'bold', // Already bold, ensure it stays
     color: '#ffffff',
     fontFamily: 'ARCHIVE',
   },
   compareText: {
-    fontSize: 16,
+    fontSize: compareFontSize, // Dynamic font size
+    fontWeight: 'bold', // Make subtitle bold
     color: '#ffffff',
     fontFamily: 'ARCHIVE',
-    marginLeft: 4,
+    marginLeft: 6, // Adjusted margin
   },
   locationButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'transparent', // Transparent background
+    backgroundColor: 'transparent',
     borderRadius: 20,
+    marginTop: 2, // Add a little top margin
+  },
+  locationIconLeft: { // Style for the icon when it's on the left
+    marginRight: 5, // Add space between icon and text
   },
   locationText: {
-    fontSize: 16, // Increased font size
+    fontSize: locationFontSize, // Dynamic font size
     color: '#ffffff',
+    flexShrink: 1, // Allow text to shrink if location name is long
   },
   hamburgerIconContainer: {
-    justifyContent: 'space-between', // Change to space-between for better line distribution
-    height: 40, // Increased container height
-    width: 45, // Increased container width
-    alignSelf: 'center',
-    alignItems: 'flex-start',
-    paddingVertical: 2, // Add vertical padding
+    justifyContent: 'space-around', // Use space-around for even spacing of lines
+    height: hamburgerHeight, // Dynamic height
+    width: hamburgerWidth,  // Dynamic width
+    alignItems: 'center', // Center lines horizontally
+    // Removed alignSelf, paddingVertical
   },
   hamburgerLine: {
-    height: 4, // Increased line height
+    height: hamburgerLineHeight, // Dynamic line height
+    width: '100%', // Make lines take full width of container
     backgroundColor: '#ffffff',
-    borderRadius: 3, // Increased border radius
+    borderRadius: 2, // Adjusted border radius
   },
   modalOverlay: {
     flex: 1,
@@ -437,7 +471,7 @@ const styles = StyleSheet.create({
   },
   menuContent: {
     position: 'absolute',
-    left: 0,
+    right: 0,
     top: 0,
     width: '80%',
     height: '100%',

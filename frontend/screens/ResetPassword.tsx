@@ -6,15 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-type SignUpScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
+type ResetPasswordScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ResetPassword'>;
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   Dimensions,
   StatusBar,
   ActivityIndicator,
@@ -22,48 +20,58 @@ import {
 
 const { width, height } = Dimensions.get('window');
 
-const SignUp = () => {
-  const navigation = useNavigation<SignUpScreenNavigationProp>();
-  const [name, setName] = useState('');
+const ResetPassword = () => {
+  const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleNext = async () => {
     try {
       setLoading(true);
       // Basic validation
-      if (!name.trim()) {
-        setError('Please enter your name');
-        return;
-      }
       if (!phoneNumber.trim() || phoneNumber.length !== 10) {
         setError('Please enter a valid phone number');
         return;
       }
-      if (!password.trim() || password.length < 6) {
+      if (!newPassword.trim() || newPassword.length < 6) {
         setError('Password must be at least 6 characters');
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setError('Passwords do not match');
         return;
       }
 
       // Clear any previous errors
       setError('');
 
-      // Save user data to AsyncStorage
-      const userData = {
-        name: name.trim(),
-        phoneNumber: phoneNumber.trim(),
-        password: password.trim()
-      };
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      // Get stored user data to verify phone number
+      const storedUserData = await AsyncStorage.getItem('userData');
+      if (!storedUserData) {
+        setError('No account found with this phone number');
+        return;
+      }
 
-      // Navigate to verification screen with user data
-      navigation.navigate('SignUpVerification', userData);
+      const userData = JSON.parse(storedUserData);
+      if (userData.phoneNumber !== phoneNumber) {
+        setError('No account found with this phone number');
+        return;
+      }
+
+      // Navigate to verification screen with reset data
+      navigation.navigate('SignUpVerification', {
+        phoneNumber: phoneNumber.trim(),
+        newPassword: newPassword.trim(),
+        isResettingPassword: true
+      } as any); // Type assertion needed due to navigation params complexity
     } catch (err) {
       setError('An error occurred. Please try again.');
-      console.error('SignUp error:', err);
+      console.error('Reset Password error:', err);
     } finally {
       setLoading(false);
     }
@@ -83,21 +91,10 @@ const SignUp = () => {
       </View>
       
       <View style={styles.bottomSection}>
-        <Text style={styles.signUpText}>Sign Up</Text>
+        <Text style={styles.resetText}>Reset Password</Text>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Your Name"
-            value={name}
-            onChangeText={setName}
-            placeholderTextColor="#666"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Number</Text>
+          <Text style={styles.label}>Phone Number</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter your phone number"
@@ -109,22 +106,46 @@ const SignUp = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
+          <Text style={styles.label}>New Password</Text>
           <View style={styles.passwordContainer}>
             <TextInput
               style={[styles.input, { flex: 1, borderWidth: 0 }]}
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
+              placeholder="Enter new password"
+              value={newPassword}
+              onChangeText={setNewPassword}
+              secureTextEntry={!showNewPassword}
               placeholderTextColor="#666"
             />
             <TouchableOpacity
               style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
+              onPress={() => setShowNewPassword(!showNewPassword)}
             >
               <Ionicons
-                name={showPassword ? "eye-off" : "eye"}
+                name={showNewPassword ? "eye-off" : "eye"}
+                size={24}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Confirm New Password</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={[styles.input, { flex: 1, borderWidth: 0 }]}
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+              placeholderTextColor="#666"
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              <Ionicons
+                name={showConfirmPassword ? "eye-off" : "eye"}
                 size={24}
                 color="#666"
               />
@@ -147,7 +168,7 @@ const SignUp = () => {
         </TouchableOpacity>
 
         <View style={styles.signInContainer}>
-          <Text style={styles.signInText}>Already have an account? </Text>
+          <Text style={styles.signInText}>Remember your password? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
             <Text style={styles.signInLink}>Sign in</Text>
           </TouchableOpacity>
@@ -183,8 +204,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     paddingHorizontal: width * 0.1,
     paddingTop: height * 0.05,
-    elevation: 10, // Android shadow
-    shadowColor: '#000', // iOS shadow
+    elevation: 10,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: -3,
@@ -192,11 +213,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 5,
   },
-  signUpText: {
+  resetText: {
     fontSize: width * 0.07,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#c60053', // Updated header text color
+    color: '#c60053',
   },
   inputContainer: {
     marginBottom: 15,
@@ -211,8 +232,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     backgroundColor: 'white',
-    elevation: 5, // Android shadow
-    shadowColor: '#000', // iOS shadow
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -258,7 +279,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   disabledButton: {
-    backgroundColor: '#f598d0', // Lighter pink when disabled
+    backgroundColor: '#f598d0',
     opacity: 0.7,
   },
   passwordContainer: {
@@ -275,4 +296,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUp;
+export default ResetPassword;

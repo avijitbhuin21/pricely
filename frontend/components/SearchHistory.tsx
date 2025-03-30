@@ -65,18 +65,18 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 4,
+    padding: 2,
     backgroundColor: '#fff',
-    borderRadius: 12,
-    marginHorizontal: 4,
-    marginBottom: 0, // Remove bottom margin
+    borderRadius: 8,
+    marginHorizontal: 0,
+    marginBottom: 0,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: '#333',
-    marginBottom: 8, // Further reduced margin
-    marginLeft: 6,
+    marginBottom: 4,
+    marginLeft: 4,
   },
   carouselContainer: {
     paddingHorizontal: ITEM_MARGIN, // Match item margin
@@ -89,16 +89,16 @@ const styles = StyleSheet.create({
     padding: 0, // Minimal padding
   },
   imageContainer: {
-    width: 70, // Smaller size to fit 5 items
-    height: 70, // Smaller size to fit 5 items
-    borderRadius: 35, // Half of width/height
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    marginBottom: 8, // Reduced margin
-    borderWidth: 1, // Add border width
-    borderColor: 'rgba(0, 0, 0, 0.2)', // Light black border for better visibility
+    marginBottom: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
   },
   placeholderImage: {
     width: '100%',
