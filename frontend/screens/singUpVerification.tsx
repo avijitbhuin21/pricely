@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   View,
   Text,
@@ -25,7 +26,13 @@ type SignUpVerificationScreenNavigationProp = StackNavigationProp<
 const SignUpVerification = () => {
   const navigation = useNavigation<SignUpVerificationScreenNavigationProp>();
   const route = useRoute();
-  const userData = route.params as { name: string; phoneNumber: string; password: string };
+  const userData = route.params as {
+    name?: string;
+    phoneNumber: string;
+    password?: string;
+    newPassword?: string;
+    isResettingPassword?: boolean;
+  };
   
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -46,14 +53,42 @@ const SignUpVerification = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       // For demo purposes, any 4-digit code works
-      // Store login status
-      await AsyncStorage.setItem('isLoggedIn', 'true');
+      if (userData.isResettingPassword && userData.newPassword) {
+        // Get stored user data
+        const storedUserData = await AsyncStorage.getItem('userData');
+        if (!storedUserData) {
+          setError('User data not found');
+          return;
+        }
 
-      // Navigate to SignIn screen
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'SignIn' }],
-      });
+        const existingData = JSON.parse(storedUserData);
+        // Update the password
+        const updatedData = {
+          ...existingData,
+          password: userData.newPassword
+        };
+        await AsyncStorage.setItem('userData', JSON.stringify(updatedData));
+        
+        // Show success message and navigate to SignIn
+        Alert.alert('Success', 'Your password has been reset', [
+          {
+            text: 'OK',
+            onPress: () => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'SignIn' }],
+              });
+            },
+          },
+        ]);
+      } else {
+        // Regular signup flow
+        await AsyncStorage.setItem('isLoggedIn', 'true');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SignIn' }],
+        });
+      }
     } catch (err) {
       setError('Verification failed. Please try again.');
       console.error('Verification error:', err);
@@ -81,7 +116,12 @@ const SignUpVerification = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#c60053', '#e8099c']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1.25, y: 0 }}
+      style={styles.container}
+    >
       <StatusBar barStyle="light-content" />
       <View style={styles.topSection}>
         <Text style={styles.verifyText}>Verify Your Number</Text>
@@ -150,14 +190,13 @@ const SignUpVerification = () => {
           )}
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF1493',
   },
   topSection: {
     flex: 0.4,
@@ -183,11 +222,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.1,
     paddingTop: height * 0.05,
     alignItems: 'center',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -3,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
   },
   headerText: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#c60053',
   },
   instructionText: {
     color: 'gray',
@@ -208,13 +256,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    backgroundColor: 'white',
   },
   codeBoxFilled: {
-    borderColor: '#FF1493',
-    backgroundColor: '#fff',
+    borderColor: '#c60053',
+    backgroundColor: 'white',
   },
   codeBoxActive: {
-    borderColor: '#FF1493',
+    borderColor: '#e8099c',
     borderWidth: 3,
   },
   codeText: {
@@ -223,17 +280,25 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   resendText: {
-    color: '#FF1493',
+    color: '#e8099c',
     marginBottom: 20,
     fontSize: 16,
     fontWeight: '600',
   },
   verifyButton: {
-    backgroundColor: '#FF1493',
+    backgroundColor: '#e8099c',
     width: width * 0.7,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   verifyButtonText: {
     color: 'white',
@@ -252,7 +317,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   disabledButton: {
-    backgroundColor: '#ffb6c1',
+    backgroundColor: '#f598d0',
     opacity: 0.7,
   },
   disabledText: {

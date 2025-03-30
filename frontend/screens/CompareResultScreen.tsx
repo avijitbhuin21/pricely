@@ -222,6 +222,7 @@ export default function CompareResultScreen() {
 
       const result = await response.json();
       console.log('API Response:', JSON.stringify(result, null, 2));
+      console.log('Parsed response:', JSON.stringify(result));
       
       if (!result.data?.data || !Array.isArray(result.data.data)) {
         throw new Error('Invalid response format: expected data.data array');

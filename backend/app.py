@@ -371,12 +371,12 @@ if __name__ == "__main__":
 # make the recent search logos a little smaller.  -- done
 
 # app opening animation, they will send --(pending as they have not sent yet)
-# in the sign in page add a drop shadow to the white secction.  -- pending
-# password hide and show button --pending
-# instead of the solid pink colour add the gradient colour they provided --pending 
-# in the searchbar add changing names. like provided --pending
+# in the sign in page add a drop shadow to the white section.  -- done
+# password hide and show button --done
+# instead of the solid pink colour add the gradient colour they provided --done 
+# in the searchbar add changing names. like provided --done
 # add slider in the home page. --pending
-# recommended daily needs also needs a animation  -- pending
+# recommended daily needs also needs a animation  -- done
 
 
 
