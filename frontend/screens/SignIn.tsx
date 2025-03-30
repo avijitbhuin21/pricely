@@ -3,6 +3,8 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type SignInScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignIn'>;
 import {
@@ -26,6 +28,7 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleNext = async () => {
     try {
@@ -71,7 +74,12 @@ const SignIn = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={['#c60053', '#e8099c']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1.25, y: 0 }}
+      style={styles.container}
+    >
       <StatusBar barStyle="light-content" />
       <View style={styles.topSection}>
         <Text style={styles.welcomeText}>Welcome to</Text>
@@ -95,14 +103,26 @@ const SignIn = () => {
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholderTextColor="#666"
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={[styles.input, { flex: 1, borderWidth: 0 }]}
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              placeholderTextColor="#666"
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off" : "eye"}
+                size={24}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -120,20 +140,23 @@ const SignIn = () => {
         </TouchableOpacity>
 
         <View style={styles.signInContainer}>
-          <Text style={styles.signInText}>Don't have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
             <Text style={styles.signInLink}>Sign up</Text>
           </TouchableOpacity>
+          <Text style={styles.signInText}> • </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')}>
+            <Text style={styles.signInLink}>Forgot password</Text>
+          </TouchableOpacity>
         </View>
+        
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF1493', // Hot pink background
   },
   topSection: {
     flex: 0.3,
@@ -157,11 +180,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     paddingHorizontal: width * 0.1,
     paddingTop: height * 0.05,
+    elevation: 10, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: {
+      width: 0,
+      height: -3,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
   },
   signUpText: {
     fontSize: width * 0.07,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#c60053', // Updated header text color
   },
   inputContainer: {
     marginBottom: 15,
@@ -176,6 +208,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     backgroundColor: 'white',
+    elevation: 5, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   errorText: {
     color: 'red',
@@ -183,11 +223,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   nextButton: {
-    backgroundColor: '#FF1493',
+    backgroundColor: '#e8099c',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   nextButtonText: {
     color: 'white',
@@ -203,12 +251,24 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   signInLink: {
-    color: '#FF1493',
+    color: '#e8099c',
     fontWeight: 'bold',
   },
   disabledButton: {
-    backgroundColor: '#ffb6c1', // Lighter pink when disabled
+    backgroundColor: '#f598d0', // Lighter pink when disabled
     opacity: 0.7,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'lightgray',
+    borderRadius: 10,
+    backgroundColor: 'white',
+  },
+  eyeIcon: {
+    padding: 10,
+    marginRight: 5,
   },
 });
 
