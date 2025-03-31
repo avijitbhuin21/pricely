@@ -1,19 +1,16 @@
-# Removed comments and docstrings
-
 import re
 import math
 import json
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from sentence_transformers import util # Keep for potential cosine similarity calculation if numpy method fails
+from sentence_transformers import SentenceTransformer
 import numpy as np
 import sys
-# Use only the specified import as requested
-from mistralai import Mistral
 
-MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
-MISTRAL_EMBED_MODEL = "mistral-embed"
+# Remove Mistral-related constants
+# MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
+# MISTRAL_EMBED_MODEL = "mistral-embed"
 
 PRICE_TOLERANCE = 0.20
 NAME_SIMILARITY_THRESHOLD = 0.90
@@ -92,23 +89,16 @@ def are_quantities_similar(q1, q2, tolerance):
 
 
 def group_and_sort_products(products_data, search_query):
-    if not MISTRAL_API_KEY:
-        raise ValueError("MISTRAL_API_KEY environment variable not set.")
-
-    print("Initializing Mistral client...")
-    # Use the specific import requested by the user
-    client = Mistral(api_key=MISTRAL_API_KEY)
-    print("Client initialized.")
+    # Initialize the SentenceTransformer model
+    print("Initializing SentenceTransformer model...")
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    print("Model initialized.")
 
     print("Generating query embedding...")
     try:
-        # Assuming 'Mistral' class uses '.embeddings.create'
-        query_embedding_response = client.embeddings.create(
-            model=MISTRAL_EMBED_MODEL,
-            inputs=[search_query] # Use 'inputs' for list
-        )
-        query_embedding_np = np.array(query_embedding_response.data[0].embedding)
-        print(f"Query embedding generated ({query_embedding_response.usage.total_tokens} tokens used).")
+        # Generate query embedding using SentenceTransformer
+        query_embedding_np = model.encode(search_query, show_progress_bar=False)
+        print(f"Query embedding generated (dimension: {len(query_embedding_np)}).")
     except Exception as e:
         print(f"Error getting query embedding: {e}")
         raise
@@ -126,50 +116,43 @@ def group_and_sort_products(products_data, search_query):
             'price': price, 'parsed_quantity': parsed_qty, 'embedding': None
         })
 
-    print(f"Generating name embeddings using {MISTRAL_EMBED_MODEL}...")
+    print("Generating name embeddings using all-MiniLM-L6-v2...")
     product_names = [p['name'] for p in processed_products if p['name']]
     original_indices_with_names = [i for i, p in enumerate(processed_products) if p['name']]
 
     if not product_names:
         print("Warning: No valid product names found to generate embeddings.")
         embeddings_np = []
-        usage_tokens = 0
     else:
         try:
-             # Assuming 'Mistral' class uses '.embeddings.create'
-            embeddings_response = client.embeddings.create(
-                 model=MISTRAL_EMBED_MODEL,
-                 inputs=product_names # Use 'inputs' for list
-            )
-            usage_tokens = embeddings_response.usage.total_tokens
-
-            # Map embeddings back using index - assuming response order matches input order
-            if len(embeddings_response.data) != len(product_names):
-                print(f"Warning: Mismatch in embedding response length. Expected {len(product_names)}, got {len(embeddings_response.data)}")
-                # Handle mismatch - basic approach: pad or trim (less safe)
-                # Safer: Use index if available and reliable
-                embedding_map = {data.index: data.embedding for data in embeddings_response.data}
-                temp_embeddings_np = [np.array(embedding_map.get(i, None)) for i in range(len(product_names))]
-
-            else:
-                 # Assume order matches if length is correct
-                 temp_embeddings_np = [np.array(data.embedding) for data in embeddings_response.data]
-
+            # Process in batches to avoid memory issues (if needed)
+            batch_size = 128  # Adjust based on your memory constraints
+            embeddings_list = []
+            
+            for i in range(0, len(product_names), batch_size):
+                batch = product_names[i:i+batch_size]
+                # Generate embeddings for the batch
+                batch_embeddings = model.encode(batch, show_progress_bar=False)
+                embeddings_list.extend(batch_embeddings)
+            
+            # Map embeddings back to products
             full_embeddings_np = [None] * len(processed_products)
-            for original_idx, emb in zip(original_indices_with_names, temp_embeddings_np):
-                 if emb is not None:
-                     full_embeddings_np[original_idx] = emb
+            for idx, original_idx in enumerate(original_indices_with_names):
+                if idx < len(embeddings_list):
+                    full_embeddings_np[original_idx] = embeddings_list[idx]
+            
             embeddings_np = full_embeddings_np
 
         except Exception as e:
-            print(f"Error calling Mistral API for product embeddings: {e}")
+            print(f"Error generating embeddings: {e}")
             raise
 
+    # Assign embeddings to products
     for i, p in enumerate(processed_products):
         if i < len(embeddings_np): p['embedding'] = embeddings_np[i]
         else: p['embedding'] = None # Fallback if something went wrong with length
 
-    print(f"Embeddings generated ({usage_tokens} tokens used).")
+    print(f"Embeddings generated for {len([e for e in embeddings_np if e is not None])} products.")
 
     groups = []
     grouped_ids = set()
@@ -246,4 +229,4 @@ def group_and_sort_products(products_data, search_query):
         del group['_min_quantity_value']; del group['_query_similarity']
         final_result.append(group)
 
-    return final_result[:35] #Max 35 results
+    return final_result[:40]
