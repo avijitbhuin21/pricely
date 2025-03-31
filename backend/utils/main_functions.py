@@ -220,4 +220,6 @@ def get_compared_results(search_query, lat, lon, credentials=None):
         data = loop.run_until_complete(get_compared_data_async(search_query, loc, credentials))
         loop.close()
 
+    log_debug(f"Final compared data: {data}", "Orchestrator", "INFO")
+
     return data

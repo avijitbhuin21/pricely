@@ -4,7 +4,7 @@ import os
 from pyngrok import ngrok
 from supabase import create_client, Client
 import secrets  
-
+from utils.supabase_handler import *
 
 # LOCAL IMPORTS
 from utils.main_functions import *
@@ -12,7 +12,7 @@ from utils.main_functions import *
 load_dotenv()
 
 url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_ANON_KEY")
+key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 app = Flask(__name__)
@@ -26,6 +26,45 @@ def send_otp():
 def confirm_otp():
     pass
 
+@app.route("/login", methods=["POST"])
+def login_to_supabase():
+    data = request.get_json()
+    username = data.get("name")
+    password = data.get("password")
+    if not username or not password:
+        return jsonify({"status": "error", "message": "Email and password required"}), 400
+
+    try:
+        response = login(username=username, password=password)
+        if response['status'] == "success":
+            return jsonify({"status": "success", "message": "Login successful"}), 200
+        else:
+            return jsonify({"status": "error", "message": "Invalid credentials"}), 401
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/signup", methods=["POST"])
+def signup_to_supabase():
+    data = request.get_json()
+    username = data.get("name")
+    password = data.get("password")
+    mobile = data.get("mobile")
+    if not username or not password or not mobile:
+        return jsonify({"status": "error", "message": "Username, password and mobile required"}), 400
+    try:
+        res = signup(username=username, password=password, mobile=mobile)
+        if res['status'] == "success":
+            return jsonify({"status": "success", "message": "Signup successful"}), 200
+        else:
+            return jsonify({"status": "error", "message": res['message']}), 400
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/trending", methods=["POST"])
+def get_trending_and_daily_needs():
+    return jsonify(tanddn())    
+    
+
 @app.route("/get-search-results", methods=["POST"])
 def get_search_results():
     data = request.get_json()
@@ -34,9 +73,11 @@ def get_search_results():
     lon = data.get("lon")
     credentials = data.get("credentials", {})
 
-    data = get_compared_results(item_name, lat, lon, credentials)
+    print("credentials",credentials)
 
-    return jsonify({"status": "success", "data": data})
+    # data = get_compared_results(item_name, lat, lon, credentials)
+
+    return jsonify({"status": "success", "data": "data"})
 
 @app.route("/get-api-key", methods=["POST"])
 def get_api_key_route():
@@ -358,7 +399,7 @@ def main():
     ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
     ngrok_tunnel = ngrok.connect(addr='5000', proto="http", hostname="noble-raven-entirely.ngrok-free.app")
     print("Public URL:", ngrok_tunnel.public_url)
-    app.run(port=5001, debug=True, use_reloader=False) 
+    app.run(port=5000, debug=True, use_reloader=False) 
 
 if __name__ == "__main__":
     main()

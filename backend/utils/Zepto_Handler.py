@@ -4,7 +4,7 @@ import json
 import os
 from dotenv import load_dotenv
 import uuid
-
+import hashlib
 # LOCAL IMPORTS
 from .universal_function import *
 
@@ -147,6 +147,9 @@ def search_zepto(item_name, location_data, credentials=None):
                 'priority': 'u=1, i',
                 'referer': 'https://www.zeptonow.com/',
                 'requestid': str(uuid.uuid4()),
+                'sessionid': str(uuid.uuid4()),
+                'deviceid': str(uuid.uuid4()),
+                'request-signature':hashlib.sha256(str(uuid.uuid4()).encode('utf-8')).hexdigest(),
                 'sec-ch-ua': '"Chromium";v="134", "Not:A-Brand";v="24", "Microsoft Edge";v="134"',
                 'sec-ch-ua-mobile': '?0',
                 'sec-ch-ua-platform': '"Windows"',
