@@ -353,8 +353,9 @@ export default function HomeScreen() {
   const footerAnimation = useRef(new Animated.Value(0)).current;
   const lastScrollY = useRef(0);
 
-  // Navigation and context
+  // Navigation and context hooks
   const { currentLocation, updateLocation, autoLocate } = useLocation();
+  const defaultLocation = { address: 'Select Location' };
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   
   // Calculate standardized item dimensions for both carousels
@@ -637,7 +638,7 @@ export default function HomeScreen() {
           }}>
             <Header
               userName={userName}
-              currentLocation={currentLocation}
+              currentLocation={currentLocation || { address: 'Select Location' }}
               onLocationSelect={updateLocation}
               onAutoLocate={autoLocate}
             />

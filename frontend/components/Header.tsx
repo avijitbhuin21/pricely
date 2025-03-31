@@ -15,14 +15,14 @@ import {
   Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { HeaderProps, Location } from '../types';
+import { HeaderProps, Location, LocationSuggestion } from '../types';
 import { useNavigation } from '@react-navigation/native';
 import { useLocation } from '../contexts/LocationContext';
 
-const AUTO_LOCATE: Location = { 
-  id: 'auto', 
-  name: 'Auto Locate', 
-  isAutoLocate: true 
+const AUTO_LOCATE: LocationSuggestion = {
+  id: 'auto',
+  name: 'Auto Locate',
+  isAutoLocate: true
 };
 
 const Header: React.FC<HeaderProps> = ({
@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({
   const { searchLocations: searchLocationsFromContext } = useLocation();
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Location[]>([AUTO_LOCATE]);
+  const [searchResults, setSearchResults] = useState<LocationSuggestion[]>([AUTO_LOCATE]);
   const [isLoading, setIsLoading] = useState(false);
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -83,14 +83,15 @@ const Header: React.FC<HeaderProps> = ({
     }, 500);
   };
 
-  const handleLocationSelect = (location: Location) => {
-    if (location.isAutoLocate) {
+  const handleLocationSelect = (locationSuggestion: LocationSuggestion) => {
+    if (locationSuggestion.isAutoLocate) {
       onAutoLocate();
     } else {
-      // Extract the main location name from the full description
-      // Google Places results have descriptions like "New York, NY, USA"
-      const mainLocationName = location.name.split(',')[0].trim();
-      onLocationSelect(mainLocationName);
+      // Convert LocationSuggestion to Location
+      const location: Location = {
+        address: locationSuggestion.fullName || locationSuggestion.name,
+      };
+      onLocationSelect(location);
     }
     setLocationModalVisible(false);
     setSearchQuery('');
@@ -124,7 +125,7 @@ const Header: React.FC<HeaderProps> = ({
     });
   };
 
-  const renderLocationItem: ListRenderItem<Location> = ({ item }) => (
+  const renderLocationItem: ListRenderItem<LocationSuggestion> = ({ item }) => (
     <TouchableOpacity
       style={styles.locationItem}
       onPress={() => handleLocationSelect(item)}
@@ -172,21 +173,21 @@ const Header: React.FC<HeaderProps> = ({
           <TouchableOpacity
             style={styles.locationButton}
             onPress={() => {
-              if (currentLocation !== 'Detecting location...') {
+              if (currentLocation.address !== 'Detecting location...') {
                 setLocationModalVisible(true);
               }
             }}
-            disabled={currentLocation === 'Detecting location...'}
+            disabled={currentLocation.address === 'Detecting location...'}
           >
             {/* Location Icon (moved to the left) */}
-            {currentLocation !== 'Detecting location...' && (
+            {currentLocation.address !== 'Detecting location...' && (
               <Ionicons name="chevron-down" size={iconSizeSmall} color="#fff" style={styles.locationIconLeft} />
             )}
             <Text
               style={styles.locationText}
               numberOfLines={1}
             >
-              {currentLocation}
+              {currentLocation.address}
             </Text>
           </TouchableOpacity>
         </View>

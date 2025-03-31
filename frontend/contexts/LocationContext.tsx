@@ -1,24 +1,32 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import * as Location from 'expo-location';
+import * as ExpoLocation from 'expo-location';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Location, LocationResult } from '../types';
 
 interface LocationContextType {
-  currentLocation: string;
+  currentLocation: Location;
   isLocating: boolean;
   googleApiKey: string | null;
-  updateLocation: (location: string) => void;
+  updateLocation: (location: Location) => void;
   autoLocate: () => Promise<void>;
-  searchLocations: (query: string) => Promise<any[]>;
+  searchLocations: (query: string) => Promise<LocationResult[]>;
 }
 
-const LocationContext = createContext<LocationContextType | undefined>(undefined);
+const LocationContext = createContext<LocationContextType>({
+  currentLocation: { address: 'Select Location' },
+  isLocating: false,
+  googleApiKey: null,
+  updateLocation: () => {},
+  autoLocate: async () => {},
+  searchLocations: async () => [],
+});
 
 const STORAGE_KEY = 'Pricely_Location';
 const API_ENDPOINT = 'https://noble-raven-entirely.ngrok-free.app/get-api-key';
 
 export function LocationProvider({ children }: { children: React.ReactNode }) {
-  const [currentLocation, setCurrentLocation] = useState("Select Location");
+  const [currentLocation, setCurrentLocation] = useState<Location>({ address: "Select Location" });
   const [isLocating, setIsLocating] = useState(false);
   const [googleApiKey, setGoogleApiKey] = useState<string | null>(null);
   const [isLoadingApiKey, setIsLoadingApiKey] = useState(false);
@@ -32,12 +40,13 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
         
         if (savedLocation) {
           console.log('[LocationContext] Found saved location:', savedLocation);
-          setCurrentLocation(savedLocation);
+          setCurrentLocation({ address: savedLocation });
         } else {
           console.log('[LocationContext] No saved location found');
         }
       } catch (error) {
         console.error('[LocationContext] Failed to load saved location:', error);
+        setCurrentLocation({ address: 'Select Location' });
       }
     };
 
@@ -166,7 +175,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
   const requestLocationPermission = async () => {
     try {
       console.log('[LocationContext] Requesting location permission');
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await ExpoLocation.requestForegroundPermissionsAsync();
       console.log(`[LocationContext] Location permission status: ${status}`);
       
       if (status !== 'granted') {
@@ -189,7 +198,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
   const autoLocate = async () => {
     console.log('[LocationContext] Starting auto-location process');
     setIsLocating(true);
-    setCurrentLocation('Detecting location...');
+    setCurrentLocation({ address: 'Detecting location...' });
     
     // If we don't have the API key yet, try to fetch it
     if (!googleApiKey) {
@@ -197,7 +206,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
       await fetchApiKey();
       if (!googleApiKey) {
         console.log('[LocationContext] Failed to get API key, aborting auto-locate');
-        setCurrentLocation('Location services unavailable');
+        setCurrentLocation({ address: 'Location services unavailable' });
         setIsLocating(false);
         return;
       }
@@ -206,21 +215,21 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     const hasPermission = await requestLocationPermission();
     if (!hasPermission) {
       console.log('[LocationContext] No location permission, aborting auto-locate');
-      setCurrentLocation('Select Location');
+      setCurrentLocation({ address: 'Select Location' });
       setIsLocating(false);
       return;
     }
 
     try {
       console.log('[LocationContext] Getting current position');
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High
+      const location = await ExpoLocation.getCurrentPositionAsync({
+        accuracy: ExpoLocation.Accuracy.High
       });
       
       const { latitude, longitude } = location.coords;
       console.log(`[LocationContext] Got coordinates: ${latitude}, ${longitude}`);
       await AsyncStorage.setItem("pricely_lat", String(latitude));
-      await AsyncStorage.setItem('pricely_lon', String(latitude));
+      await AsyncStorage.setItem('pricely_lon', String(longitude));
       
       // Use Google's Geocoding API with our API key
       const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleApiKey}`;
@@ -246,11 +255,15 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
         const locationName = [city, region, country].filter(Boolean).join(', ');
         console.log(`[LocationContext] Location resolved: ${locationName}`);
         
-        updateLocation(locationName || 'Location Found');
+        updateLocation({
+          address: locationName || 'Location Found',
+          lat: latitude,
+          lon: longitude
+        });
       } else {
         // Fallback to Expo Location's reverseGeocodeAsync if Google API fails
         console.log('[LocationContext] Falling back to Expo reverseGeocodeAsync');
-        const addresses = await Location.reverseGeocodeAsync({ latitude, longitude });
+        const addresses = await ExpoLocation.reverseGeocodeAsync({ latitude, longitude });
         
         if (addresses && addresses.length > 0) {
           const address = addresses[0];
@@ -263,10 +276,14 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
           ].filter(Boolean).join(', ');
           
           console.log(`[LocationContext] Location resolved from Expo: ${locationName}`);
-          updateLocation(locationName || 'Location Found');
+          updateLocation({
+            address: locationName || 'Location Found',
+            lat: latitude,
+            lon: longitude
+          });
         } else {
           console.log('[LocationContext] No address found from either source');
-          updateLocation('Location not found');
+          setCurrentLocation({ address: 'Location not found' });
           Alert.alert('Error', 'Could not determine your address');
         }
       }
@@ -277,14 +294,14 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
         'Unable to get your current location. Please check your GPS settings and try again.',
         [{ text: 'OK' }]
       );
-      updateLocation('Select Location');
+      setCurrentLocation({ address: 'Select Location' });
     } finally {
       setIsLocating(false);
       console.log('[LocationContext] Auto-locate process completed');
     }
   };
 
-  const searchLocations = async (query: string): Promise<any[]> => {
+  const searchLocations = async (query: string): Promise<LocationResult[]> => {
     console.log(`[LocationContext] Searching locations for query: "${query}"`);
     
     if (!googleApiKey) {
@@ -326,19 +343,19 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateLocation = async (location: string) => {
-    console.log(`[LocationContext] Updating location to: "${location}"`);
+  const updateLocation = async (location: Location) => {
+    console.log(`[LocationContext] Updating location to:`, location);
     setCurrentLocation(location);
     
     // Save location to AsyncStorage
     try {
       console.log(`[LocationContext] Saving location to storage with key: ${STORAGE_KEY}`);
-      await AsyncStorage.setItem(STORAGE_KEY, location);
+      await AsyncStorage.setItem(STORAGE_KEY, location.address);
       console.log('[LocationContext] Location successfully saved to storage');
 
-      // Get coordinates for the selected location
-      if (googleApiKey) {
-        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${googleApiKey}`;
+      // Get coordinates if not provided
+      if (!location.lat && !location.lon && googleApiKey) {
+        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location.address)}&key=${googleApiKey}`;
         const response = await fetch(geocodeUrl);
         const data = await response.json();
 
@@ -371,9 +388,5 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useLocation() {
-  const context = useContext(LocationContext);
-  if (context === undefined) {
-    throw new Error('useLocation must be used within a LocationProvider');
-  }
-  return context;
+  return useContext(LocationContext);
 }
