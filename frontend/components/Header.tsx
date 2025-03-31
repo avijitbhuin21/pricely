@@ -30,6 +30,8 @@ const Header: React.FC<HeaderProps> = ({
   currentLocation,
   onLocationSelect,
   onAutoLocate,
+  showBackButton = false,
+  hideHamburger = false,
 }): React.ReactElement => {
   const navigation = useNavigation();
   const { searchLocations: searchLocationsFromContext } = useLocation();
@@ -152,7 +154,16 @@ const Header: React.FC<HeaderProps> = ({
     <View style={styles.container}>
       {/* Main content area */}
       <View style={styles.contentContainer}>
-        {/* Text and Location section (now on the left) */}
+        {/* Back Button */}
+        {showBackButton && (
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Ionicons name="chevron-back" size={iconSizeMedium} color="#ffffff" />
+          </TouchableOpacity>
+        )}
+        {/* Text and Location section */}
         <View style={styles.textAndLocationContainer}>
           <View style={styles.titleContainer}>
             <Text style={styles.titleText}>PRICELY</Text>
@@ -181,14 +192,16 @@ const Header: React.FC<HeaderProps> = ({
         </View>
 
         {/* Hamburger Menu (now on the right) */}
-        <TouchableOpacity
-          onPress={handleMenuPress}
-          style={styles.hamburgerIconContainer} // Removed inline width
-        >
-          <View style={styles.hamburgerLine} aria-label="Menu button top line" />
-          <View style={styles.hamburgerLine} aria-label="Menu button middle line" />
-          <View style={styles.hamburgerLine} aria-label="Menu button bottom line" />
-        </TouchableOpacity>
+        {!hideHamburger && (
+          <TouchableOpacity
+            onPress={handleMenuPress}
+            style={styles.hamburgerIconContainer}
+          >
+            <View style={styles.hamburgerLine} aria-label="Menu button top line" />
+            <View style={styles.hamburgerLine} aria-label="Menu button middle line" />
+            <View style={styles.hamburgerLine} aria-label="Menu button bottom line" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <Modal
@@ -325,6 +338,10 @@ const menuItemSize = screenWidth * 0.04;
 
 
 const styles = StyleSheet.create({
+  backButton: {
+    padding: 8,
+    marginRight: 8,
+  },
   container: {
     backgroundColor: '#C60053',
     minHeight: headerMinHeight, // Dynamic min height

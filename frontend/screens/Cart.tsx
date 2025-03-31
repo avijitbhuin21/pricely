@@ -8,16 +8,17 @@ import {
   Image,
   Alert,
   Linking,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
 import { useLocation } from '../contexts/LocationContext';
 import { useCart } from '../contexts/CartContext';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 interface CartItemProps {
   item: {
@@ -157,12 +158,40 @@ const CartScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        userName="Demo"
-        currentLocation={currentLocation}
-        onLocationSelect={updateLocation}
-        onAutoLocate={autoLocate}
-      />
+      <View style={styles.header}>
+        {/* Top Row with Back Button and Title */}
+        <View style={styles.topRow}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="chevron-back" size={48} color="#ffffff" />
+          </TouchableOpacity>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleText}>CART</Text>
+          </View>
+        </View>
+        
+        {/* Location Row */}
+        <View style={styles.locationRow}>
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={() => {
+              if (currentLocation !== 'Detecting location...') {
+                updateLocation(currentLocation);
+              }
+            }}
+            disabled={currentLocation === 'Detecting location...'}
+          >
+            {currentLocation !== 'Detecting location...' && (
+              <Ionicons name="chevron-down" size={screenWidth * 0.05} color="#fff" style={styles.locationIcon} />
+            )}
+            <Text style={styles.locationText} numberOfLines={1}>
+              {currentLocation}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
       <View style={styles.content}>
         <ScrollView
           style={styles.cartItemsContainer}
@@ -191,7 +220,6 @@ const CartScreen = () => {
         </ScrollView>
       </View>
 
-      <Footer navigation={navigation} activeTab="cart" setActiveTab={() => {}} />
     </SafeAreaView>
   );
 };
@@ -201,10 +229,62 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
+  header: {
+    backgroundColor: '#C60053',
+    paddingHorizontal: screenWidth * 0.04,
+    paddingTop: 10,
+    paddingBottom: 12,
+    minHeight: 100,
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    height: 50,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 0,
+    paddingTop: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  titleContainer: {
+    flex: 0.8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  titleText: {
+    fontSize: screenWidth * 0.09,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    fontFamily: 'ARCHIVE',
+    letterSpacing: 1,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    marginTop: 4,
+  },
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderRadius: 20,
+    paddingLeft: 8,
+  },
+  locationIcon: {
+    marginRight: 6,
+  },
+  locationText: {
+    fontSize: screenWidth * 0.035,
+    color: '#ffffff',
+    flexShrink: 1,
+  },
   content: {
     flex: 1,
     padding: 20,
-    paddingBottom: 100,
+    paddingBottom: 20,
     position: 'relative'
   },
   vendorSection: {

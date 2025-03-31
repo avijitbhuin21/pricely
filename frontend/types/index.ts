@@ -24,6 +24,8 @@ export interface HeaderProps {
   currentLocation: string;
   onLocationSelect: (location: string) => void;
   onAutoLocate: () => void;
+  showBackButton?: boolean;
+  hideHamburger?: boolean;
 }
 
 export interface Location {
