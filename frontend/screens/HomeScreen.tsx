@@ -14,7 +14,8 @@ import {
   NativeSyntheticEvent,
   Platform,
   PixelRatio,
-  useWindowDimensions
+  useWindowDimensions,
+  TextStyle
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Footer from '../components/Footer';
@@ -102,31 +103,37 @@ const trendingItems = [
   {
     id: '1',
     name: 'Fresh Apples',
+    price: '1kg/ ₹60',
     image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6'
   },
   {
     id: '2',
     name: 'Organic Honey',
+    price: '250g/ ₹120',
     image: 'https://heavenearth.in/wp-content/uploads/2023/01/Organic-Honey-by-Heaven-earth-foods-1.jpg'
   },
   {
     id: '3',
     name: 'Fresh Milk',
+    price: '500ml/ ₹35',
     image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150'
   },
   {
     id: '4',
     name: 'Whole Wheat',
+    price: '1kg/ ₹55',
     image: 'https://images.unsplash.com/photo-1568254183919-78a4f43a2877'
   },
   {
     id: '5',
     name: 'Cheese',
+    price: '200g/ ₹180',
     image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d'
   },
   {
     id: '6',
     name: 'Dark Chocolate',
+    price: '100g/ ₹90',
     image: 'https://images.unsplash.com/photo-1587132137056-bfbf0166836e'
   }
 ];
@@ -146,56 +153,69 @@ interface CarouselSectionProps {
     verticalScale: (size: number) => number;
     moderateScale: (size: number, factor?: number) => number;
   };
-  recommendedCarouselHeight: number;
-  trendingCarouselHeight: number;
+  carouselHeight: number;
   onItemPress: (item: CarouselItem) => void;
   showPrices?: boolean;
+  standardCardHeight: number;
+  standardImageHeight: number;
+  standardItemWidth: number;
+  standardItemGap: number;
+  standardFontSizes: {
+    title: number;
+    price: number;
+  };
+  autoScrollInterval?: number; // New prop for customizing scroll interval
 }
 
 const CarouselSection: React.FC<CarouselSectionProps> = ({
   title,
   items,
   scales,
-  recommendedCarouselHeight,
-  trendingCarouselHeight,
+  carouselHeight,
   onItemPress,
-  showPrices = true
+  showPrices = true,
+  standardCardHeight,
+  standardImageHeight,
+  standardItemWidth,
+  standardItemGap,
+  standardFontSizes,
+  autoScrollInterval = 3000 // Default to 3 seconds if not specified
 }) => {
   const { horizontalScale, verticalScale, moderateScale } = scales;
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList<CarouselItem>>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [visibleItems, setVisibleItems] = useState(2);
-
-  // Calculate item dimensions
-  const itemGap = horizontalScale(24);
-  const totalHorizontalPadding = horizontalScale(32);
-  const flatListHorizontalPadding = horizontalScale(16);
-  const availableWidth = Dimensions.get('window').width - totalHorizontalPadding;
-  const itemWidth = (availableWidth - itemGap) / visibleItems;
   
-  // Optimize image height based on whether prices are shown
-  const imageHeight = verticalScale(showPrices ? 70 : 65);
+  // Always show exactly 2 items
+  const visibleItems = 2;
   
-  // Calculate card height with min/max constraints
-  const minCardHeight = verticalScale(95);
-  const maxCardHeight = verticalScale(120);
-  const calculatedCardHeight = showPrices 
-    ? imageHeight + verticalScale(35) // Image + space for name and price
-    : imageHeight + verticalScale(25); // Image + space for just name
-    
-  // Apply min/max constraints
-  const cardHeight = Math.min(Math.max(calculatedCardHeight, minCardHeight), maxCardHeight);
+  // Use standardized dimensions passed from parent
+  const itemWidth = standardItemWidth;
+  const itemGap = standardItemGap;
+  const cardHeight = standardCardHeight;
+  const imageHeight = standardImageHeight;
   
-  // Dynamically adjust number of visible items based on screen width
-  useEffect(() => {
-    const width = Dimensions.get('window').width;
-    if (width > 400) {
-      setVisibleItems(2);
-    } else {
-      setVisibleItems(2); // Keep at 2 for consistency, adjust if needed for very small screens
-    }
-  }, []);
+  // Using standardized font sizes
+  const titleFontSize = standardFontSizes.title;
+  const priceFontSize = standardFontSizes.price;
+  
+  // Calculate side padding to ensure consistent layout
+  const sidePadding = horizontalScale(16);
+  
+  // Memoize styles to prevent unnecessary recalculations
+  const titleStyle = useMemo<TextStyle>(() => ({
+    fontSize: titleFontSize,
+    color: '#333',
+    fontWeight: '600',
+    width: '100%',
+  }), [titleFontSize]);
+  
+  const priceStyle = useMemo<TextStyle>(() => ({
+    fontSize: priceFontSize,
+    color: '#E8099C',
+    fontWeight: 'bold',
+    width: '100%',
+  }), [priceFontSize]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -207,7 +227,7 @@ const CarouselSection: React.FC<CarouselSectionProps> = ({
         animated: true
       });
       setCurrentIndex(nextIndex);
-    }, 3000);
+    }, autoScrollInterval);
 
     return () => clearInterval(timer);
   }, [currentIndex, items.length, visibleItems]);
@@ -252,25 +272,19 @@ const CarouselSection: React.FC<CarouselSectionProps> = ({
           gap: verticalScale(1),
         }}>
           <Text 
-            style={{
-              fontSize: moderateScale(13),
-              color: '#333',
-              fontWeight: '600',
-              width: '100%',
-            }} 
+            style={titleStyle} 
             numberOfLines={1}
           >
             {item.name}
           </Text>
           {showPrices && item.price && (
-            <Text style={{
-              fontSize: moderateScale(13),
-              color: '#E8099C',
-              fontWeight: 'bold',
-              width: '100%',
-            }}>
+            <Text style={priceStyle}>
               {item.price}
             </Text>
+          )}
+          {/* Add empty space if prices aren't shown to maintain consistent height */}
+          {!showPrices && (
+            <View style={{ height: priceFontSize * 1.2 }} />
           )}
         </View>
       </View>
@@ -279,8 +293,8 @@ const CarouselSection: React.FC<CarouselSectionProps> = ({
 
   return (
     <View style={{
-      height: title.includes('Recommended') ? recommendedCarouselHeight : trendingCarouselHeight,
-      marginBottom: title.includes('Recommended') ? verticalScale(4) : 0
+      height: carouselHeight,
+      marginBottom: verticalScale(4)
     }}>
       <Text style={{
         fontSize: moderateScale(18),
@@ -299,7 +313,7 @@ const CarouselSection: React.FC<CarouselSectionProps> = ({
         showsHorizontalScrollIndicator={false}
         snapToInterval={itemWidth + itemGap}
         decelerationRate="fast"
-        contentContainerStyle={{ paddingHorizontal: flatListHorizontalPadding }}
+        contentContainerStyle={{ paddingHorizontal: sidePadding }}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           { useNativeDriver: false }
@@ -342,6 +356,52 @@ export default function HomeScreen() {
   // Navigation and context
   const { currentLocation, updateLocation, autoLocate } = useLocation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  
+  // Calculate standardized item dimensions for both carousels
+  const standardItemDimensions = useMemo(() => {
+    // Calculate font sizes based on screen dimensions
+    const fontScaleFactor = Math.min(width / 375, height / 812);
+    const titleFontSize = moderateScale(13 * fontScaleFactor);
+    const priceFontSize = moderateScale(13 * fontScaleFactor);
+    
+    // Calculate appropriate gap based on screen size
+    const itemGapPercentage = 0.05; // 5% of screen width
+    const itemGap = horizontalScale(Math.min(24, width * itemGapPercentage));
+    
+    // Calculate item width to ensure exactly 2 items are visible
+    const sidePadding = horizontalScale(16);
+    const totalHorizontalPadding = sidePadding * 2;
+    const availableWidth = width - totalHorizontalPadding;
+    const itemWidth = (availableWidth - itemGap) / 2; // Always show 2 items
+    
+    // Calculate image dimensions with appropriate aspect ratio
+    const imageAspectRatio = 4/3; // Standard aspect ratio
+    const baseImageHeight = itemWidth / imageAspectRatio;
+    
+    // Adjust image height based on screen size with min/max constraints
+    const minImageHeight = verticalScale(60);
+    const maxImageHeight = verticalScale(90);
+    const imageHeight = Math.min(maxImageHeight, Math.max(minImageHeight, baseImageHeight));
+    
+    // Calculate text area height for both price and non-price versions
+    const titleLineHeight = titleFontSize * 1.3;
+    const priceLineHeight = priceFontSize * 1.3;
+    const textAreaHeight = verticalScale(Math.ceil(titleLineHeight + priceLineHeight + 8));
+    
+    // Calculate final card height
+    const cardHeight = imageHeight + textAreaHeight + verticalScale(6);
+    
+    return {
+      itemWidth,
+      itemGap,
+      cardHeight,
+      imageHeight,
+      fontSizes: {
+        title: titleFontSize,
+        price: priceFontSize
+      }
+    };
+  }, [width, height, horizontalScale, verticalScale, moderateScale]);
 
   // Calculate layout proportions based on available space
   const layoutProportions = useMemo(() => {
@@ -360,8 +420,8 @@ export default function HomeScreen() {
     // Search history section - if present
     const historyHeight = searchHistory.length > 0 ? verticalScale(90) : 0;
     
-    // Add spacing between history and first carousel - INCREASED as requested
-    const historyBottomMargin = searchHistory.length > 0 ? verticalScale(30) : 0;
+    // Add spacing between history and first carousel
+    const historyBottomMargin = searchHistory.length > 0 ? verticalScale(10) : 0;
     
     // Top margin for recommended section
     const recommendedTopMargin = verticalScale(10);
@@ -371,6 +431,11 @@ export default function HomeScreen() {
     
     // Dynamic spacing between carousels based on screen height
     const carouselGap = Math.max(verticalScale(1), Math.floor(height * .005)); // 0.5% of screen height
+    
+    // Calculate standardized height for each carousel section (title + items)
+    const sectionTitleHeight = verticalScale(30);
+    const carouselItemHeight = standardItemDimensions.cardHeight;
+    const standardCarouselHeight = sectionTitleHeight + carouselItemHeight + verticalScale(10);
     
     // Calculate dynamic space for carousels based on available height
     const availableSpace = height - (
@@ -384,10 +449,13 @@ export default function HomeScreen() {
       carouselGap +
       footerHeight
     );
-    // Allocate space for carousels with dynamic ratio based on content
-    const recommendedCarouselHeight = Math.floor(availableSpace * 0.40); // 52% for recommended items (slightly larger)
-    const trendingCarouselHeight = Math.floor(availableSpace * 0.60); // 48% for trending items
     
+    // Make both carousel sections equal height
+    // Use a height that works for both carousels, considering we need space for two of them
+    const equalCarouselHeight = Math.min(
+      standardCarouselHeight,
+      (availableSpace - carouselGap) / 2.3
+    );
     
     return {
       headerHeight,
@@ -397,12 +465,11 @@ export default function HomeScreen() {
       historyHeight,
       historyBottomMargin,
       recommendedTopMargin,
-      recommendedCarouselHeight,
-      trendingCarouselHeight,
+      carouselHeight: equalCarouselHeight,
       carouselGap,
       footerHeight
     };
-  }, [height, searchHistory.length, verticalScale]);
+  }, [height, searchHistory.length, verticalScale, standardItemDimensions]);
 
   // Handle scroll events to show/hide footer
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -649,15 +716,19 @@ export default function HomeScreen() {
             {/* Top margin for recommended section */}
             <View style={{ height: layoutProportions.recommendedTopMargin }} />
             
-            {/* Recommended Section - No prices */}
+            {/* Recommended Section */}
             <CarouselSection
               title="Recommended Daily Needs"
               items={recommendedItems}
               scales={{ horizontalScale, verticalScale, moderateScale }}
-              recommendedCarouselHeight={layoutProportions.recommendedCarouselHeight}
-              trendingCarouselHeight={layoutProportions.trendingCarouselHeight}
+              carouselHeight={layoutProportions.carouselHeight}
               onItemPress={handleItemPress}
-              showPrices={false} // Don't show prices for recommended items
+              showPrices={false} // Hide prices for all items
+              standardCardHeight={standardItemDimensions.cardHeight}
+              standardImageHeight={standardItemDimensions.imageHeight}
+              standardItemWidth={standardItemDimensions.itemWidth}
+              standardItemGap={standardItemDimensions.itemGap}
+              standardFontSizes={standardItemDimensions.fontSizes}
             />
             
             {/* Minimal space between carousels */}
@@ -665,15 +736,20 @@ export default function HomeScreen() {
               <View style={{ height: layoutProportions.carouselGap }} />
             )}
             
-            {/* Trending Section - With prices */}
+            {/* Trending Section */}
             <CarouselSection
               title="Trending Items"
               items={trendingItems}
               scales={{ horizontalScale, verticalScale, moderateScale }}
-              recommendedCarouselHeight={layoutProportions.recommendedCarouselHeight}
-              trendingCarouselHeight={layoutProportions.trendingCarouselHeight}
+              carouselHeight={layoutProportions.carouselHeight}
               onItemPress={handleItemPress}
-              showPrices={true} // Show prices for trending items
+              showPrices={false}
+              standardCardHeight={standardItemDimensions.cardHeight}
+              standardImageHeight={standardItemDimensions.imageHeight}
+              standardItemWidth={standardItemDimensions.itemWidth}
+              standardItemGap={standardItemDimensions.itemGap}
+              standardFontSizes={standardItemDimensions.fontSizes}
+              autoScrollInterval={5000} // 5 seconds interval for trending items
             />
           </View>
 

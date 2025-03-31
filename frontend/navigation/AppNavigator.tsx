@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
 import HomeScreen from '../screens/HomeScreen';
 import SignUp from '../screens/SignUp';
 import SignUpVerification from '../screens/singUpVerification';
@@ -11,6 +10,8 @@ import ResetPassword from '../screens/ResetPassword';
 import ProfileScreen from '../screens/ProfileScreen';
 import CartScreen from '../screens/Cart';
 import OffersScreen from '../screens/OffersScreen';
+import MemberScreen from '../screens/Member';
+
 
 // Define the root stack parameter list
 export type RootStackParamList = {
@@ -32,6 +33,7 @@ export type RootStackParamList = {
   };
   SignIn: undefined;
   ResetPassword: undefined;
+  Member: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -83,6 +85,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="Offers"
           component={OffersScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Member"
+          component={MemberScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

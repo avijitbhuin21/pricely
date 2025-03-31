@@ -41,8 +41,7 @@ export default function Footer({ navigation, activeTab, setActiveTab }: FooterPr
   };
 
   const handleMemberPress = () => {
-    console.log("Member+ Pressed");
-    // Example navigation: navigation.navigate('Membership');
+    navigation.navigate('Member');
   };
 
   // Determine icon names based on active tab
