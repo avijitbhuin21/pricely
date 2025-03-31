@@ -19,18 +19,39 @@ export interface NotificationItem {
   timestamp: Date;
 }
 
-export interface HeaderProps {
-  userName: string;
-  currentLocation: string;
-  onLocationSelect: (location: string) => void;
-  onAutoLocate: () => void;
-  showBackButton?: boolean;
-  hideHamburger?: boolean;
+export interface Location {
+  address: string;
+  lat?: number;
+  lon?: number;
 }
 
-export interface Location {
+export interface LocationResult {
+  id: string;
+  description: string;
+}
+
+export interface LocationSuggestion {
   id: string;
   name: string;
   fullName?: string;
   isAutoLocate?: boolean;
 }
+
+export interface HeaderProps {
+  userName: string;
+  currentLocation: Location;
+  onLocationSelect: (location: Location) => void;
+  onAutoLocate: () => void;
+  showBackButton?: boolean;
+  hideHamburger?: boolean;
+}
+
+export interface LocationContextType {
+  currentLocation: Location;
+  isLocating: boolean;
+  googleApiKey: string | null;
+  updateLocation: (location: Location) => void;
+  autoLocate: () => Promise<void>;
+  searchLocations: (query: string) => Promise<LocationResult[]>;
+}
+

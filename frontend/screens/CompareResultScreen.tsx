@@ -48,6 +48,8 @@ interface CompareResultItem {
   }[];
 }
 
+const STORAGE_CRED_KEY = 'Pricely-credentials';
+
 const ComparisonCard: React.FC<{
   item: CompareResultItem;
   opacity: Animated.Value;
@@ -199,12 +201,27 @@ export default function CompareResultScreen() {
       const lon = await AsyncStorage.getItem('pricely_lon') || '88.448261';
       const item_name = route.params?.query || '';
 
+      // Get stored credentials if they exist
+      const storedCredentialsJson = await AsyncStorage.getItem(STORAGE_CRED_KEY);
+      let storedCredentials = null;
+      
+      if (storedCredentialsJson) {
+        storedCredentials = JSON.parse(storedCredentialsJson);
+        // Verify if stored credentials match current location
+        if (storedCredentials.lat === lat && storedCredentials.lon === lon) {
+          console.log('Using stored credentials for location:', lat, lon);
+        } else {
+          console.log('Location mismatch, not using stored credentials');
+          storedCredentials = null;
+        }
+      }
+
       // Prepare request payload
       const payload = {
         item_name,
         lat,
         lon,
-        credentials: null
+        credentials: storedCredentials
       };
 
       // Make API call
@@ -222,8 +239,51 @@ export default function CompareResultScreen() {
 
       const result = await response.json();
       console.log('API Response:', JSON.stringify(result, null, 2));
-      console.log('Parsed response:', JSON.stringify(result));
+
+      console.log('Parsed response:', JSON.stringify(result.data.credentials));
+
+      // If the stored location is not matching then send null as credentials and after we get new credentials then we store the new credentials in the local storage and send the new credentials to the server
+      // Check if credentials are present in the response and check if the location (lat,lon,address) is matching with the already stored location then
+      // use the already stored credentials in the local storage and send the credentials to the server
+
+      // Check if credentials are present in the response
+      if (result.data?.credentials) {
+        try {
+          // Compare the received credentials with what we sent
+          const receivedCredentials = result.data.credentials;
+          console.log('Received new credentials from server', receivedCredentials);
+
+          // If we didn't send credentials or received new ones, store them
+          if (!payload.credentials || JSON.stringify(payload.credentials) !== JSON.stringify(receivedCredentials)) {
+            await AsyncStorage.setItem(STORAGE_CRED_KEY, JSON.stringify({
+              ...receivedCredentials,
+              lat,
+              lon
+            }));
+            console.log('Stored new credentials with location info',receivedCredentials);
+
+            // Update location context if needed
+            if (receivedCredentials.address &&
+                (!currentLocation || currentLocation.address !== receivedCredentials.address)) {
+              updateLocation({
+                address: receivedCredentials.address,
+                lat: parseFloat(lat),
+                lon: parseFloat(lon)
+              });
+              console.log('Updated location context with new address');
+            }
+          } else {
+            console.log('Using existing credentials, no updates needed');
+          }
+        } catch (error) {
+          console.error('Error handling credentials:', error);
+          setError('Error handling credentials. Please try again.');
+        }
+      } else {
+        console.log('No credentials received from server');
+      }
       
+
       if (!result.data?.data || !Array.isArray(result.data.data)) {
         throw new Error('Invalid response format: expected data.data array');
       }
@@ -353,7 +413,7 @@ export default function CompareResultScreen() {
     <SafeAreaView style={styles.container}>
       <Header
         userName="Demo"
-        currentLocation={currentLocation}
+        currentLocation={currentLocation || { address: 'Select Location' }}
         onLocationSelect={updateLocation}
         onAutoLocate={autoLocate}
       />
