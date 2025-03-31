@@ -282,7 +282,7 @@ const CarouselSection: React.FC<CarouselSectionProps> = ({
               {item.price}
             </Text>
           )}
-          {/* Add empty space if prices aren't shown to maintain consistent height */}
+          
           {!showPrices && (
             <View style={{ height: priceFontSize * 1.2 }} />
           )}
