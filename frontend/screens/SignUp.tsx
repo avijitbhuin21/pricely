@@ -5,6 +5,9 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import Toast from 'react-native-toast-message';
+import { SignupResponse, UserData, ApiError } from '../types/api';
+import API_CONFIG from '../config/api';
 
 type SignUpScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
 import {
@@ -33,127 +36,202 @@ const SignUp = () => {
 
   const handleNext = async () => {
     try {
+      // Clear any previous errors
+      setError('');
       setLoading(true);
+
       // Basic validation
       if (!name.trim()) {
-        setError('Please enter your name');
+        setError('Username is required');
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Input',
+          text2: 'Username is required',
+        });
         return;
       }
       if (!phoneNumber.trim() || phoneNumber.length !== 10) {
-        setError('Please enter a valid phone number');
+        setError('Please enter a valid 10-digit phone number');
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Input',
+          text2: 'Please enter a valid 10-digit phone number',
+        });
         return;
       }
       if (!password.trim() || password.length < 6) {
         setError('Password must be at least 6 characters');
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Input',
+          text2: 'Password must be at least 6 characters',
+        });
         return;
       }
 
-      // Clear any previous errors
-      setError('');
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SIGNUP}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          mobile: phoneNumber.trim(),
+          password: password.trim(),
+        }),
+      });
 
-      // Save user data to AsyncStorage
-      const userData = {
-        name: name.trim(),
-        phoneNumber: phoneNumber.trim(),
-        password: password.trim()
-      };
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      const data = await response.json();
 
-      // Navigate to verification screen with user data
-      navigation.navigate('SignUpVerification', userData);
+      // Validate response data structure
+      if (!data || typeof data.status !== 'string' || typeof data.message !== 'string') {
+        throw new Error('Invalid server response format');
+      }
+
+      const typedData = data as SignupResponse;
+
+      if (typedData.status === 'success') {
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: typedData.message
+        });
+
+        const userData: UserData = {
+          name: name.trim(),
+          phoneNumber: phoneNumber.trim(),
+        };
+
+        await AsyncStorage.setItem('userData', JSON.stringify(userData));
+        
+        // Navigate to verification screen
+        navigation.replace('SignUpVerification', userData);
+      } else {
+        setError(typedData.message);
+        Toast.show({
+          type: 'error',
+          text1: 'Signup Failed',
+          text2: typedData.message
+        });
+      }
     } catch (err) {
-      setError('An error occurred. Please try again.');
-      console.error('SignUp error:', err);
+      let errorMessage = 'Network error. Please check your connection and try again.';
+      
+      if (err instanceof Error) {
+        // Handle specific error cases
+        if (err.message === 'Invalid server response format') {
+          errorMessage = 'Unexpected server response. Please try again later.';
+        } else if (err instanceof TypeError) {
+          errorMessage = 'Unable to connect to server. Please check your internet connection.';
+        }
+        
+        const apiError = err as ApiError;
+        if (apiError.status === 429) {
+          errorMessage = 'Too many attempts. Please try again later.';
+        }
+        
+        console.error('Signup error:', err.message);
+      }
+
+      setError(errorMessage);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: errorMessage
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <LinearGradient
-      colors={['#c60053', '#e8099c']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1.25, y: 0 }}
-      style={styles.container}
-    >
-      <StatusBar barStyle="light-content" />
-      <View style={styles.topSection}>
-        <Text style={styles.welcomeText}>Welcome to</Text>
-        <Text style={styles.appName}>PRICELY</Text>
-      </View>
-      
-      <View style={styles.bottomSection}>
-        <Text style={styles.signUpText}>Sign Up</Text>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Your Name"
-            value={name}
-            onChangeText={setName}
-            placeholderTextColor="#666"
-          />
+    <>
+      <LinearGradient
+        colors={['#c60053', '#e8099c']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1.25, y: 0 }}
+        style={styles.container}
+      >
+        <StatusBar barStyle="light-content" />
+        <View style={styles.topSection}>
+          <Text style={styles.welcomeText}>Welcome to</Text>
+          <Text style={styles.appName}>PRICELY</Text>
         </View>
+        
+        <View style={styles.bottomSection}>
+          <Text style={styles.signUpText}>Sign Up</Text>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Number</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your phone number"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            keyboardType="phone-pad"
-            placeholderTextColor="#666"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
-          <View style={styles.passwordContainer}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Name</Text>
             <TextInput
-              style={[styles.input, { flex: 1, borderWidth: 0 }]}
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
+              style={styles.input}
+              placeholder="Enter Your Name"
+              value={name}
+              onChangeText={setName}
               placeholderTextColor="#666"
             />
-            <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <Ionicons
-                name={showPassword ? "eye-off" : "eye"}
-                size={24}
-                color="#666"
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Number</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your phone number"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              keyboardType="phone-pad"
+              placeholderTextColor="#666"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Password</Text>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={[styles.input, { flex: 1, borderWidth: 0 }]}
+                placeholder="Enter your password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                placeholderTextColor="#666"
               />
+              <TouchableOpacity
+                style={styles.eyeIcon}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={24}
+                  color="#666"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <TouchableOpacity
+            style={[styles.nextButton, loading && styles.disabledButton]}
+            onPress={handleNext}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.nextButtonText}>Next</Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.signInContainer}>
+            <Text style={styles.signInText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
+              <Text style={styles.signInLink}>Sign in</Text>
             </TouchableOpacity>
           </View>
         </View>
-
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-        <TouchableOpacity
-          style={[styles.nextButton, loading && styles.disabledButton]}
-          onPress={handleNext}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.nextButtonText}>Next</Text>
-          )}
-        </TouchableOpacity>
-
-        <View style={styles.signInContainer}>
-          <Text style={styles.signInText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-            <Text style={styles.signInLink}>Sign in</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </LinearGradient>
+      </LinearGradient>
+      <Toast />
+    </>
   );
 };
 

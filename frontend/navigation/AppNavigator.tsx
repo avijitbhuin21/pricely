@@ -11,10 +11,12 @@ import ProfileScreen from '../screens/ProfileScreen';
 import CartScreen from '../screens/Cart';
 import OffersScreen from '../screens/OffersScreen';
 import MemberScreen from '../screens/Member';
+import SplashScreen from '../screens/SplashScreen';
 
 
 // Define the root stack parameter list
 export type RootStackParamList = {
+  Splash: undefined;
   Home: undefined;
   CompareResult: {
     query: string;
@@ -41,7 +43,12 @@ const Stack = createStackNavigator<RootStackParamList>();
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SignIn">
+      <Stack.Navigator initialRouteName="Splash">
+        <Stack.Screen
+          name="Splash"
+          component={SplashScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="SignIn"
           component={SignIn}
