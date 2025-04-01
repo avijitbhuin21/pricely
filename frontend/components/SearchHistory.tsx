@@ -18,8 +18,16 @@ export interface SearchHistoryProps {
 }
 
 const SearchHistory: React.FC<SearchHistoryProps> = ({ searches, onSearchPress }) => {
-  if (searches.length === 0) return null;
-
+  if (searches.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Recent Searches</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No recent searches</Text>
+        </View>
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Recent Searches</Text>
@@ -77,6 +85,16 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 4,
     marginLeft: 4,
+  },
+  emptyContainer: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
   },
   carouselContainer: {
     paddingHorizontal: ITEM_MARGIN, // Match item margin

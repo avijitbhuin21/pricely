@@ -58,85 +58,19 @@ const createScaleFunctions = (width: number, height: number) => {
   
   return { horizontalScale, verticalScale, moderateScale };
 };
+// Interfaces for server response
+interface ServerItem {
+  url: string;
+  name: string;
+}
 
-// Sample data for carousels
-const recommendedItems = [
-  {
-    id: '1',
-    name: 'Fresh Onions',
-    price: '1kg/ ₹40',
-    image: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb'
-  },
-  {
-    id: '2',
-    name: 'Fresh Bread',
-    price: '₹45',
-    image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73'
-  },
-  {
-    id: '3',
-    name: 'Fresh Tomatoes',
-    price: '1kg/ ₹60',
-    image: 'https://m.media-amazon.com/images/I/61ZJhcdG7LL.jpg'
-  },
-  {
-    id: '4',
-    name: 'Fresh Eggs',
-    price: '12pcs/ ₹85',
-    image: 'https://thehomesteadingrd.com/wp-content/uploads/2023/12/How-to-store-fresh-eggs.jpg'
-  },
-  {
-    id: '5',
-    name: 'Fresh Potatoes',
-    price: '1kg/ ₹35',
-    image: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655'
-  },
-  {
-    id: '6',
-    name: 'Carrots',
-    price: '500g/ ₹30',
-    image: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37'
-  }
-];
-
-const trendingItems = [
-  {
-    id: '1',
-    name: 'Fresh Apples',
-    price: '1kg/ ₹60',
-    image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6'
-  },
-  {
-    id: '2',
-    name: 'Organic Honey',
-    price: '250g/ ₹120',
-    image: 'https://heavenearth.in/wp-content/uploads/2023/01/Organic-Honey-by-Heaven-earth-foods-1.jpg'
-  },
-  {
-    id: '3',
-    name: 'Fresh Milk',
-    price: '500ml/ ₹35',
-    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150'
-  },
-  {
-    id: '4',
-    name: 'Whole Wheat',
-    price: '1kg/ ₹55',
-    image: 'https://images.unsplash.com/photo-1568254183919-78a4f43a2877'
-  },
-  {
-    id: '5',
-    name: 'Cheese',
-    price: '200g/ ₹180',
-    image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d'
-  },
-  {
-    id: '6',
-    name: 'Dark Chocolate',
-    price: '100g/ ₹90',
-    image: 'https://images.unsplash.com/photo-1587132137056-bfbf0166836e'
-  }
-];
+interface ServerResponse {
+  status: string;
+  data: {
+    trending: ServerItem[];
+    daily_needs: ServerItem[];
+  };
+}
 
 interface CarouselItem {
   id: string;
@@ -348,6 +282,51 @@ export default function HomeScreen() {
   const [isKeyboardActive, setIsKeyboardActive] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [userName] = useState('Demo');
+  
+  // State for carousel data
+  const [recommendedItems, setRecommendedItems] = useState<CarouselItem[]>([]);
+  const [trendingItems, setTrendingItems] = useState<CarouselItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Function to fetch trending and daily needs data
+  const fetchTrendingAndDailyNeeds = async () => {
+    try {
+      const response = await fetch('http://noble-raven-entirely.ngrok-free.app/trending', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data: ServerResponse = await response.json();
+      
+      if (data.status === 'success' && data.data) {
+        // Transform server data to match CarouselItem interface
+        const transformedDailyNeeds = data.data.daily_needs.map((item, index) => ({
+          id: `daily-${index}`,
+          name: item.name,
+          image: item.url
+        }));
+
+        const transformedTrending = data.data.trending.map((item, index) => ({
+          id: `trending-${index}`,
+          name: item.name,
+          image: item.url
+        }));
+
+        setRecommendedItems(transformedDailyNeeds);
+        setTrendingItems(transformedTrending);
+      }
+    } catch (error) {
+      console.error('Error fetching trending and daily needs:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Animation refs
   const footerAnimation = useRef(new Animated.Value(0)).current;
@@ -419,10 +398,10 @@ export default function HomeScreen() {
     const historyTopMargin = verticalScale(10);
     
     // Search history section - if present
-    const historyHeight = searchHistory.length > 0 ? verticalScale(90) : 0;
+    const historyHeight = verticalScale(90); // Always allocate height
     
     // Add spacing between history and first carousel
-    const historyBottomMargin = searchHistory.length > 0 ? verticalScale(10) : 0;
+    const historyBottomMargin = verticalScale(10); // Always allocate bottom margin
     
     // Top margin for recommended section
     const recommendedTopMargin = verticalScale(10);
@@ -504,7 +483,7 @@ export default function HomeScreen() {
         const storedHistory = await AsyncStorage.getItem('searchHistory');
         if (storedHistory) {
           const parsedHistory = JSON.parse(storedHistory);
-          const formattedHistory = Array.isArray(parsedHistory) ? 
+          const formattedHistory = Array.isArray(parsedHistory) ?
             parsedHistory.map((item: string | SearchItem) => {
               if (typeof item === 'string') {
                 return {
@@ -521,6 +500,9 @@ export default function HomeScreen() {
       }
     };
     loadSearchHistory();
+    
+    // Fetch trending and daily needs data
+    fetchTrendingAndDailyNeeds();
   }, []);
 
   // Handle keyboard events
@@ -677,7 +659,8 @@ export default function HomeScreen() {
           <View style={{ height: layoutProportions.searchBarBottomSpace }} />
 
           {/* Search History with top margin */}
-          {searchHistory.length > 0 && (
+          {/* Always render the Search History section */}
+          {(
             <>
               {/* Top margin for search history */}
               <View style={{ height: layoutProportions.historyTopMargin }} />
@@ -718,19 +701,25 @@ export default function HomeScreen() {
             <View style={{ height: layoutProportions.recommendedTopMargin }} />
             
             {/* Recommended Section */}
-            <CarouselSection
-              title="Recommended Daily Needs"
-              items={recommendedItems}
-              scales={{ horizontalScale, verticalScale, moderateScale }}
-              carouselHeight={layoutProportions.carouselHeight}
-              onItemPress={handleItemPress}
-              showPrices={false} // Hide prices for all items
-              standardCardHeight={standardItemDimensions.cardHeight}
-              standardImageHeight={standardItemDimensions.imageHeight}
-              standardItemWidth={standardItemDimensions.itemWidth}
-              standardItemGap={standardItemDimensions.itemGap}
-              standardFontSizes={standardItemDimensions.fontSizes}
-            />
+            {isLoading ? (
+              <View style={{ height: layoutProportions.carouselHeight, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>Loading daily needs...</Text>
+              </View>
+            ) : (
+              <CarouselSection
+                title="Recommended Daily Needs"
+                items={recommendedItems}
+                scales={{ horizontalScale, verticalScale, moderateScale }}
+                carouselHeight={layoutProportions.carouselHeight}
+                onItemPress={handleItemPress}
+                showPrices={false} // Hide prices for all items
+                standardCardHeight={standardItemDimensions.cardHeight}
+                standardImageHeight={standardItemDimensions.imageHeight}
+                standardItemWidth={standardItemDimensions.itemWidth}
+                standardItemGap={standardItemDimensions.itemGap}
+                standardFontSizes={standardItemDimensions.fontSizes}
+              />
+            )}
             
             {/* Minimal space between carousels */}
             {layoutProportions.carouselGap > 0 && (
@@ -738,20 +727,26 @@ export default function HomeScreen() {
             )}
             
             {/* Trending Section */}
-            <CarouselSection
-              title="Trending Items"
-              items={trendingItems}
-              scales={{ horizontalScale, verticalScale, moderateScale }}
-              carouselHeight={layoutProportions.carouselHeight}
-              onItemPress={handleItemPress}
-              showPrices={false}
-              standardCardHeight={standardItemDimensions.cardHeight}
-              standardImageHeight={standardItemDimensions.imageHeight}
-              standardItemWidth={standardItemDimensions.itemWidth}
-              standardItemGap={standardItemDimensions.itemGap}
-              standardFontSizes={standardItemDimensions.fontSizes}
-              autoScrollInterval={5000} // 5 seconds interval for trending items
-            />
+            {isLoading ? (
+              <View style={{ height: layoutProportions.carouselHeight, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>Loading trending items...</Text>
+              </View>
+            ) : (
+              <CarouselSection
+                title="Trending Items"
+                items={trendingItems}
+                scales={{ horizontalScale, verticalScale, moderateScale }}
+                carouselHeight={layoutProportions.carouselHeight}
+                onItemPress={handleItemPress}
+                showPrices={false}
+                standardCardHeight={standardItemDimensions.cardHeight}
+                standardImageHeight={standardItemDimensions.imageHeight}
+                standardItemWidth={standardItemDimensions.itemWidth}
+                standardItemGap={standardItemDimensions.itemGap}
+                standardFontSizes={standardItemDimensions.fontSizes}
+                autoScrollInterval={5000} // 5 seconds interval for trending items
+              />
+            )}
           </View>
 
           {/* Footer */}
