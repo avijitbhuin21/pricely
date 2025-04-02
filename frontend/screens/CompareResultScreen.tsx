@@ -54,11 +54,12 @@ const ComparisonCard: React.FC<{
   item: CompareResultItem;
   opacity: Animated.Value;
   onAddToCart: (item: CompareResultItem, shopName: string, price: string, remove: boolean) => void;
-  isInCart: (shopId: string) => boolean;
+  isInCart: (shopId: string, searchId?: string) => boolean;
+  searchId: string;
   style?: any;
-}> = ({ item, opacity, onAddToCart, isInCart, style }) => {
+}> = ({ item, opacity, onAddToCart, isInCart, searchId, style }) => {
   const displayQuantity = item.shops.length > 0 ? item.shops[0].quantity : item.quantity;
-  const areAllItemsInCart = item.shops.every(shop => isInCart(`${item.id}-${shop.name}`));
+  const areAllItemsInCart = item.shops.every(shop => isInCart(`${item.id}-${shop.name}`, searchId));
 
   const handleAddAllItems = () => {
     const shouldRemove = areAllItemsInCart;
@@ -84,10 +85,10 @@ const ComparisonCard: React.FC<{
       ]}
     >
       <LinearGradient
-        colors={['rgba(255,255,255,0.98)', 'rgba(255,255,255,0.95)']}
-        style={styles.cardGradient}
+        colors={['#ffffff', '#ffffff']}
+        style={[styles.cardGradient, { padding: Dimensions.get('window').width * 0.02 }]}
       >
-        <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
+        <Image source={{ uri: item.image }} style={styles.image} resizeMode="contain" />
         <View style={styles.cardContent}>
           <View style={styles.topContent}>
             <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
@@ -103,7 +104,7 @@ const ComparisonCard: React.FC<{
                     <Text style={styles.price}>₹{shop.price}</Text>
                     <Text style={styles.shopQuantity}>{shop.quantity}</Text>
                   </View>
-                  {isInCart(`${item.id}-${shop.name}`) ? (
+                  {isInCart(`${item.id}-${shop.name}`, searchId) ? (
                     <TouchableOpacity
                       onPress={() => onAddToCart(item, shop.name, shop.price, true)}
                       style={styles.button}
@@ -171,6 +172,7 @@ export default function CompareResultScreen() {
   const { addToCart, removeFromCart, isInCart } = useCart();
   const [compareData, setCompareData] = useState<CompareResultItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchId = route.params?.query || Date.now().toString();
   const [error, setError] = useState<string | null>(null);
   const [fadeAnims] = useState<Animated.Value[]>([]);
   const [activeTab, setActiveTab] = useState('');
@@ -350,7 +352,8 @@ export default function CompareResultScreen() {
         quantity: item.quantity,
         shopName: capitalizedShopName,
         price: price,
-        url: item.shops.find(shop => shop.name === shopName)?.link || ''
+        url: item.shops.find(shop => shop.name === shopName)?.link || '',
+        searchId
       });
       Toast.show({
         type: 'success',
@@ -372,18 +375,26 @@ export default function CompareResultScreen() {
       const secondCardShops = secondCard ? secondCard.shops.length : 0;
       const maxShops = Math.max(firstCardShops, secondCardShops);
       
-      // Calculate exact height needed
-      const imageHeight = 160;
-      const headerHeight = 65; // Reduced space for name and quantity
-      const shopItemHeight = Dimensions.get('window').height * 0.056;
-      const bottomButtonHeight = Dimensions.get('window').height * 0.06;
-      const padding = Dimensions.get('window').height * 0.025;
+      // Calculate dynamic height based on content
+      const baseHeight = Dimensions.get('window').height;
+      const imageHeight = Dimensions.get('window').width * 0.25;
+      const imageMargin = baseHeight * 0.01;
+      const headerHeight = baseHeight * 0.04;
+      const shopItemHeight = baseHeight * 0.05;
+      const shopMargin = baseHeight * 0.005;
+      const bottomButtonHeight = baseHeight * 0.04;
+      const padding = baseHeight * 0.05;
       
-      // Calculate height needed for all items
-      const contentHeight = headerHeight + (maxShops * shopItemHeight) + bottomButtonHeight + padding;
-      const minHeight = imageHeight + contentHeight;
+      // Calculate total height including gaps between shop items
+      const shopsHeight = (maxShops * shopItemHeight) + ((maxShops - 1) * shopMargin);
+      const contentHeight = headerHeight + shopsHeight + bottomButtonHeight + (padding * 2);
+      const totalHeight = imageHeight + imageMargin + contentHeight;
       
-      const cardStyle = { minHeight };
+      const cardStyle = {
+        height: totalHeight,
+        backgroundColor: '#ffffff',
+        paddingBottom: baseHeight * 0.01
+      };
 
       pairs.push(
         <View key={`pair-${i}`} style={styles.comparePair}>
@@ -392,6 +403,7 @@ export default function CompareResultScreen() {
             opacity={fadeAnims[i] || new Animated.Value(1)}
             onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
             isInCart={isInCart}
+            searchId={searchId}
             style={cardStyle}
           />
           {i + 1 < compareData.length && (
@@ -400,6 +412,7 @@ export default function CompareResultScreen() {
               opacity={fadeAnims[i + 1] || new Animated.Value(1)}
               onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
               isInCart={isInCart}
+              searchId={searchId}
               style={cardStyle}
             />
           )}
@@ -486,19 +499,21 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   image: {
-    width: '100%',
-    height: Dimensions.get('window').height * 0.2,
-    maxHeight: 160,
-    borderTopLeftRadius: Dimensions.get('window').width * 0.035,
-    borderTopRightRadius: Dimensions.get('window').width * 0.035,
-    backgroundColor: '#f8f8f8',
+    width: '75%',
+    height: Dimensions.get('window').width * 0.25,
+    alignSelf: 'center',
+    borderRadius: Dimensions.get('window').width * 0.02,
+    backgroundColor: '#ffffff',
+    marginVertical: Dimensions.get('window').height * 0.01,
+    resizeMode: 'contain',
   },
   cardContent: {
     padding: Dimensions.get('window').width * 0.025,
-    paddingBottom: 0,
+    paddingTop: Dimensions.get('window').height * 0.01,
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    gap: Dimensions.get('window').height * 0.006,
   },
   topContent: {
     flex: 1,
@@ -531,36 +546,36 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   shopsContainer: {
-    marginTop: Dimensions.get('window').height * 0.006,
     flexDirection: 'column',
+    gap: Dimensions.get('window').height * 0.005,
+    marginTop: Dimensions.get('window').height * 0.008,
+    marginBottom: Dimensions.get('window').height * 0.004,
   },
   shopItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: Dimensions.get('window').height * 0.008,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.04)',
-    height: Dimensions.get('window').height * 0.056,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    paddingVertical: Dimensions.get('window').height * 0.006,
+    minHeight: Dimensions.get('window').height * 0.05,
+    backgroundColor: '#ffffff',
     borderRadius: 6,
   },
   shopIcon: {
-    width: Dimensions.get('window').width * 0.065,
-    height: Dimensions.get('window').width * 0.065,
-    marginRight: Dimensions.get('window').width * 0.015,
+    width: Dimensions.get('window').width * 0.05,
+    height: Dimensions.get('window').width * 0.05,
+    marginRight: Dimensions.get('window').width * 0.01,
     flexShrink: 0,
-    opacity: 0.95,
+    opacity: 1,
   },
   priceContainer: {
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexGrow: 1,
-    paddingHorizontal: Dimensions.get('window').width * 0.008,
+    paddingHorizontal: Dimensions.get('window').width * 0.01,
   },
   price: {
     fontFamily: 'Poppins',
-    fontSize: Dimensions.get('window').width * 0.034,
+    fontSize: Dimensions.get('window').width * 0.032,
     fontWeight: '700',
     color: '#2ecc71',
     letterSpacing: 0.2,
@@ -593,13 +608,13 @@ const styles = StyleSheet.create({
     }),
   },
   buttonGradient: {
-    paddingVertical: Dimensions.get('window').width * 0.014,
-    paddingHorizontal: Dimensions.get('window').width * 0.014,
+    paddingVertical: Dimensions.get('window').width * 0.012,
+    paddingHorizontal: Dimensions.get('window').width * 0.012,
     alignItems: 'center',
     justifyContent: 'center',
-    width: Dimensions.get('window').width * 0.065,
-    height: Dimensions.get('window').width * 0.065,
-    borderRadius: Dimensions.get('window').width * 0.016,
+    width: Dimensions.get('window').width * 0.06,
+    height: Dimensions.get('window').width * 0.06,
+    borderRadius: Dimensions.get('window').width * 0.012,
   },
   buttonText: {
     fontFamily: 'Poppins',
