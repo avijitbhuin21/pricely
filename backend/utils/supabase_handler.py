@@ -87,10 +87,10 @@ def signup(username, password, mobile):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-def login(username, password):
+def login(number, password):
     hashed_password = get_sha256_hash(password)
     user_data = {
-        "name": username,
+        "mobile": number,
         "password": hashed_password,
     }
     users = select_data("users", user_data)
@@ -102,6 +102,19 @@ def login(username, password):
 def tanddn():
     try:
         data = select_data("trending_and_daily_needs")
-        return {"status": "success", "data": {"trending": [{"url": i['image_url'], "name": i['name']} for i in data['data'] if i['column_type'] == "trending"], "daily_needs":[{"url": i['image_url'], "name": i['name']} for i in data['data'] if i['column_type'] == "daily needs"]}}
+        print(data)
+        return {
+            "status": "success", 
+            "data": {
+                "trending": [
+                    {"url": i['image_url'], "name": i['name']} 
+                    for i in data if i['column_type'] == "trending"
+                ], 
+                "daily_needs": [
+                    {"url": i['image_url'], "name": i['name']} 
+                    for i in data if i['column_type'] == "daily needs"
+                ]
+            }
+        }
     except Exception as e:
         return {"status": "error", "message": str(e)}
