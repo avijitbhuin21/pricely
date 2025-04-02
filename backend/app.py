@@ -29,13 +29,13 @@ def confirm_otp():
 @app.route("/login", methods=["POST"])
 def login_to_supabase():
     data = request.get_json()
-    username = data.get("name")
+    username = '91' +data.get("phonenumber")
     password = data.get("password")
     if not username or not password:
         return jsonify({"status": "error", "message": "Email and password required"}), 400
 
     try:
-        response = login(username=username, password=password)
+        response = login(number=username, password=password)
         if response['status'] == "success":
             return jsonify({"status": "success", "message": "Login successful"}), 200
         else:
@@ -48,7 +48,7 @@ def signup_to_supabase():
     data = request.get_json()
     username = data.get("name")
     password = data.get("password")
-    mobile = data.get("mobile")
+    mobile = '91'+data.get("mobile")
     if not username or not password or not mobile:
         return jsonify({"status": "error", "message": "Username, password and mobile required"}), 400
     try:
