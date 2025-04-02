@@ -177,17 +177,19 @@ const CartScreen = () => {
           <TouchableOpacity
             style={styles.locationButton}
             onPress={() => {
-              if (currentLocation !== 'Detecting location...') {
+              // Check the address property for the specific string
+              if (currentLocation.address !== 'Detecting location...') {
                 updateLocation(currentLocation);
               }
             }}
-            disabled={currentLocation === 'Detecting location...'}
+            disabled={currentLocation.address === 'Detecting location...'}
           >
-            {currentLocation !== 'Detecting location...' && (
+            {/* Check the address property for the specific string */}
+            {currentLocation.address !== 'Detecting location...' && (
               <Ionicons name="chevron-down" size={screenWidth * 0.05} color="#fff" style={styles.locationIcon} />
             )}
             <Text style={styles.locationText} numberOfLines={1}>
-              {currentLocation}
+              {currentLocation.address}
             </Text>
           </TouchableOpacity>
         </View>
