@@ -76,8 +76,10 @@ def get_search_results():
     print("credentials",credentials)
 
     # data = get_compared_results(item_name, lat, lon, credentials)
+    data = open("compared_data.json", "r").read()
+    data = json.loads(data)
 
-    return jsonify({"status": "success", "data": "data"})
+    return jsonify({"status": "success", "data": data})
 
 @app.route("/get-api-key", methods=["POST"])
 def get_api_key_route():
