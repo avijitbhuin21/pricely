@@ -8,6 +8,7 @@ interface CartItem {
   shopName: string;
   price: string;
   url: string;
+  searchId?: string;
 }
 
 interface CartContextType {
@@ -15,7 +16,7 @@ interface CartContextType {
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
-  isInCart: (id: string) => boolean;
+  isInCart: (id: string, searchId?: string) => boolean;
   getItemsByVendor: (vendor: string) => CartItem[];
   calculateVendorTotal: (vendor: string) => number;
 }
@@ -39,8 +40,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCartItems([]);
   };
 
-  const isInCart = (id: string) => {
-    return cartItems.some(item => item.id === id);
+  const isInCart = (id: string, searchId?: string) => {
+    // Extract the base item ID without the shop name
+    const [baseId, shopName] = id.split('-');
+    
+    // First check if exact item is in cart
+    const exactMatch = cartItems.some(item => item.id === id);
+    if (exactMatch) {
+      return true;
+    }
+    
+    // If no exact match, check if same item from same shop exists in cart
+    return cartItems.some(item => {
+      const [itemBaseId, itemShopName] = item.id.split('-');
+      return itemBaseId === baseId && itemShopName === shopName;
+    });
   };
 
   const getItemsByVendor = (vendor: string) => {
