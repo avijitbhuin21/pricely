@@ -829,10 +829,10 @@
                     <div class="card-icon">
                         <i class="fas fa-images"></i>
                     </div>
-                    <h2>Update Slideshow</h2>
-                    <p>Change the images displayed in the home page slideshow banner for better engagement.</p>
+                    <h2>Update BG Image</h2>
+                    <p>Change the images displayed in the home page Background for better engagement.</p>
                     <button id="manage-slideshow-btn" class="button">
-                        <span>Manage Slideshow</span>
+                        <span>Manage Background</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
@@ -1109,10 +1109,8 @@
                         delete: "/api/offers/"  // We'll append the ID in the handler functions
                     },
                     slideshow: {
-                        get: "{{ url_for('get_slideshow_items') }}",
-                        add: "{{ url_for('add_slideshow_item') }}",
-                        update: "/api/slideshow/", // We'll append the ID in the handler functions
-                        delete: "/api/slideshow/"  // We'll append the ID in the handler functions
+                        get: "{{ url_for('get_bg_image') }}",
+                        update: "/api/bg_image/", // We'll append the ID in the handler functions
                     },
                     daily_needs: {
                         get: "{{ url_for('get_daily_needs_items') }}",

@@ -140,7 +140,9 @@ async def get_compared_data_async(search_query, location_data, initial_credentia
     # --- Process Results ---
     all_products = []
     final_credentials = {}
-    platform_names = ["BigBasket", "Blinkit", "Instamart", "DMart", "Zepto"] # Keep order consistent with tasks
+    results = results[0] + results[1:-1]
+
+    platform_names = ["BigBasket", "Zepto", "Blinkit", "Instamart", "DMart"] 
 
     for i, res in enumerate(results):
         platform = platform_names[i].upper()
