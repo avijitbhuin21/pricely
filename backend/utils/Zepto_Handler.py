@@ -134,7 +134,9 @@ def format_zepto_data(data):
 
 def search_zepto(item_name, location_data, credentials=None):
 
-    for i in range(3):
+    for i in range(1):
+        if credentials != "cred":
+            return {"data": {}, "credentials": {}}
         try:
             credentials = get_zepto_credentials(location_data) if credentials is None else credentials
             

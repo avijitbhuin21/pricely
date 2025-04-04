@@ -218,10 +218,10 @@ def delete_offer(offer_id):
     except Exception as e:
         return jsonify({"status": "error", "message": "Failed to delete offer"}), 500
 
-@app.route('/api/slideshow', methods=['GET'])
-def get_slideshow_items():
+@app.route('/api/bg_image', methods=['GET'])
+def get_bg_image():
     try:
-        response = supabase.table('slide_show').select("id, image_url, price, created_at").order('created_at', desc=False).execute()
+        response = supabase.table('bgimage').select("id, image_url").order('created_at', desc=False).execute()
         if response.data:
             return jsonify(response.data)
         else:
@@ -229,82 +229,7 @@ def get_slideshow_items():
     except Exception as e:
         return jsonify({"status": "error", "message": "Failed to fetch slideshow items"}), 500
 
-@app.route('/api/slideshow', methods=['POST'])
-def add_slideshow_item():
-    if 'admin_username' not in session:
-        return jsonify({"status": "error", "message": "Unauthorized"}), 401
-    data = request.get_json()
-    if not data or 'image_url' not in data:
-        return jsonify({"status": "error", "message": "Missing image_url"}), 400
-    try:
-        image_url = str(data['image_url']).strip()
-        price = str(data.get('price')).strip() if data.get('price') is not None else None
-        if not image_url:
-             return jsonify({"status": "error", "message": "Image URL cannot be empty"}), 400
-        new_item_data = {
-            "image_url": image_url,
-            "price": price # Can be None
-        }
-        response = supabase.table('slide_show').insert(new_item_data).execute()
-        if response.data:
-            inserted_item = response.data[0]
-            return jsonify({"status": "success", "message": "Slideshow item added", "item": inserted_item}), 201
-        else:
-            return jsonify({"status": "error", "message": "Failed to add slideshow item to database"}), 500
-    except (ValueError, TypeError) as e:
-         return jsonify({"status": "error", "message": "Invalid data format"}), 400
-    except Exception as e:
-        return jsonify({"status": "error", "message": "Failed to save slideshow item"}), 500
 
-@app.route('/api/slideshow/<int:item_id>', methods=['PUT'])
-def update_slideshow_item(item_id):
-    if 'admin_username' not in session:
-        return jsonify({"status": "error", "message": "Unauthorized"}), 401
-    data = request.get_json()
-    if not data or 'image_url' not in data:
-         return jsonify({"status": "error", "message": "Missing image_url"}), 400
-    try:
-        image_url = str(data['image_url']).strip()
-        price = str(data.get('price')).strip() if data.get('price') is not None else None
-        if not image_url:
-             return jsonify({"status": "error", "message": "Image URL cannot be empty"}), 400
-        updated_item_data = {
-            "image_url": image_url,
-            "price": price
-        }
-        response = supabase.table('slide_show').update(updated_item_data).eq('id', item_id).execute()
-        if response.data:
-            updated_item = response.data[0]
-            return jsonify({"status": "success", "message": f"Slideshow item {item_id} updated", "item": updated_item})
-        else:
-            check_exists = supabase.table('slide_show').select('id', count='exact').eq('id', item_id).execute()
-            if check_exists.count == 0:
-                 return jsonify({"status": "error", "message": "Slideshow item not found"}), 404
-            else:
-                 return jsonify({"status": "error", "message": "Failed to update slideshow item in database"}), 500
-    except (ValueError, TypeError) as e:
-         return jsonify({"status": "error", "message": "Invalid data format"}), 400
-    except Exception as e:
-        return jsonify({"status": "error", "message": "Failed to update slideshow item"}), 500
-
-@app.route('/api/slideshow/<int:item_id>', methods=['DELETE'])
-def delete_slideshow_item(item_id):
-    if 'admin_username' not in session:
-        return jsonify({"status": "error", "message": "Unauthorized"}), 401
-    try:
-        response = supabase.table('slide_show').delete().eq('id', item_id).execute()
-        if response.data:
-            deleted_item_details = response.data[0]
-            return jsonify({"status": "success", "message": f"Slideshow item {item_id} deleted", "deleted_item": deleted_item_details})
-        else:
-            check_exists = supabase.table('slide_show').select('id', count='exact').eq('id', item_id).execute()
-            if check_exists.count == 0:
-                 return jsonify({"status": "error", "message": "Slideshow item not found"}), 404
-            else:
-                return jsonify({"status": "error", "message": "Failed to delete slideshow item from database"}), 500
-
-    except Exception as e:
-        return jsonify({"status": "error", "message": "Failed to delete slideshow item"}), 500
 
 @app.route('/api/daily_needs', methods=['GET'])
 def get_daily_needs_items():
@@ -397,11 +322,12 @@ def delete_daily_needs_item(item_id):
         return jsonify({"status": "error", "message": "Failed to delete Daily Needs item"}), 500
 
 def main():
-    kill_ngrok_processes()
-    ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
-    ngrok_tunnel = ngrok.connect(addr='5000', proto="http", hostname="noble-raven-entirely.ngrok-free.app")
-    print("Public URL:", ngrok_tunnel.public_url)
-    app.run(port=5000, debug=True, use_reloader=False) 
+    # kill_ngrok_processes()
+    # ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
+    # ngrok_tunnel = ngrok.connect(addr='5000', proto="http", hostname="noble-raven-entirely.ngrok-free.app")
+    # print("Public URL:", ngrok_tunnel.public_url)
+    # app.run(port=5000, debug=True, use_reloader=False) 
+    app.run(debug=True)
 
 if __name__ == "__main__":
     main()
@@ -430,3 +356,8 @@ if __name__ == "__main__":
 
 # add push notifications as well. -- pending
 # normal anaytics --pending
+
+
+
+# notes today 4-03-25
+# in the header make c and i caps in compare it and add a space after the hiphen.
