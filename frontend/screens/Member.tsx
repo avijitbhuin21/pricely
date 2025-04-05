@@ -294,13 +294,16 @@ const MemberScreen = ({ navigation }: MemberScreenProps) => {
 
           {/* Footer links */}
           <View style={styles.footer}>
-            <TouchableOpacity style={styles.footerButton}>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => navigation.navigate('Terms')}
+            >
               <Text style={styles.footerText}>View all FAQs</Text>
               <Ionicons name="chevron-forward" size={SCREEN_WIDTH * 0.05} color="#D1D5DB" />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.footerButton}>
-              <Text style={styles.footerText}>View Terms & Conditons</Text>
+              <Text style={styles.footerText}>View Terms & Conditions</Text>
               <Ionicons name="chevron-forward" size={SCREEN_WIDTH * 0.05} color="#D1D5DB" />
             </TouchableOpacity>
           </View>

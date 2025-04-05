@@ -12,6 +12,10 @@ import CartScreen from '../screens/Cart';
 import OffersScreen from '../screens/OffersScreen';
 import MemberScreen from '../screens/Member';
 import SplashScreen from '../screens/SplashScreen';
+import TermsScreen from '../components/terms';
+import ContactUsScreen from '../components/contactUs';
+import PrivacyPolicyScreen from '../components/privacy';
+import AboutUsScreen from '../components/aboutUs';
 
 
 // Define the root stack parameter list
@@ -36,6 +40,10 @@ export type RootStackParamList = {
   SignIn: undefined;
   ResetPassword: undefined;
   Member: undefined;
+  Terms: undefined;
+  ContactUs: undefined;
+  privacy: undefined;
+  aboutus: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -97,6 +105,26 @@ export default function AppNavigator() {
         <Stack.Screen
           name="Member"
           component={MemberScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Terms"
+          component={TermsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ContactUs"
+          component={ContactUsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="privacy"
+          component={PrivacyPolicyScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="aboutus"
+          component={AboutUsScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
