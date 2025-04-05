@@ -228,6 +228,29 @@ def get_bg_image():
             return jsonify([])
     except Exception as e:
         return jsonify({"status": "error", "message": "Failed to fetch slideshow items"}), 500
+@app.route('/api/bg_image/<int:bg_id>', methods=['PUT'])
+def update_bg_image(bg_id):
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    data = request.get_json()
+    if not data or 'image_url' not in data:
+        return jsonify({"status": "error", "message": "Missing image_url"}), 400
+    try:
+        image_url = str(data['image_url']).strip()
+        if not image_url:
+            return jsonify({"status": "error", "message": "Image URL cannot be empty"}), 400
+        updated = supabase.table('bgimage').update({"image_url": image_url}).eq('id', bg_id).execute()
+        if updated.data:
+            return jsonify({"status": "success", "message": "Background image updated", "item": updated.data[0]})
+        else:
+            # Check if record exists
+            exists = supabase.table('bgimage').select('id', count='exact').eq('id', bg_id).execute()
+            if exists.count == 0:
+                return jsonify({"status": "error", "message": "Background image not found"}), 404
+            else:
+                return jsonify({"status": "error", "message": "Failed to update background image"}), 500
+    except Exception as e:
+        return jsonify({"status": "error", "message": "Failed to update background image"}), 500
 
 
 
@@ -321,12 +344,233 @@ def delete_daily_needs_item(item_id):
     except Exception as e:
         return jsonify({"status": "error", "message": "Failed to delete Daily Needs item"}), 500
 
+# =================== NEW TRENDING PRODUCTS & DAILY NEEDS (UNIFIED TABLE) ===================
+
+@app.route('/api/trending_products', methods=['GET'])
+def get_trending_products():
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    try:
+        filters = {"column_type": "trending"}
+        print("Fetching trending products with filters:", filters)
+        data = select_data("trending_and_daily_needs", filters)
+        print("Trending products fetched from DB:", data)
+        return jsonify(data)
+    except Exception as e:
+        print("Error fetching trending products:", e)
+        return jsonify({"status": "error", "message": "Failed to fetch trending products"}), 500
+
+@app.route('/api/trending_products', methods=['POST'])
+def add_trending_product():
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    data = request.get_json()
+    print("Add trending product request data:", data)
+    if not data or 'image_url' not in data or 'name' not in data:
+        return jsonify({"status": "error", "message": "Missing image_url or name"}), 400
+    try:
+        new_data = {
+            "image_url": data['image_url'].strip(),
+            "name": data['name'].strip(),
+            "column_type": "trending"
+        }
+        inserted = insert_data("trending_and_daily_needs", new_data)
+        return jsonify({"status": "success", "message": "Trending product added", "item": inserted}), 201
+    except Exception as e:
+        print("Error adding trending product:", e)
+        return jsonify({"status": "error", "message": "Failed to add trending product"}), 500
+
+@app.route('/api/trending_products/<int:item_id>', methods=['PUT'])
+def update_trending_product(item_id):
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    data = request.get_json()
+    print(f"Update trending product {item_id} data:", data)
+    if not data or 'image_url' not in data or 'name' not in data:
+        return jsonify({"status": "error", "message": "Missing image_url or name"}), 400
+    try:
+        updated = update_data(
+            "trending_and_daily_needs",
+            {"id": item_id, "column_type": "trending"},
+            {"image_url": data['image_url'].strip(), "name": data['name'].strip()}
+        )
+        return jsonify({"status": "success", "message": "Trending product updated", "item": updated})
+    except Exception as e:
+        print(f"Error updating trending product {item_id}:", e)
+        return jsonify({"status": "error", "message": "Failed to update trending product"}), 500
+
+@app.route('/api/trending_products/<int:item_id>', methods=['DELETE'])
+def delete_trending_product(item_id):
+    print(f"Delete trending product {item_id} request")
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    try:
+        deleted = delete_data(
+            "trending_and_daily_needs",
+            {"id": item_id, "column_type": "trending"}
+        )
+        return jsonify({"status": "success", "message": "Trending product deleted", "item": deleted})
+    except Exception as e:
+        print(f"Error deleting trending product {item_id}:", e)
+        return jsonify({"status": "error", "message": "Failed to delete trending product"}), 500
+
+# ------------------- DAILY NEEDS (from unified table) -------------------
+
+@app.route('/api/daily_needs_items', methods=['GET'])
+def get_daily_needs_items_new():
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    try:
+        filters = {"column_type": "daily needs"}
+        print("Fetching daily needs with filters:", filters)
+        data = select_data("trending_and_daily_needs", filters)
+        return jsonify(data)
+    except Exception as e:
+        print("Error fetching daily needs:", e)
+        return jsonify({"status": "error", "message": "Failed to fetch daily needs"}), 500
+
+@app.route('/api/daily_needs_items', methods=['POST'])
+def add_daily_needs_item_new():
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    data = request.get_json()
+    print("Add daily needs item request data:", data)
+    if not data or 'image_url' not in data or 'name' not in data:
+        return jsonify({"status": "error", "message": "Missing image_url or name"}), 400
+    try:
+        new_data = {
+            "image_url": data['image_url'].strip(),
+            "name": data['name'].strip(),
+            "column_type": "daily needs"
+        }
+        inserted = insert_data("trending_and_daily_needs", new_data)
+        return jsonify({"status": "success", "message": "Daily needs item added", "item": inserted}), 201
+    except Exception as e:
+        print("Error adding daily needs item:", e)
+        return jsonify({"status": "error", "message": "Failed to add daily needs item"}), 500
+
+@app.route('/api/daily_needs_items/<int:item_id>', methods=['PUT'])
+def update_daily_needs_item_new(item_id):
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    data = request.get_json()
+    print(f"Update daily needs item {item_id} data:", data)
+    if not data or 'image_url' not in data or 'name' not in data:
+        return jsonify({"status": "error", "message": "Missing image_url or name"}), 400
+    try:
+        updated = update_data(
+            "trending_and_daily_needs",
+            {"id": item_id, "column_type": "daily needs"},
+            {"image_url": data['image_url'].strip(), "name": data['name'].strip()}
+        )
+        return jsonify({"status": "success", "message": "Daily needs item updated", "item": updated})
+    except Exception as e:
+        print(f"Error updating daily needs item {item_id}:", e)
+        return jsonify({"status": "error", "message": "Failed to update daily needs item"}), 500
+
+@app.route('/api/daily_needs_items/<int:item_id>', methods=['DELETE'])
+def delete_daily_needs_item_new(item_id):
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    try:
+        deleted = delete_data(
+            "trending_and_daily_needs",
+            {"id": item_id, "column_type": "daily needs"}
+        )
+        return jsonify({"status": "success", "message": "Daily needs item deleted", "item": deleted})
+    except Exception as e:
+        print(f"Error deleting daily needs item {item_id}:", e)
+        return jsonify({"status": "error", "message": "Failed to delete daily needs item"}), 500
+
+
+@app.route('/api/customer_analytics', methods=['GET'])
+def get_customer_analytics():
+    if 'admin_username' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    try:
+        # Total users count
+        total_users_resp = supabase.table('users').select('id', count='exact').execute()
+        total_users = total_users_resp.count or 0
+
+        # Premium users count
+        premium_users_resp = supabase.table('users').select('id', count='exact').eq('is_premium', True).execute()
+        premium_users = premium_users_resp.count or 0
+
+        # New users in last 7 days
+        from datetime import datetime, timedelta
+        now = datetime.utcnow()
+        seven_days_ago = now - timedelta(days=7)
+        thirty_days_ago = now - timedelta(days=30)
+        sixty_days_ago = now - timedelta(days=60)
+
+        new_users_7_resp = supabase.table('users').select('id', count='exact').gte('created_at', seven_days_ago.isoformat()).execute()
+        new_users_7 = new_users_7_resp.count or 0
+
+        # New users in last 30 days
+        new_users_30_resp = supabase.table('users').select('id', count='exact').gte('created_at', thirty_days_ago.isoformat()).execute()
+        new_users_30 = new_users_30_resp.count or 0
+
+        # Previous period calculations for trends
+        prev_period_7_resp = supabase.table('users').select('id', count='exact').gte('created_at', sixty_days_ago.isoformat()).lt('created_at', thirty_days_ago.isoformat()).execute()
+        prev_period_7 = prev_period_7_resp.count or 0
+
+        # Calculate growth rates
+        new_users_growth = calculate_growth_rate(new_users_7, prev_period_7)
+        total_users_growth = 5  # Placeholder, typically calculated based on previous total
+        premium_users_growth = 12  # Placeholder, typically calculated based on previous total
+
+        # Premium conversion rate
+        premium_conversion_rate = (premium_users / total_users * 100) if total_users > 0 else 0
+        conversion_rate_change = 0  # Placeholder, typically calculated based on previous rate
+
+        # Recent premium subscribers (last 5)
+        recent_premium_resp = supabase.table('users').select('name', 'mobile', 'premium_start_at').eq('is_premium', True).order('premium_start_at', desc=True).limit(5).execute()
+        recent_premium = recent_premium_resp.data if recent_premium_resp.data else []
+
+        # Generate sample data for charts
+        # In a real scenario, this would come from database queries
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+        free_users = [50, 65, 75, 90, 100, 110]
+        premium_users_data = [8, 12, 18, 22, 28, 35]
+
+        return jsonify({
+            "total_users": total_users,
+            "premium_users": premium_users,
+            "new_users_7_days": new_users_7,
+            "new_users_30_days": new_users_30,
+            "premium_conversion_rate": premium_conversion_rate,
+            "recent_premium_subscribers": recent_premium,
+            
+            # Additional fields for UI
+            "total_users_growth": total_users_growth,
+            "premium_users_growth": premium_users_growth,
+            "new_users_growth": new_users_growth,
+            "conversion_rate_change": conversion_rate_change,
+            
+            # Chart data
+            "growth_data": {
+                "months": months,
+                "free_users": free_users,
+                "premium_users": premium_users_data
+            }
+        })
+    except Exception as e:
+        print("Error fetching customer analytics:", e)
+        return jsonify({"status": "error", "message": "Failed to fetch customer analytics"}), 500
+        
+# Helper function for growth calculation
+def calculate_growth_rate(current, previous):
+    if previous == 0:
+        return 100 if current > 0 else 0
+    return round(((current - previous) / previous) * 100)
+
+
 def main():
     # kill_ngrok_processes()
     # ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
     # ngrok_tunnel = ngrok.connect(addr='5000', proto="http", hostname="noble-raven-entirely.ngrok-free.app")
     # print("Public URL:", ngrok_tunnel.public_url)
-    # app.run(port=5000, debug=True, use_reloader=False) 
+    # app.run(port=5000, debug=True, use_reloader=False)
     app.run(debug=True)
 
 if __name__ == "__main__":
