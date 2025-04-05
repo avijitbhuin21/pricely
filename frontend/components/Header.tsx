@@ -16,7 +16,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HeaderProps, Location, LocationSuggestion } from '../types';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { useLocation } from '../contexts/LocationContext';
 
 const AUTO_LOCATE: LocationSuggestion = {
@@ -33,7 +34,7 @@ const Header: React.FC<HeaderProps> = ({
   showBackButton = false,
   hideHamburger = false,
 }): React.ReactElement => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { searchLocations: searchLocationsFromContext } = useLocation();
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -302,7 +303,7 @@ const Header: React.FC<HeaderProps> = ({
                 style={styles.menuItem}
                 activeOpacity={0.7}
                 onPress={() => {
-                  // TODO: Implement contact us functionality
+                  navigation.navigate('ContactUs');
                   handleMenuClose();
                 }}
               >
