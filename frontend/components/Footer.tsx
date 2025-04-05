@@ -58,12 +58,12 @@ export default function Footer({ navigation, activeTab, setActiveTab }: FooterPr
         activeOpacity={0.8}
       >
         <Image
-          source={{ uri: 'https://img.icons8.com/plasticine/100/crown.png' }}
+          source={require('../assets/member_icon.png')}
           style={styles.crownImage}
-          resizeMode="contain"
+          resizeMode="cover"
         />
       </TouchableOpacity>
-      
+
       {/* Main Footer Bar */}
       <View style={styles.bottomNav}>
         {/* Home Button */}
@@ -118,9 +118,9 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 // Define base height/scaling factors
 const footerHeight = screenHeight * 0.085;
-const memberButtonSize = screenWidth * 0.16;
+const memberButtonSize = screenWidth * 0.13;
 const iconSize = screenWidth * 0.06;
-const crownImageSize = memberButtonSize * 0.75;
+const crownImageSize = memberButtonSize*1.2;
 const fontSize = screenWidth * 0.03;
 
 const styles = StyleSheet.create({
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   },
   memberButton: {
     position: 'absolute',
-    top: 0,
+    top: 17,
     width: memberButtonSize,
     height: memberButtonSize,
     borderRadius: memberButtonSize / 2,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 10,
-    zIndex: 10,
+    zIndex: 5,
   },
   crownImage: {
     width: crownImageSize,
