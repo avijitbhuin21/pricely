@@ -6,6 +6,7 @@
     <title>Pricely Admin Panel</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #4F46E5;
@@ -244,7 +245,7 @@
         }
         
         .modal-container {
-            background-color: rgba(15, 23, 42, 0.95);
+            background-color: transparent;
             border-radius: 1rem;
             width: 95%;
             max-width: 1400px;
@@ -703,6 +704,366 @@
             background: rgba(79, 70, 229, 0.6);
         }
         /* ------------------------------------------------- */
+        
+        /* Specific adjustments for BG Image (slideshow modal) */
+        #slideshow-modal .modal-container {
+            max-height: 90vh;
+            height: auto;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #slideshow-modal .item-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #slideshow-modal .item-card {
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        #slideshow-modal .item-image-container {
+            max-width: 100%;
+            max-height: 80vh;
+            height: auto;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #slideshow-modal .item-image {
+            max-width: 100%;
+            max-height: 80vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+        
+        /* New Analytics Styles */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            width: 100%;
+        }
+        
+        .analytics-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+        }
+        
+        .analytics-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        
+        .analytics-card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        
+        .total-users .analytics-card-icon {
+            background-color: rgba(79, 70, 229, 0.2);
+            color: #818CF8;
+        }
+        
+        .premium-users .analytics-card-icon {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #FBBF24;
+        }
+        
+        .conversion-rate .analytics-card-icon {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #34D399;
+        }
+        
+        .new-users .analytics-card-icon {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #F87171;
+        }
+        
+        .analytics-card-content {
+            flex: 1;
+        }
+        
+        .analytics-card-content h3 {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .analytics-card-content p {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .analytics-card-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .analytics-card-trend.positive {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #34D399;
+        }
+        
+        .analytics-card-trend.negative {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+        }
+        
+        .analytics-card-trend.neutral {
+            background-color: rgba(107, 114, 128, 0.15);
+            color: #9CA3AF;
+        }
+        
+        .analytics-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            width: 100%;
+        }
+        
+        .chart-container {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .chart-body {
+            flex: 1;
+            position: relative;
+            min-height: 200px;
+        }
+        
+        .chart-legend {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--gray-light);
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .legend-color.premium {
+            background-color: #FBBF24;
+        }
+        
+        .legend-color.free {
+            background-color: #64748B;
+        }
+        
+        .analytics-recent-users {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            width: 100%;
+        }
+        
+        .recent-users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .recent-users-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .recent-users-header h3 i {
+            color: #FBBF24;
+        }
+        
+        .users-count-badge {
+            background-color: rgba(79, 70, 229, 0.3);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .recent-users-list-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .recent-users-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .recent-users-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--gray-light);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .recent-users-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .user-list-loading {
+            justify-content: center;
+            padding: 2rem 0 !important;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: rgba(79, 70, 229, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #818CF8;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            color: white;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        .user-meta {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .user-date {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .user-mobile {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .analytics-charts {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .analytics-summary {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .analytics-card {
+                padding: 1rem;
+            }
+            
+            .analytics-card-content p {
+                font-size: 1.4rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .analytics-summary {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .analytics-card-content h3 {
+                font-size: 0.8rem;
+            }
+            
+            .analytics-card-content p {
+                font-size: 1.3rem;
+            }
+            
+            .analytics-card-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
     </style>
     <script>
         // IIFE (Immediately Invoked Function Expression) to run auth check immediately
@@ -811,33 +1172,20 @@
         <main class="container">
             <h1 class="page-title">Admin Controls</h1>
             <div class="card-grid">
-                <!-- Card 1: Manage Offers -->
+                <!-- Card 1: Trending Products -->
                 <div class="card">
                     <div class="card-icon">
-                        <i class="fas fa-tags"></i>
+                        <i class="fas fa-fire"></i>
                     </div>
-                    <h2>Manage Offers</h2>
-                    <p>Update promotional offers, discounts, and special prices for items in your catalog.</p>
-                    <button id="manage-offers-btn" class="button">
-                        <span>Manage Offers</span>
+                    <h2>Trending Products</h2>
+                    <p>Manage the trending products displayed prominently on your platform.</p>
+                    <button id="manage-trending-btn" class="button">
+                        <span>Manage Trending</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
-                
-                <!-- Card 2: Update Slideshow -->
-                <div class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-images"></i>
-                    </div>
-                    <h2>Update BG Image</h2>
-                    <p>Change the images displayed in the home page Background for better engagement.</p>
-                    <button id="manage-slideshow-btn" class="button">
-                        <span>Manage Background</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-                
-                <!-- Card 3: Daily Needs Section -->
+
+                <!-- Card 2: Daily Needs Section -->
                 <div class="card">
                     <div class="card-icon">
                         <i class="fas fa-shopping-basket"></i>
@@ -850,55 +1198,68 @@
                     </button>
                 </div>
                 
+                <!-- Card 3: Update Slideshow -->
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <h2>Update BG Image</h2>
+                    <p>Change the images displayed in the home page Background for better engagement.</p>
+                    <button id="manage-slideshow-btn" class="button">
+                        <span>Manage Background</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
                 <!-- Card 4 -->
                 <div class="card">
                     <div class="card-icon">
                         <i class="fas fa-chart-pie"></i>
                     </div>
-                    <h2>View Analytics</h2>
+                    <h2>Customer  Analytics</h2>
                     <p>Access website usage statistics, conversion rates, and detailed user behavior data.</p>
-                    <a href="#" class="button">
-                        <span>View Analytics</span>
+                    <button id="view-customer-analytics-btn" class="button">
+                        <span>Customer Analytics</span>
                         <i class="fas fa-arrow-right"></i>
-                    </a>
+                    </button>
                 </div>
             </div>
         </main>
     </div>
     
-    <!-- Offers Modal -->
-    <div id="offers-modal" class="modal-overlay">
+    <!-- Trending Products Modal -->
+    <div id="trending-modal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
-                <h2 class="modal-title"><i class="fas fa-tags"></i> Manage Promotional Offers</h2>
-                <button class="modal-close" data-modal-id="offers-modal" title="Close">
+                <h2 class="modal-title"><i class="fas fa-fire"></i> Manage Trending Products</h2>
+                <button class="modal-close" data-modal-id="trending-modal" title="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="item-grid" id="offers-grid">
-                    <!-- Offer cards will be generated by JS -->
-                    <div class="item-card add-item-card" data-modal-id="offers-modal" data-item-type="offer">
+                <div class="item-grid" id="trending-grid">
+                    <!-- Trending cards will be generated by JS -->
+                    <div class="item-card add-item-card" data-modal-id="trending-modal" data-item-type="trending">
                         <i class="fas fa-plus-circle"></i>
-                        <span>Add New Offer</span>
+                        <span>Add New Trending Product</span>
                     </div>
-                    <div class="item-card add-item-form-container" data-modal-id="offers-modal" data-item-type="offer" style="display: none;">
-                        <form class="add-item-form" data-item-type="offer">
-                            <h3><i class="fas fa-plus-circle"></i> Add New Offer</h3>
+                    <div class="item-card add-item-form-container" data-modal-id="trending-modal" data-item-type="trending" style="display: none;">
+                        <form class="add-item-form" data-item-type="trending">
+                            <h3><i class="fas fa-plus-circle"></i> Add New Trending Product</h3>
                             <div class="item-field">
-                                <label for="new-offer-url"><i class="fas fa-link"></i> Image URL</label>
-                                <input type="text" id="new-offer-url" name="image_url" placeholder="https://example.com/image.jpg" required>
+                                <label for="new-trending-url"><i class="fas fa-link"></i> Image URL</label>
+                                <input type="text" id="new-trending-url" name="image_url" placeholder="https://example.com/image.jpg" required>
                             </div>
                             <div class="item-field">
-                                <label for="new-offer-price"><i class="fas fa-tag"></i> Price</label>
-                                <input type="number" id="new-offer-price" name="price" placeholder="99.99" step="any" required>
+                                <label for="new-trending-name"><i class="fas fa-tag"></i> Name</label>
+                                <input type="text" id="new-trending-name" name="name" placeholder="Product Name" required>
                             </div>
                             <div class="item-actions">
-                                <button type="button" class="cancel-add" data-modal-id="offers-modal" data-item-type="offer">
+                                <button type="button" class="cancel-add" data-modal-id="trending-modal" data-item-type="trending">
                                     <i class="fas fa-times"></i> Cancel
                                 </button>
-                                <button type="submit" class="save-new-item" data-item-type="offer">
-                                    <i class="fas fa-save"></i> Save Offer
+                                <button type="submit" class="save-new-item" data-item-type="trending">
+                                    <i class="fas fa-save"></i> Save Product
                                 </button>
                             </div>
                         </form>
@@ -910,30 +1271,23 @@
     
     <!-- Slideshow Modal -->
     <div id="slideshow-modal" class="modal-overlay">
-        <div class="modal-container">
+        <div class="modal-container" >
             <div class="modal-header">
-                <h2 class="modal-title"><i class="fas fa-images"></i> Manage Slideshow Images</h2>
+                <h2 class="modal-title"><i class="fas fa-images"></i> Update Background Image</h2>
                 <button class="modal-close" data-modal-id="slideshow-modal" title="Close">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times" style="margin-left: 3rem;"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="item-grid" id="slideshow-grid">
+                <div class="item-grid" id="slideshow-grid" style="display: block;">
                     <!-- Slideshow cards will be generated by JS -->
-                    <div class="item-card add-item-card" data-modal-id="slideshow-modal" data-item-type="slideshow">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Add New Slide</span>
-                    </div>
+                    <!-- Removed Add New Slide button for BG Image -->
                     <div class="item-card add-item-form-container" data-modal-id="slideshow-modal" data-item-type="slideshow" style="display: none;">
                         <form class="add-item-form" data-item-type="slideshow">
                             <h3><i class="fas fa-plus-circle"></i> Add New Slide</h3>
                             <div class="item-field">
                                 <label for="new-slideshow-url"><i class="fas fa-link"></i> Image URL</label>
                                 <input type="text" id="new-slideshow-url" name="image_url" placeholder="https://example.com/slide.jpg" required>
-                            </div>
-                            <div class="item-field">
-                                <label for="new-slideshow-price"><i class="fas fa-tag"></i> Price (Optional)</label>
-                                <input type="number" id="new-slideshow-price" name="price" placeholder="e.g., 49.99" step="any">
                             </div>
                             <div class="item-actions">
                                 <button type="button" class="cancel-add" data-modal-id="slideshow-modal" data-item-type="slideshow">
@@ -944,6 +1298,123 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Analytics Modal -->
+    <div id="customer-analytics-modal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-chart-pie"></i> Customer Analytics</h2>
+                <button class="modal-close" data-modal-id="customer-analytics-modal" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="analytics-grid">
+                    <!-- Analytics Summary Cards -->
+                    <div class="analytics-summary">
+                        <div class="analytics-card total-users">
+                            <div class="analytics-card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="analytics-card-content">
+                                <h3>Total Users</h3>
+                                <p id="total-users-count">--</p>
+                                <div class="analytics-card-trend positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="total-users-trend">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="analytics-card premium-users">
+                            <div class="analytics-card-icon">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="analytics-card-content">
+                                <h3>Premium Users</h3>
+                                <p id="premium-users-count">--</p>
+                                <div class="analytics-card-trend positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="premium-users-trend">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="analytics-card conversion-rate">
+                            <div class="analytics-card-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="analytics-card-content">
+                                <h3>Conversion Rate</h3>
+                                <p id="conversion-rate-value">--</p>
+                                <div class="analytics-card-trend neutral">
+                                    <i class="fas fa-minus"></i>
+                                    <span id="conversion-rate-trend">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="analytics-card new-users">
+                            <div class="analytics-card-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="analytics-card-content">
+                                <h3>New Users (7d)</h3>
+                                <p id="new-users-count">--</p>
+                                <div class="analytics-card-trend positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="new-users-trend">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Section -->
+                    <div class="analytics-charts">
+                        <div class="chart-container users-distribution">
+                            <div class="chart-header">
+                                <h3>Users Distribution</h3>
+                                <div class="chart-legend">
+                                    <div class="legend-item">
+                                        <span class="legend-color premium"></span>
+                                        <span>Premium</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color free"></span>
+                                        <span>Free</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-body">
+                                <canvas id="userDistributionChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-container user-growth">
+                            <div class="chart-header">
+                                <h3>User Growth</h3>
+                            </div>
+                            <div class="chart-body">
+                                <canvas id="userGrowthChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Premium Users -->
+                    <div class="analytics-recent-users">
+                        <div class="recent-users-header">
+                            <h3><i class="fas fa-crown"></i> Recent Premium Subscribers</h3>
+                            <div class="users-count-badge" id="recent-premium-count">0</div>
+                        </div>
+                        <div class="recent-users-list-container">
+                            <ul class="recent-users-list" id="recent-premium-list">
+                                <li class="user-list-loading">
+                                    <div class="spinner"></div>
+                                    <span>Loading subscribers...</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -974,8 +1445,8 @@
                                 <input type="text" id="new-daily_needs-url" name="image_url" placeholder="https://example.com/item.jpg" required>
                             </div>
                             <div class="item-field">
-                                <label for="new-daily_needs-price"><i class="fas fa-tag"></i> Price</label>
-                                <input type="number" id="new-daily_needs-price" name="price" placeholder="19.99" step="any" required>
+                                <label for="new-daily_needs-name"><i class="fas fa-tag"></i> Name</label>
+                                <input type="text" id="new-daily_needs-name" name="name" placeholder="Product Name" required>
                             </div>
                             <div class="item-actions">
                                 <button type="button" class="cancel-add" data-modal-id="daily-needs-modal" data-item-type="daily_needs">
@@ -1083,13 +1554,14 @@
                 
                 // --- Modal Management ---
                 const modals = {
-                    offer: document.getElementById('offers-modal'),
+                    trending: document.getElementById('trending-modal'),
                     slideshow: document.getElementById('slideshow-modal'),
-                    daily_needs: document.getElementById('daily-needs-modal')
+                    daily_needs: document.getElementById('daily-needs-modal'),
+                    customer_analytics: document.getElementById('customer-analytics-modal')
                 };
                 
                 const grids = {
-                    offer: document.getElementById('offers-grid'),
+                    trending: document.getElementById('trending-grid'),
                     slideshow: document.getElementById('slideshow-grid'),
                     daily_needs: document.getElementById('daily-needs-grid')
                 };
@@ -1102,25 +1574,26 @@
                 
                 // Updated API endpoints using Flask's url_for function
                 const apiEndpoints = {
-                    offer: {
-                        get: "{{ url_for('get_offers') }}",
-                        add: "{{ url_for('add_offer') }}",
-                        update: "/api/offers/", // We'll append the ID in the handler functions
-                        delete: "/api/offers/"  // We'll append the ID in the handler functions
+                    trending: {
+                        get: "/api/trending_products",
+                        add: "/api/trending_products",
+                        update: "/api/trending_products/", // Append ID
+                        delete: "/api/trending_products/"  // Append ID
                     },
                     slideshow: {
                         get: "{{ url_for('get_bg_image') }}",
                         update: "/api/bg_image/", // We'll append the ID in the handler functions
                     },
                     daily_needs: {
-                        get: "{{ url_for('get_daily_needs_items') }}",
-                        add: "{{ url_for('add_daily_needs_item') }}",
-                        update: "/api/daily_needs/", // We'll append the ID in the handler functions
-                        delete: "/api/daily_needs/"  // We'll append the ID in the handler functions
+                        get: "/api/daily_needs_items",
+                        add: "/api/daily_needs_items",
+                        update: "/api/daily_needs_items/", // Append ID
+                        delete: "/api/daily_needs_items/"  // Append ID
                     }
                 };
                 
                 const itemNames = {
+                    trending: "Trending Product",
                     offer: "Offer",
                     slideshow: "Slide",
                     daily_needs: "Daily Needs Item"
@@ -1130,8 +1603,9 @@
                 console.log("Attaching event listeners...");
                 
                 // Open Modals
-                document.getElementById('manage-offers-btn')?.addEventListener('click', () => openModal('offer'));
+                document.getElementById('manage-trending-btn')?.addEventListener('click', () => openModal('trending'));
                 document.getElementById('manage-slideshow-btn')?.addEventListener('click', () => openModal('slideshow'));
+                    document.getElementById('view-customer-analytics-btn')?.addEventListener('click', () => openCustomerAnalyticsModal());
                 document.getElementById('edit-daily-needs-btn')?.addEventListener('click', () => openModal('daily_needs'));
                 
                 console.log("Modal open listeners attached.");
@@ -1280,7 +1754,318 @@
                         showNotification(`Error: UI component for ${itemType} is missing.`, 'error');
                     }
                 }
+
+                async function openCustomerAnalyticsModal() {
+                    const modal = modals['customer_analytics'];
+                    if (!modal) {
+                        console.error("Customer Analytics modal not found");
+                        return;
+                    }
+                    modal.classList.add('active');
+
+                    // Get references to all elements we need to update
+                    const totalUsersCount = document.getElementById('total-users-count');
+                    const totalUsersTrend = document.getElementById('total-users-trend');
+                    const premiumUsersCount = document.getElementById('premium-users-count');
+                    const premiumUsersTrend = document.getElementById('premium-users-trend');
+                    const conversionRateValue = document.getElementById('conversion-rate-value');
+                    const conversionRateTrend = document.getElementById('conversion-rate-trend');
+                    const newUsersCount = document.getElementById('new-users-count');
+                    const newUsersTrend = document.getElementById('new-users-trend');
+                    const recentPremiumList = document.getElementById('recent-premium-list');
+                    const recentPremiumCount = document.getElementById('recent-premium-count');
+
+                    // Set loading state
+                    totalUsersCount.textContent = '--';
+                    totalUsersTrend.textContent = '--';
+                    premiumUsersCount.textContent = '--';
+                    premiumUsersTrend.textContent = '--';
+                    conversionRateValue.textContent = '--';
+                    conversionRateTrend.textContent = '--';
+                    newUsersCount.textContent = '--';
+                    newUsersTrend.textContent = '--';
+                    recentPremiumList.innerHTML = `
+                        <li class="user-list-loading">
+                            <div class="spinner"></div>
+                            <span>Loading subscribers...</span>
+                        </li>
+                    `;
+
+                    try {
+                        const response = await fetch('/api/customer_analytics');
+                        if (!response.ok) throw new Error('Failed to fetch analytics');
+                        const data = await response.json();
+
+                        // Update summary cards
+                        totalUsersCount.textContent = formatNumber(data.total_users || 0);
+                        totalUsersTrend.textContent = `${data.total_users_growth || 0}%`;
+                        updateTrendClass(totalUsersTrend.parentElement, data.total_users_growth || 0);
+
+                        premiumUsersCount.textContent = formatNumber(data.premium_users || 0);
+                        premiumUsersTrend.textContent = `${data.premium_users_growth || 0}%`;
+                        updateTrendClass(premiumUsersTrend.parentElement, data.premium_users_growth || 0);
+
+                        conversionRateValue.textContent = `${(data.premium_conversion_rate || 0).toFixed(1)}%`;
+                        conversionRateTrend.textContent = `${data.conversion_rate_change || 0}%`;
+                        updateTrendClass(conversionRateTrend.parentElement, data.conversion_rate_change || 0);
+
+                        newUsersCount.textContent = formatNumber(data.new_users_7_days || 0);
+                        newUsersTrend.textContent = `${data.new_users_growth || 0}%`;
+                        updateTrendClass(newUsersTrend.parentElement, data.new_users_growth || 0);
+
+                        // Users Distribution Chart - FIX HERE
+                        const premiumCount = data.premium_users || 0;
+                        const freeCount = Math.max((data.total_users || 0) - premiumCount, 0);
+
+                        const ctxDistribution = document.getElementById('userDistributionChart');
+                        if (!ctxDistribution) {
+                            console.error("Could not find userDistributionChart canvas element");
+                            return;
+                        }
+                        
+                        // Safe destroy of existing chart
+                        if (window.userDistributionChart instanceof Chart) {
+                            window.userDistributionChart.destroy();
+                        } else if (window.userDistributionChart) {
+                            // If it exists but isn't a Chart instance, delete it to start fresh
+                            delete window.userDistributionChart;
+                        }
+                        
+                        // Create new chart
+                        window.userDistributionChart = new Chart(ctxDistribution.getContext('2d'), {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Premium', 'Free'],
+                                datasets: [{
+                                    data: [premiumCount, freeCount],
+                                    backgroundColor: ['#FBBF24', '#64748B'],
+                                    borderWidth: 0,
+                                    borderRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutout: '70%',
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                        titleFont: {
+                                            family: "'Poppins', sans-serif",
+                                            size: 14
+                                        },
+                                        bodyFont: {
+                                            family: "'Poppins', sans-serif",
+                                            size: 13
+                                        },
+                                        padding: 12,
+                                        cornerRadius: 8,
+                                        displayColors: false
+                                    }
+                                }
+                            }
+                        });
+
+                        // User Growth Chart - FIX HERE TOO
+                        const months = data.growth_data?.months || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                        const freeUsers = data.growth_data?.free_users || [50, 60, 70, 80, 90, 100];
+                        const premiumUsers = data.growth_data?.premium_users || [10, 15, 20, 25, 30, 35];
+
+                        const ctxGrowth = document.getElementById('userGrowthChart');
+                        if (!ctxGrowth) {
+                            console.error("Could not find userGrowthChart canvas element");
+                            return;
+                        }
+                        
+                        // Safe destroy of existing chart
+                        if (window.userGrowthChart instanceof Chart) {
+                            window.userGrowthChart.destroy();
+                        } else if (window.userGrowthChart) {
+                            delete window.userGrowthChart;
+                        }
+                        
+                        window.userGrowthChart = new Chart(ctxGrowth.getContext('2d'), {
+                            type: 'line',
+                            data: {
+                                labels: months,
+                                datasets: [
+                                    {
+                                        label: 'Free Users',
+                                        data: freeUsers,
+                                        borderColor: '#64748B',
+                                        backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                                        borderWidth: 2,
+                                        tension: 0.3,
+                                        fill: true
+                                    },
+                                    {
+                                        label: 'Premium Users',
+                                        data: premiumUsers,
+                                        borderColor: '#FBBF24',
+                                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                                        borderWidth: 2,
+                                        tension: 0.3,
+                                        fill: true
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: 'rgba(255, 255, 255, 0.05)'
+                                        },
+                                        ticks: {
+                                            color: 'rgba(255, 255, 255, 0.7)',
+                                            font: {
+                                                family: "'Poppins', sans-serif",
+                                                size: 10
+                                            }
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            color: 'rgba(255, 255, 255, 0.7)',
+                                            font: {
+                                                family: "'Poppins', sans-serif",
+                                                size: 10
+                                            }
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                        labels: {
+                                            color: 'rgba(255, 255, 255, 0.7)',
+                                            font: {
+                                                family: "'Poppins', sans-serif",
+                                                size: 11
+                                            },
+                                            boxWidth: 12,
+                                            padding: 15
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                        titleFont: {
+                                            family: "'Poppins', sans-serif",
+                                            size: 14
+                                        },
+                                        bodyFont: {
+                                            family: "'Poppins', sans-serif",
+                                            size: 13
+                                        },
+                                        padding: 12,
+                                        cornerRadius: 8
+                                    }
+                                }
+                            }
+                        });
+
+                        // Update Recent Premium Users List
+                        recentPremiumList.innerHTML = '';
+                        if (data.recent_premium_subscribers && data.recent_premium_subscribers.length > 0) {
+                            recentPremiumCount.textContent = data.recent_premium_subscribers.length;
+                            data.recent_premium_subscribers.forEach(user => {
+                                const initialLetter = (user.name || 'U').charAt(0).toUpperCase();
+                                const dateStr = user.premium_start_at ? formatRelativeDate(new Date(user.premium_start_at)) : 'N/A';
+                                
+                                const li = document.createElement('li');
+                                li.innerHTML = `
+                                    <div class="user-avatar">${initialLetter}</div>
+                                    <div class="user-info">
+                                        <span class="user-name">${user.name || 'Unknown User'}</span>
+                                        <div class="user-meta">
+                                            <span class="user-mobile"><i class="fas fa-mobile-alt"></i> ${user.mobile || 'N/A'}</span>
+                                            <span class="user-date"><i class="fas fa-calendar-alt"></i> ${dateStr}</span>
+                                        </div>
+                                    </div>
+                                `;
+                                recentPremiumList.appendChild(li);
+                            });
+                        } else {
+                            recentPremiumCount.textContent = '0';
+                            const emptyLi = document.createElement('li');
+                            emptyLi.style.justifyContent = 'center';
+                            emptyLi.innerHTML = '<span style="opacity: 0.7;">No recent premium subscribers</span>';
+                            recentPremiumList.appendChild(emptyLi);
+                        }
+                    } catch (error) {
+                        console.error("Error fetching customer analytics:", error);
+                        
+                        // Show error state
+                        totalUsersCount.textContent = 'Error';
+                        premiumUsersCount.textContent = 'Error';
+                        conversionRateValue.textContent = 'Error';
+                        newUsersCount.textContent = 'Error';
+                        
+                        recentPremiumList.innerHTML = `
+                            <li style="justify-content: center; color: #F87171;">
+                                <i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>
+                                Failed to load data. Please try again.
+                            </li>
+                        `;
+                    }
+                }
+
+                // Helper function to format numbers with commas
+                function formatNumber(num) {
+                    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+
+                // Helper function to update trend classes
+                function updateTrendClass(element, value) {
+                    if (!element) return;
+                    
+                    // Remove existing classes
+                    element.classList.remove('positive', 'negative', 'neutral');
+                    
+                    // Update icon
+                    const icon = element.querySelector('i');
+                    if (icon) {
+                        if (value > 0) {
+                            icon.className = 'fas fa-arrow-up';
+                            element.classList.add('positive');
+                        } else if (value < 0) {
+                            icon.className = 'fas fa-arrow-down';
+                            element.classList.add('negative');
+                        } else {
+                            icon.className = 'fas fa-minus';
+                            element.classList.add('neutral');
+                        }
+                    }
+                }
+
+                // Helper function to format relative dates
+                function formatRelativeDate(date) {
+                    const now = new Date();
+                    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays === 0) {
+                        return 'Today';
+                    } else if (diffDays === 1) {
+                        return 'Yesterday';
+                    } else if (diffDays < 7) {
+                        return `${diffDays} days ago`;
+                    } else if (diffDays < 30) {
+                        const weeks = Math.floor(diffDays / 7);
+                        return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+                    } else {
+                        return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+                    }
+                }
                 
+                // --- Core Functions ---
                 function closeModalById(modalId) {
                     const modal = document.getElementById(modalId);
                     if (modal) {
@@ -1384,30 +2169,40 @@
                     urlField.appendChild(urlLabel);
                     urlField.appendChild(urlInput);
                     
-                    // Price field
-                    const priceField = document.createElement('div');
-                    priceField.className = 'item-field';
-                    const priceLabel = document.createElement('label');
-                    priceLabel.innerHTML = `<i class="fas fa-tag"></i> Price ${itemType === 'slideshow' ? '(Optional)' : ''}`; // Optional label for slideshow
-                    const priceInput = document.createElement('input');
-                    priceInput.type = 'number';
-                    // Use nullish coalescing for potentially null price
-                    priceInput.value = item.price ?? '';
-                    priceInput.step = 'any';
-                    priceInput.className = 'item-price-input';
-                    
-                    // Make price optional for slideshow
-                    if (itemType === 'slideshow') {
-                        priceInput.required = false;
-                    } else {
+                    // Name field (for trending and daily_needs)
+                    if (itemType === 'trending' || itemType === 'daily_needs') {
+                        const nameField = document.createElement('div');
+                        nameField.className = 'item-field';
+                        const nameLabel = document.createElement('label');
+                        nameLabel.innerHTML = '<i class="fas fa-tag"></i> Name';
+                        const nameInput = document.createElement('input');
+                        nameInput.type = 'text';
+                        nameInput.value = item.name ?? '';
+                        nameInput.className = 'item-name-input';
+                        nameField.appendChild(nameLabel);
+                        nameField.appendChild(nameInput);
+                        details.appendChild(urlField);
+                        details.appendChild(nameField);
+                    } else if(itemType !== 'slideshow') {
+                        // Price field (for other types, NOT slideshow/bgimage)
+                        const priceField = document.createElement('div');
+                        priceField.className = 'item-field';
+                        const priceLabel = document.createElement('label');
+                        priceLabel.innerHTML = `<i class="fas fa-tag"></i> Price`;
+                        const priceInput = document.createElement('input');
+                        priceInput.type = 'number';
+                        priceInput.value = item.price ?? '';
+                        priceInput.step = 'any';
+                        priceInput.className = 'item-price-input';
                         priceInput.required = true;
+                        priceField.appendChild(priceLabel);
+                        priceField.appendChild(priceInput);
+                        details.appendChild(urlField);
+                        details.appendChild(priceField);
+                    } else {
+                        // For slideshow/bgimage, only show URL field
+                        details.appendChild(urlField);
                     }
-                    
-                    priceField.appendChild(priceLabel);
-                    priceField.appendChild(priceInput);
-                    
-                    details.appendChild(urlField);
-                    details.appendChild(priceField);
                     
                     // Action buttons
                     const actions = document.createElement('div');
@@ -1422,6 +2217,9 @@
                     deleteBtn.className = 'btn-delete';
                     deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
                     // deleteBtn listener added via delegation
+                    if(itemType === 'slideshow') {
+                        deleteBtn.style.display = 'none';
+                    }
                     
                     actions.appendChild(updateBtn);
                     actions.appendChild(deleteBtn);
@@ -1457,7 +2255,7 @@
                     const getUrl = apiEndpoints[itemType].get;
                     const addTrigger = grid?.querySelector(`.add-item-card[data-item-type="${itemType}"]`);
                     
-                    if (!grid || !getUrl || !addTrigger) {
+                    if (!grid || !getUrl || (!addTrigger && itemType !== 'slideshow')) {
                         console.error(`fetchAndDisplayItems: Grid, URL, or Add Trigger not found for item type: ${itemType}`);
                         showNotification(`Error: UI components missing for ${itemType}.`, 'error');
                         return;
@@ -1474,7 +2272,11 @@
                     loadingCard.className = 'item-card loading-card';
                     loadingCard.style.cssText = 'display: flex; align-items: center; justify-content: center; grid-column: 1 / -1;';
                     loadingCard.innerHTML = `<div class="spinner"></div><span style="color: var(--gray-300); margin-left: 1rem; font-weight: 500;">Loading ${itemNames[itemType].toLowerCase()}s...</span>`;
-                    grid.insertBefore(loadingCard, addTrigger);
+                    if(addTrigger){
+                        grid.insertBefore(loadingCard, addTrigger);
+                    } else {
+                        grid.appendChild(loadingCard);
+                    }
                     
                     try {
                         const response = await fetch(getUrl);
@@ -1494,12 +2296,16 @@
                         }
                         
                         let items = await response.json();
+                        if(itemType === 'slideshow' && items.length > 1) {
+                            items = [items[0]];
+                        }
                         
                         if (!Array.isArray(items)) {
                             throw new Error(`Invalid data format received for ${itemType}. Expected an array.`);
                         }
                         
                         console.log(`Received ${items.length} items for ${itemType}.`);
+                        console.log("Fetched items data:", items);
                         
                         if (items.length === 0) {
                             const emptyState = document.createElement('div');
@@ -1510,12 +2316,20 @@
                                 <span style="color: var(--gray-300); font-size: 1.1rem;">No ${itemNames[itemType].toLowerCase()}s found</span>
                                 <p style="color: var(--gray-400); max-width: 80%;">Click the "+" button to add the first ${itemNames[itemType].toLowerCase()}.</p>
                             `;
-                            grid.insertBefore(emptyState, addTrigger);
+                            if(addTrigger){
+                                grid.insertBefore(emptyState, addTrigger);
+                            } else {
+                                grid.appendChild(emptyState);
+                            }
                             console.log(`Displayed empty state for ${itemType}.`);
                         } else {
                             items.forEach(item => {
                                 const card = createItemCard(item, itemType);
-                                grid.insertBefore(card, addTrigger);
+                                if(addTrigger){
+                                    grid.insertBefore(card, addTrigger);
+                                } else {
+                                    grid.appendChild(card);
+                                }
                             });
                             console.log(`Displayed ${items.length} item cards for ${itemType}.`);
                         }
@@ -1536,7 +2350,11 @@
                                 <i class="fas fa-redo"></i> Retry
                             </button>
                         `;
-                        grid.insertBefore(errorCard, addTrigger);
+                        if(addTrigger){
+                            grid.insertBefore(errorCard, addTrigger);
+                        } else {
+                            grid.appendChild(errorCard);
+                        }
                         console.log(`Displayed error state for ${itemType}.`);
                     }
                 }
@@ -1558,6 +2376,7 @@
                     console.log(`Attempting update for ${itemType} ID: ${itemId}`);
                     
                     const urlInput = card.querySelector('.item-url-input');
+                    const nameInput = card.querySelector('.item-name-input');
                     const priceInput = card.querySelector('.item-price-input');
                     
                     // Build the update URL with the item ID
@@ -1565,34 +2384,50 @@
                     
                     // Basic Validation
                     const imageUrl = urlInput.value.trim();
-                    const priceValue = priceInput.value.trim();
-                    let price = null; // Default to null
                     
                     if (!imageUrl) {
-                        // URL required for all item types
                         showNotification('Please enter a valid image URL', 'error');
                         urlInput.focus();
                         return;
                     }
                     
-                    // Price validation (required for offer/daily_needs, optional for slideshow)
-                    if (priceValue !== '') {
-                        price = parseFloat(priceValue);
-                        if (isNaN(price) || price < 0) {
-                            showNotification('Please enter a valid non-negative price, or leave it empty if optional.', 'error');
+                    let updatedItem = {};
+                    
+                    if(itemType === 'slideshow') {
+                        updatedItem = {
+                            image_url: imageUrl
+                        };
+                    } else if (itemType === 'trending' || itemType === 'daily_needs') {
+                        const nameValue = nameInput?.value.trim();
+                        if (!nameValue) {
+                            showNotification('Please enter a valid name', 'error');
+                            nameInput.focus();
+                            return;
+                        }
+                        updatedItem = {
+                            image_url: imageUrl,
+                            name: nameValue
+                        };
+                    } else {
+                        const priceValue = priceInput.value.trim();
+                        let price = null;
+                        if (priceValue !== '') {
+                            price = parseFloat(priceValue);
+                            if (isNaN(price) || price < 0) {
+                                showNotification('Please enter a valid non-negative price, or leave it empty if optional.', 'error');
+                                priceInput.focus();
+                                return;
+                            }
+                        } else {
+                            showNotification('Price is required for this item type.', 'error');
                             priceInput.focus();
                             return;
                         }
-                    } else if (itemType !== 'slideshow') {
-                        showNotification('Price is required for this item type.', 'error');
-                        priceInput.focus();
-                        return;
+                        updatedItem = {
+                            image_url: imageUrl,
+                            price: price
+                        };
                     }
-                    
-                    const updatedItem = {
-                        image_url: imageUrl,
-                        price: price // Send null if price was empty/invalid for optional field
-                    };
                     
                     console.log("Update data:", updatedItem);
                     

@@ -36,26 +36,15 @@ def insert_data(table: str, data: Dict[str, Any]) -> Dict[str, Any]:
 
 def update_data(table: str, match_criteria: Dict[str, Any], new_data: Dict[str, Any]) -> List[Dict[str, Any]]:
     try:
-        query = supabase.table(table)
-        
-        # Apply match criteria
-        for key, value in match_criteria.items():
-            query = query.eq(key, value)
-            
-        response = query.update(new_data).execute()
+        response = supabase.table(table).update(new_data).eq("id", match_criteria['id']).execute()
         return response.data
     except Exception as e:
         raise Exception(f"Error updating data in {table}: {str(e)}")
 
 def delete_data(table: str, match_criteria: Dict[str, Any]) -> List[Dict[str, Any]]:
     try:
-        query = supabase.table(table)
-        
-        # Apply match criteria
-        for key, value in match_criteria.items():
-            query = query.eq(key, value)
-            
-        response = query.delete().execute()
+        # Use match method to apply all criteria at once
+        response = supabase.table(table).delete().eq('id', match_criteria['id']).execute()
         return response.data
     except Exception as e:
         raise Exception(f"Error deleting data from {table}: {str(e)}")
