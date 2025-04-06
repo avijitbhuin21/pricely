@@ -16,7 +16,7 @@ import TermsScreen from '../components/terms';
 import ContactUsScreen from '../components/contactUs';
 import PrivacyPolicyScreen from '../components/privacy';
 import AboutUsScreen from '../components/aboutUs';
-
+import EditProfileScreen from '../screens/EditProfileScreen'; // Import the new screen
 
 // Define the root stack parameter list
 export type RootStackParamList = {
@@ -44,6 +44,7 @@ export type RootStackParamList = {
   ContactUs: undefined;
   privacy: undefined;
   aboutus: undefined;
+  EditProfile: undefined; // Add EditProfile to the param list
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -112,6 +113,11 @@ export default function AppNavigator() {
           component={TermsScreen}
           options={{ headerShown: false }}
         />
+       <Stack.Screen // Add the EditProfile screen to the stack
+         name="EditProfile"
+         component={EditProfileScreen}
+         options={{ headerShown: false }}
+       />
         <Stack.Screen
           name="ContactUs"
           component={ContactUsScreen}

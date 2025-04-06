@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface CartItem {
   id: string;
@@ -23,12 +24,51 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_STORAGE_KEY = 'PricelyCartItems';
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load cart from storage on mount
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        const storedCart = await AsyncStorage.getItem(CART_STORAGE_KEY);
+        if (storedCart) {
+          setCartItems(JSON.parse(storedCart));
+        }
+      } catch (error) {
+        console.error("Failed to load cart items from storage", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadCart();
+  }, []);
+
+  // Save cart to storage whenever it changes
+  useEffect(() => {
+    if (!isLoading) { // Avoid saving initial empty state before loading
+      const saveCart = async () => {
+        try {
+          await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+        } catch (error) {
+          console.error("Failed to save cart items to storage", error);
+        }
+      };
+      saveCart();
+    }
+  }, [cartItems, isLoading]);
 
   const addToCart = (item: CartItem) => {
-    if (!isInCart(item.id)) {
+    // Check if item with the exact same ID already exists
+    const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
+    if (!existingItem) {
       setCartItems(prev => [...prev, item]);
+    } else {
+      console.log("Item already in cart:", item.id);
+      // Optionally: update quantity or show a message
     }
   };
 
@@ -40,21 +80,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCartItems([]);
   };
 
-  const isInCart = (id: string, searchId?: string) => {
-    // Extract the base item ID without the shop name
-    const [baseId, shopName] = id.split('-');
-    
-    // First check if exact item is in cart
-    const exactMatch = cartItems.some(item => item.id === id);
-    if (exactMatch) {
-      return true;
-    }
-    
-    // If no exact match, check if same item from same shop exists in cart
-    return cartItems.some(item => {
-      const [itemBaseId, itemShopName] = item.id.split('-');
-      return itemBaseId === baseId && itemShopName === shopName;
-    });
+  const isInCart = (id: string) => {
+    // With unique IDs, we just need to check for the exact ID
+    return cartItems.some(item => item.id === id);
   };
 
   const getItemsByVendor = (vendor: string) => {
@@ -67,14 +95,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <CartContext.Provider value={{ 
-      cartItems, 
-      addToCart, 
-      removeFromCart, 
-      clearCart, 
+    <CartContext.Provider value={{
+      cartItems,
+      addToCart,
+      removeFromCart,
+      clearCart,
       isInCart,
       getItemsByVendor,
-      calculateVendorTotal
+      calculateVendorTotal,
+      // isLoading // Optionally expose loading state if needed by UI
     }}>
       {children}
     </CartContext.Provider>
