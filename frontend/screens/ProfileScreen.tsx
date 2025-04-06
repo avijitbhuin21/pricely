@@ -13,6 +13,8 @@ import {
   Modal,
   TextInput,
   FlatList,
+  Dimensions,
+  PixelRatio,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -20,7 +22,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useLocation } from '../contexts/LocationContext';
-
 // Define RootStackParamList type for navigation
 type RootStackParamList = {
   Profile: undefined;
@@ -261,13 +262,13 @@ const ProfileScreen = () => {
               </View> */}
 
               {/* Member+ Banner */}
-              <TouchableOpacity style={styles.memberBanner} onPress={navigateToMemberPlus}>
-                <Text style={styles.memberTextHighlight}>MEMBER+</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.memberTextMain}>Join Now at ₹29</Text>
-                  <Text style={styles.memberTextSub}>For 1 Month</Text>
-                </View>
-              </TouchableOpacity>
+              <View style={styles.memberBannerContainer}>
+                <Image
+                  source={require('../assets/member_plus_profile.png')}
+                  style={styles.memberBannerImage}
+                  resizeMode="cover"
+                />
+              </View>
 
               {/* Check App Update Row */}
               <TouchableOpacity style={styles.optionRow} onPress={navigateToCheckUpdate}>
@@ -418,6 +419,14 @@ const ProfileScreen = () => {
   );
 };
 
+const windowWidth = Dimensions.get('window').width;
+const scale = windowWidth / 375; // 375 is standard width used for design
+
+const normalize = (size: number) => {
+  const newSize = size * scale;
+  return Math.round(PixelRatio.roundToNearestPixel(newSize));
+};
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -430,8 +439,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: '4%',
-    paddingTop: Platform.OS === 'android' ? '3%' : '2%',
-    marginBottom: '2%',
+    paddingTop: Platform.OS === 'android' ? '4%' : '2%',
+    marginBottom: '3%',
   },
   backButton: {
     padding: '2%',
@@ -442,16 +451,24 @@ const styles = StyleSheet.create({
   profileInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: '5%',
-    paddingVertical: '4%',
-    marginBottom: '3%',
-    backgroundColor: '#F0F0F0',
-    borderRadius: 15,
+    paddingHorizontal: '6%',
+    paddingVertical: '5%',
+    marginBottom: '4%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
     marginHorizontal: '4%',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   avatar: {
-    width: '15%',
-    aspectRatio: 1,
+    width: 80,
+    height: 80,
     borderRadius: 50,
     marginRight: '4%',
     backgroundColor: '#DDD',
@@ -534,36 +551,28 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontWeight: '600',
   },
-  memberBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#000000',
-    paddingVertical: '3%',
-    paddingHorizontal: '5%',
-    borderRadius: 12,
-    marginBottom: '2%',
+  memberBannerContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: normalize(12),
+    marginBottom: normalize(8),
+    padding: normalize(8),
+    marginHorizontal: '4%',
+    width: windowWidth * 0.92, // 92% of screen width
+    alignSelf: 'center',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  memberTextHighlight: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  memberTextMain: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    width: '100%',
-    paddingRight: 15,
-    textAlign: 'right',
-  },
-  memberTextSub: {
-    fontSize: 24,
-    color: '#CCCCCC',
-    marginTop: '1%',
-    width: '100%',
-    paddingRight: 15,
-    textAlign: 'right',
+  memberBannerImage: {
+    width: windowWidth * 0.88, // 88% of screen width (accounting for container padding)
+    height: windowWidth * 0.19, // Maintaining aspect ratio of 4.65 (0.88/4.65 ≈ 0.19)
+    borderRadius: normalize(10),
+    objectFit: 'fill',
   },
   helpSection: {
     paddingHorizontal: '4%',
@@ -585,29 +594,31 @@ const styles = StyleSheet.create({
     marginRight: '4%',
   },
   helpText: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#333333',
     flex: 1,
+    marginLeft: 4,
   },
   footer: {
     position: 'absolute',
-    bottom: 10,
+    bottom: Platform.OS === 'ios' ? 20 : 10,
     left: 0,
     right: 0,
     paddingVertical: '3%',
+    backgroundColor: 'transparent',
   },
   scrollView: {
     flex: 1,
-    paddingBottom: 80,
+    paddingBottom: Platform.OS === 'ios' ? 100 : 90,
   },
   footerText: {
-    fontSize: Platform.OS === 'ios' ? 32 : 28,
+    fontSize: Platform.OS === 'ios' ? 34 : 30,
     fontWeight: '700',
-    color: '#555555',
+    color: '#333333',
     textAlign: 'center',
-    letterSpacing: 3,
+    letterSpacing: 4,
     textTransform: 'uppercase',
-    opacity: 0.9,
+    opacity: 0.85,
   }
 });
 

@@ -66,12 +66,20 @@ const ComparisonCard: React.FC<{
 }> = ({ item, opacity, onAddToCart, isInCart, style }) => {
   const displayQuantity = item.shops.length > 0 ? item.shops[0].quantity : item.quantity;
   // Pass the full shop object to generateCartItemId
-  const areAllItemsInCart = item.shops.every(shop => isInCart(generateCartItemId(item, shop)));
+  const areAllItemsInCart = item.shops.every(shop => {
+    const cartItemId = generateCartItemId(item, shop);
+    const inCart = isInCart(cartItemId);
+    console.log(`[DEBUG] Checking if in cart: ID=${cartItemId}, Result=${inCart}`);
+    return inCart;
+  });
 
   const handleAddAllItems = () => {
+    console.log(`[DEBUG] handleAddAllItems triggered for item ${item.id} (${item.name})`);
+    console.log(`[DEBUG] Current areAllItemsInCart: ${areAllItemsInCart}`);
     const shouldRemove = areAllItemsInCart;
     item.shops.forEach(shop => {
-      // Pass the whole shop object to match the updated signature
+      const cartItemId = generateCartItemId(item, shop);
+      console.log(`[DEBUG] Bulk ${shouldRemove ? 'removing' : 'adding'} item with ID=${cartItemId}`);
       onAddToCart(item, shop, shouldRemove);
     });
   };
@@ -154,7 +162,7 @@ const ComparisonCard: React.FC<{
           <View style={styles.bottomContent}>
             <TouchableOpacity
               style={styles.addAllButton}
-              // onPress={handleAddAllItems} // TODO: Revisit Add/Remove All logic if needed
+              onPress={handleAddAllItems}
             >
               <LinearGradient
                 colors={areAllItemsInCart ? ['#ff6b6b', '#ee5253'] : ['#4c669f', '#3b5998', '#192f6a']}
@@ -352,7 +360,11 @@ export default function CompareResultScreen() {
     const cartItemId = generateCartItemId(item, shop); // Generate ID based on specific shop entry
     const shopName = shop.name; // Extract shopName for convenience
 
+    console.log(`[DEBUG] handleCartAction called for item ${item.id} (${item.name}), shop=${shopName}, remove=${remove}`);
+    console.log(`[DEBUG] CartItemId=${cartItemId}`);
+
     if (remove) {
+      console.log(`[DEBUG] Removing item with ID=${cartItemId}`);
       removeFromCart(cartItemId); // Use the specific ID to remove
       Toast.show({
         type: 'info',
@@ -368,6 +380,7 @@ export default function CompareResultScreen() {
       else if (capitalizedShopName === "Bigbasket") capitalizedShopName = "BigBasket";
       // Add other capitalizations if needed (e.g., Instamart)
 
+      console.log(`[DEBUG] Adding item with ID=${cartItemId}`);
       addToCart({
         id: cartItemId, // Use the generated unique ID
         name: item.name,
