@@ -18,6 +18,7 @@ from .Blinkit_Handler import search_blinkit
 from .Instamart_Handler import search_instamart
 from .Dmart_Handler import search_dmart
 from .Zepto_Handler import search_zepto
+from .supabase_handler import select_data
 
 
 load_dotenv()
@@ -225,3 +226,13 @@ def get_compared_results(search_query, lat, lon, credentials=None):
     log_debug(f"Final compared data: {data}", "Orchestrator", "INFO")
 
     return data
+
+def get_suggestions(query, max_suggestions=5):
+    products = [i['name'] for i in select_data("autosuggest")]
+    if not query:
+        return []
+    query = query.lower()
+    starts_with = [product for product in products if product.lower().startswith(query)]
+    contains = [product for product in products if query in product.lower() and not product.lower().startswith(query)]
+    suggestions = starts_with + contains
+    return suggestions[:max_suggestions]
