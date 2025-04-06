@@ -75,9 +75,9 @@ def get_search_results():
 
     print("credentials",credentials)
 
-    # data = get_compared_results(item_name, lat, lon, credentials)
-    data = open("compared_data.json", "r").read()
-    data = json.loads(data)
+    data = get_compared_results(item_name, lat, lon, credentials)
+    # data = open("compared_data.json", "r").read()
+    # data = json.loads(data)
 
     return jsonify({"status": "success", "data": data})
 
@@ -566,11 +566,11 @@ def calculate_growth_rate(current, previous):
 
 
 def main():
-    # kill_ngrok_processes()
-    # ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
-    # ngrok_tunnel = ngrok.connect(addr='5000', proto="http", hostname="noble-raven-entirely.ngrok-free.app")
-    # print("Public URL:", ngrok_tunnel.public_url)
-    # app.run(port=5000, debug=True, use_reloader=False)
+    kill_ngrok_processes()
+    ngrok.set_auth_token(os.getenv("NGROK_AUTH_TOKEN"))
+    ngrok_tunnel = ngrok.connect(addr='5000', proto="http", hostname="noble-raven-entirely.ngrok-free.app")
+    print("Public URL:", ngrok_tunnel.public_url)
+    app.run(port=5000, debug=True, use_reloader=False)
     app.run(debug=True)
 
 if __name__ == "__main__":
