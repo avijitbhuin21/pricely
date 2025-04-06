@@ -104,26 +104,9 @@ const Header: React.FC<HeaderProps> = ({
     navigation.navigate('Profile');
   };
 
-  const [isMenuVisible, setMenuVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(screenWidth)).current;
-
   const handleMenuPress = () => {
-    setMenuVisible(true);
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handleMenuClose = () => {
-    Animated.timing(slideAnim, {
-      toValue: screenWidth,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => {
-      setMenuVisible(false);
-    });
+    console.log('Hamburger pressed - navigating to Profile with slide animation');
+    navigation.navigate('Profile');
   };
 
   const renderLocationItem: ListRenderItem<LocationSuggestion> = ({ item }) => (
@@ -169,7 +152,7 @@ const Header: React.FC<HeaderProps> = ({
         <View style={styles.textAndLocationContainer}>
           <View style={styles.titleContainer}>
             <Text style={styles.titleText}>PRICELY</Text>
-            <Text style={styles.compareText}>-compare it</Text>
+            <Text style={styles.compareText}>- Compare It</Text>
           </View>
           <TouchableOpacity
             style={styles.locationButton}
@@ -257,63 +240,6 @@ const Header: React.FC<HeaderProps> = ({
         </View>
       </Modal>
 
-      <Modal
-        visible={isMenuVisible}
-        animationType="fade"
-        transparent
-        onRequestClose={handleMenuClose}
-      >
-        <TouchableOpacity
-          style={styles.menuOverlay}
-          activeOpacity={1}
-          onPress={handleMenuClose}
-        >
-          <Animated.View style={[
-            styles.menuContent,
-            {
-              transform: [{ translateX: slideAnim }]
-            }
-          ]}>
-            <View style={styles.menuHeader}>
-              <View style={styles.menuTitleContainer}>
-                <Text style={styles.menuTitleText}>PRICELY</Text>
-                <Text style={styles.menuCompareText}>compare it</Text>
-              </View>
-              <TouchableOpacity
-                style={styles.menuCloseButton}
-                onPress={handleMenuClose}
-              >
-                <Ionicons name="close" size={iconSizeMedium} color="#fff" />
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.menuItems}>
-              <TouchableOpacity
-                style={styles.menuItem}
-                activeOpacity={0.7}
-                onPress={() => {
-                  handleProfilePress();
-                  handleMenuClose();
-                }}
-              >
-                <Ionicons name="person-outline" size={iconSizeMedium} color="#C60053" />
-                <Text style={styles.menuItemText}>Profile</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.menuItem}
-                activeOpacity={0.7}
-                onPress={() => {
-                  navigation.navigate('ContactUs');
-                  handleMenuClose();
-                }}
-              >
-                <Ionicons name="mail-outline" size={iconSizeMedium} color="#C60053" />
-                <Text style={styles.menuItemText}>Contact Us</Text>
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </TouchableOpacity>
-      </Modal>
     </View>
   );
 };

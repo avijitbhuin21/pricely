@@ -28,7 +28,7 @@ import Header from '../components/Header';
 import SearchBar from '../components/SearchBar';
 import SearchHistory from '../components/SearchHistory';
 
-const PROMO_IMAGE_URL = 'https://images.unsplash.com/photo-1606787366850-de6330128bfc';
+const PROMO_IMAGE_URL = 'https://images.unsplash.com/photo-1606787366850-de6330128bfc'; // fallback default, will be replaced dynamically
 
 // Create responsive scale functions
 const createScaleFunctions = (width: number, height: number) => {
@@ -282,6 +282,9 @@ export default function HomeScreen() {
   const [isKeyboardActive, setIsKeyboardActive] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [userName] = useState('Demo');
+
+  // Promo image URL state
+  const [promoImageUrl, setPromoImageUrl] = useState<string>(PROMO_IMAGE_URL);
   
   // State for carousel data
   const [recommendedItems, setRecommendedItems] = useState<CarouselItem[]>([]);
@@ -503,6 +506,28 @@ export default function HomeScreen() {
     
     // Fetch trending and daily needs data
     fetchTrendingAndDailyNeeds();
+
+    // Fetch promo image URL from backend
+    const fetchPromoImage = async () => {
+      try {
+        const response = await fetch('http://noble-raven-entirely.ngrok-free.app/api/bg_image');
+        if (!response.ok) {
+          console.error('Failed to fetch promo image, status:', response.status);
+          return;
+        }
+        const data = await response.json();
+        console.log('Promo image API response:', data);
+        if (Array.isArray(data) && data.length > 0 && data[0].image_url) {
+          setPromoImageUrl(data[0].image_url);
+        } else {
+          console.warn('Promo image API returned empty or invalid data');
+        }
+      } catch (error) {
+        console.error('Error fetching promo image:', error);
+      }
+    };
+
+    fetchPromoImage();
   }, []);
 
   // Handle keyboard events
@@ -634,7 +659,7 @@ export default function HomeScreen() {
             position: 'relative'
           }}>
             <Image
-              source={{ uri: PROMO_IMAGE_URL }}
+              source={{ uri: promoImageUrl }}
               style={{ width: '100%', height: '100%' }}
               resizeMode="cover"
             />
