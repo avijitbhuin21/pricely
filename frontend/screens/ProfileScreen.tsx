@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,16 @@ import {
   Platform,
   Image,
   Share,
+  Modal,
+  TextInput,
+  FlatList,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useLocation } from '../contexts/LocationContext';
 
 // Define RootStackParamList type for navigation
 type RootStackParamList = {
@@ -34,6 +39,117 @@ type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Prof
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const [appearance, setAppearance] = useState<'light' | 'dark'>('light');
+  const [userName, setUserName] = useState<string>('User'); // Default name
+  const [userPhone, setUserPhone] = useState<string>(''); // Default phone
+  const [profilePictureUri, setProfilePictureUri] = useState<string | null>(null); // Default picture URI
+
+  const { currentLocation, searchLocations, updateLocation, autoLocate } = useLocation();
+
+  const [isLocationModalVisible, setLocationModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([
+    { id: 'auto', name: 'Auto Locate', isAutoLocate: true }
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleSearchLocations = async (query: string) => {
+    if (!query.trim() || query.length < 3) {
+      setSearchResults([{ id: 'auto', name: 'Auto Locate', isAutoLocate: true }]);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const results = await searchLocations(query);
+      if (Array.isArray(results)) {
+        const locationResults = results.map((item: any) => ({
+          id: item.id,
+          name: item.description.split(',')[0],
+          fullName: item.description,
+        }));
+        setSearchResults([
+          { id: 'auto', name: 'Auto Locate', isAutoLocate: true },
+          ...locationResults,
+        ]);
+      } else {
+        setSearchResults([{ id: 'auto', name: 'Auto Locate', isAutoLocate: true }]);
+      }
+    } catch (error) {
+      console.error('Error searching locations:', error);
+      setSearchResults([{ id: 'auto', name: 'Auto Locate', isAutoLocate: true }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearchQueryChange = (text: string) => {
+    setSearchQuery(text);
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+    searchTimeout.current = setTimeout(() => {
+      handleSearchLocations(text);
+    }, 500);
+  };
+
+  const handleLocationSelect = (item: any) => {
+    if (item.isAutoLocate) {
+      autoLocate();
+    } else {
+      updateLocation({
+        address: item.fullName || item.name,
+      });
+    }
+    setLocationModalVisible(false);
+    setSearchQuery('');
+    setSearchResults([{ id: 'auto', name: 'Auto Locate', isAutoLocate: true }]);
+  };
+  // Use useFocusEffect to reload data when the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      const loadUserData = async () => {
+        console.log('ProfileScreen: Loading user data...'); // Log start
+        try {
+          // Load user name and phone
+          const userDataString = await AsyncStorage.getItem('userData');
+          console.log('ProfileScreen: userDataString from AsyncStorage:', userDataString); // Log raw string
+          if (userDataString) {
+            const userData = JSON.parse(userDataString);
+            console.log('ProfileScreen: Parsed userData:', userData); // Log parsed object
+            // Assuming userData has 'name' and 'phoneNumber' properties
+            setUserName(userData.name || 'User');
+            const phone = userData.phoneNumber || ''; // FIX: use correct key
+            setUserPhone(phone);
+            console.log('ProfileScreen: Setting userPhone state to:', phone); // Log phone value being set
+          } else {
+            console.log('ProfileScreen: No userData found in AsyncStorage.'); // Log if not found
+            // Handle case where userData is not found
+            setUserName('User');
+            setUserPhone('');
+          }
+
+          // Load profile picture URI
+          const pictureUri = await AsyncStorage.getItem('profilePictureUri');
+          console.log('ProfileScreen: profilePictureUri from AsyncStorage:', pictureUri); // Log picture URI
+          setProfilePictureUri(pictureUri);
+
+        } catch (error) {
+          console.error('ProfileScreen: Failed to load user data from storage', error); // Add context to error
+          // Optionally set defaults or show an error message
+          setUserName('User');
+          setUserPhone('');
+          setProfilePictureUri(null);
+        }
+      };
+
+      loadUserData();
+
+      // Optional: Return a cleanup function if needed
+      return () => {
+        // console.log('Profile screen lost focus');
+      };
+    }, []) // Empty dependency array means the callback itself doesn't depend on props/state
+  );
 
   const handleBackPress = () => {
     if (navigation.canGoBack()) {
@@ -84,12 +200,15 @@ const ProfileScreen = () => {
             {/* Profile Info Section */}
             <View style={styles.profileInfoContainer}>
               <Image
-                source={require('../assets/member_icon.png')}
+                source={profilePictureUri ? { uri: profilePictureUri } : require('../assets/member_icon.png')}
                 style={styles.avatar}
               />
               <View style={styles.profileTextContainer}>
-                <Text style={styles.profileName}>Melvin</Text>
-                <Text style={styles.profilePhone}>+91 12345 67890</Text>
+                {/* Ensure name and phone are displayed vertically */}
+                <Text style={styles.profileName}>{userName}</Text>
+                <Text style={styles.profilePhone}>
+                  {userPhone ? `+91 ${userPhone.replace(/[^\x20-\x7E]+/g, '').trim().replace(/^\+?91\s*/, '')}` : ''}
+                </Text>
                 <TouchableOpacity onPress={navigateToEditProfile}>
                   <Text style={styles.editProfileLink}>Edit Profile ›</Text>
                 </TouchableOpacity>
@@ -99,16 +218,18 @@ const ProfileScreen = () => {
             {/* Main Options Section */}
             <View style={styles.optionsSection}>
               {/* Edit Addresses Row */}
-              <TouchableOpacity style={styles.optionRow} onPress={navigateToEditAddresses}>
+              <TouchableOpacity style={styles.optionRow} onPress={() => setLocationModalVisible(true)}>
                 <View style={styles.optionIconText}>
                   <MaterialIcons name="location-on" size={24} color="#555" />
-                  <Text style={styles.optionText}>Edit Addresses</Text>
+                  <Text style={styles.optionText} numberOfLines={1}>
+                    {currentLocation?.address || 'Select Location'}
+                  </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={22} color="#AAAAAA" />
               </TouchableOpacity>
 
               {/* Appearance Row */}
-              <View style={[styles.optionRow, styles.appearanceRow]}>
+              {/* <View style={[styles.optionRow, styles.appearanceRow]}>
                 <View style={styles.optionIconText}>
                   <Ionicons name="sunny-outline" size={24} color="#555" />
                   <Text style={styles.optionText}>Appearance</Text>
@@ -137,12 +258,12 @@ const ProfileScreen = () => {
                     <Text style={[styles.toggleText, appearance === 'dark' && styles.toggleTextActive]}>Dark</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </View> */}
 
               {/* Member+ Banner */}
               <TouchableOpacity style={styles.memberBanner} onPress={navigateToMemberPlus}>
                 <Text style={styles.memberTextHighlight}>MEMBER+</Text>
-                <View>
+                <View style={{ flex: 1 }}>
                   <Text style={styles.memberTextMain}>Join Now at ₹29</Text>
                   <Text style={styles.memberTextSub}>For 1 Month</Text>
                 </View>
@@ -198,6 +319,101 @@ const ProfileScreen = () => {
           <Text style={styles.footerText}>PRICELY</Text>
         </View>
       </LinearGradient>
+
+      <Modal
+        visible={isLocationModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setLocationModalVisible(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          justifyContent: 'flex-end',
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            maxHeight: '80%',
+            padding: 16,
+          }}>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 12,
+            }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Select Location</Text>
+              <TouchableOpacity onPress={() => setLocationModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: '#f0f0f0',
+              borderRadius: 8,
+              paddingHorizontal: 8,
+              marginBottom: 12,
+            }}>
+              <Ionicons name="search" size={20} color="#888" />
+              <TextInput
+                style={{ flex: 1, marginLeft: 8, height: 40 }}
+                placeholder="Search location..."
+                value={searchQuery}
+                onChangeText={handleSearchQueryChange}
+                autoFocus
+              />
+              {isLoading && (
+                <View style={{ marginLeft: 8 }}>
+                  <Ionicons name="sync" size={20} color="#888" />
+                </View>
+              )}
+            </View>
+
+            <FlatList
+              data={searchResults}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingVertical: 12,
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#eee',
+                  }}
+                  onPress={() => handleLocationSelect(item)}
+                >
+                  <Ionicons
+                    name={item.isAutoLocate ? 'navigate' : 'location-outline'}
+                    size={20}
+                    color={item.isAutoLocate ? '#007AFF' : '#333'}
+                    style={{ marginRight: 12 }}
+                  />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 16, color: '#333' }}>{item.name}</Text>
+                    {item.fullName && !item.isAutoLocate && (
+                      <Text style={{ fontSize: 12, color: '#666' }} numberOfLines={1}>
+                        {item.fullName}
+                      </Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              )}
+              ListEmptyComponent={
+                !isLoading && searchQuery.length >= 3 ? (
+                  <View style={{ padding: 16, alignItems: 'center' }}>
+                    <Text style={{ color: '#666' }}>No locations found</Text>
+                  </View>
+                ) : null
+              }
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -329,21 +545,25 @@ const styles = StyleSheet.create({
     marginBottom: '2%',
   },
   memberTextHighlight: {
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   memberTextMain: {
-    fontSize: 16,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
+    width: '100%',
+    paddingRight: 15,
     textAlign: 'right',
   },
   memberTextSub: {
-    fontSize: 12,
+    fontSize: 24,
     color: '#CCCCCC',
-    textAlign: 'right',
     marginTop: '1%',
+    width: '100%',
+    paddingRight: 15,
+    textAlign: 'right',
   },
   helpSection: {
     paddingHorizontal: '4%',

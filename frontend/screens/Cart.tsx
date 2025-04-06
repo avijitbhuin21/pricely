@@ -105,8 +105,8 @@ const VendorCartSection: React.FC<VendorCartSectionProps> = ({ vendor, items, on
           style={styles.itemsScroll}
           contentContainerStyle={styles.itemsScrollContent}
         >
-          {items.map((item) => (
-            <CartItem key={item.id} item={item} onRemove={onRemove} />
+          {items.map((item, index) => (
+            <CartItem key={`${vendor}-${item.id}-${index}`} item={item} onRemove={onRemove} />
           ))}
         </ScrollView>
       </LinearGradient>

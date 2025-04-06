@@ -50,21 +50,29 @@ interface CompareResultItem {
 
 const STORAGE_CRED_KEY = 'Pricely-credentials';
 
+// Helper function to generate a unique ID for a specific shop entry in the cart
+const generateCartItemId = (item: CompareResultItem, shop: { name: string; price: string; quantity: string; link: string }): string => {
+  // Use item's original index ID, shop name, price, and quantity for uniqueness
+  return `${item.id}-${shop.name}-${shop.price}-${shop.quantity}`;
+};
+
 const ComparisonCard: React.FC<{
   item: CompareResultItem;
   opacity: Animated.Value;
-  onAddToCart: (item: CompareResultItem, shopName: string, price: string, remove: boolean) => void;
-  isInCart: (shopId: string, searchId?: string) => boolean;
-  searchId: string;
+  // Update prop type to accept the shop object
+  onAddToCart: (item: CompareResultItem, shop: { name: string; price: string; quantity: string; link: string }, remove: boolean) => void;
+  isInCart: (cartItemId: string) => boolean;
   style?: any;
-}> = ({ item, opacity, onAddToCart, isInCart, searchId, style }) => {
+}> = ({ item, opacity, onAddToCart, isInCart, style }) => {
   const displayQuantity = item.shops.length > 0 ? item.shops[0].quantity : item.quantity;
-  const areAllItemsInCart = item.shops.every(shop => isInCart(`${item.id}-${shop.name}`, searchId));
+  // Pass the full shop object to generateCartItemId
+  const areAllItemsInCart = item.shops.every(shop => isInCart(generateCartItemId(item, shop)));
 
   const handleAddAllItems = () => {
     const shouldRemove = areAllItemsInCart;
     item.shops.forEach(shop => {
-      onAddToCart(item, shop.name, shop.price, shouldRemove);
+      // Pass the whole shop object to match the updated signature
+      onAddToCart(item, shop, shouldRemove);
     });
   };
 
@@ -93,20 +101,24 @@ const ComparisonCard: React.FC<{
           <View style={styles.topContent}>
             <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
             <View style={styles.shopsContainer}>
-              {item.shops.map((shop, index) => (
-                <View key={index} style={styles.shopItem}>
-                  <Image
-                    source={getShopLogo(shop.name)}
-                    style={styles.shopIcon}
-                    resizeMode="contain"
-                  />
+              {item.shops.map((shop, index) => {
+                // Generate the unique ID for this specific shop entry
+                const cartItemId = generateCartItemId(item, shop);
+                return (
+                  <View key={index} style={styles.shopItem}>
+                    <Image
+                      source={getShopLogo(shop.name)}
+                      style={styles.shopIcon}
+                      resizeMode="contain"
+                    />
                   <View style={styles.priceContainer}>
                     <Text style={styles.price}>₹{shop.price}</Text>
                     <Text style={styles.shopQuantity}>{shop.quantity}</Text>
                   </View>
-                  {isInCart(`${item.id}-${shop.name}`, searchId) ? (
+                  {isInCart(cartItemId) ? (
                     <TouchableOpacity
-                      onPress={() => onAddToCart(item, shop.name, shop.price, true)}
+                      // Pass the specific shop object to onAddToCart
+                      onPress={() => onAddToCart(item, shop, true)}
                       style={styles.button}
                     >
                       <LinearGradient
@@ -120,7 +132,8 @@ const ComparisonCard: React.FC<{
                     </TouchableOpacity>
                   ) : (
                     <TouchableOpacity
-                      onPress={() => onAddToCart(item, shop.name, shop.price, false)}
+                      // Pass the specific shop object to onAddToCart
+                      onPress={() => onAddToCart(item, shop, false)}
                       style={styles.button}
                     >
                       <LinearGradient
@@ -133,14 +146,15 @@ const ComparisonCard: React.FC<{
                       </LinearGradient>
                     </TouchableOpacity>
                   )}
-                </View>
-              ))}
+                  </View>
+                );
+              })}
             </View>
           </View>
           <View style={styles.bottomContent}>
             <TouchableOpacity
               style={styles.addAllButton}
-              onPress={handleAddAllItems}
+              // onPress={handleAddAllItems} // TODO: Revisit Add/Remove All logic if needed
             >
               <LinearGradient
                 colors={areAllItemsInCart ? ['#ff6b6b', '#ee5253'] : ['#4c669f', '#3b5998', '#192f6a']}
@@ -149,7 +163,9 @@ const ComparisonCard: React.FC<{
                 style={styles.addAllButtonGradient}
               >
                 <Text style={styles.addAllButtonText}>
-                  {areAllItemsInCart ? 'Remove all items' : 'Add all items'}
+                  {/* {areAllItemsInCart ? 'Remove all items' : 'Add all items'} */}
+                  {/* Temporarily disable Add/Remove All until logic is verified */}
+                  Add/Remove Items Above
                 </Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -327,39 +343,47 @@ export default function CompareResultScreen() {
     }
   };
 
-  const handleCartAction = (item: CompareResultItem, shopName: string, price: string, remove: boolean) => {
+  // Updated handleCartAction to accept the specific shop object
+  const handleCartAction = (
+    item: CompareResultItem,
+    shop: { name: string; price: string; quantity: string; link: string },
+    remove: boolean
+  ) => {
+    const cartItemId = generateCartItemId(item, shop); // Generate ID based on specific shop entry
+    const shopName = shop.name; // Extract shopName for convenience
+
     if (remove) {
-      removeFromCart(`${item.id}-${shopName}`);
+      removeFromCart(cartItemId); // Use the specific ID to remove
       Toast.show({
         type: 'info',
-        text1: 'Removed from Cart',
-        text2: `${item.name} from ${shopName} removed from your cart`,
+        text1: 'Removed from Cart', // Keep Toast messages concise
+        text2: `${item.name} (${shop.quantity}) from ${shopName} removed.`,
         position: 'bottom',
+        visibilityTime: 2000,
       });
     } else {
       // Capitalize shop name to match Cart screen's vendor names
       let capitalizedShopName = shopName.charAt(0).toUpperCase() + shopName.slice(1);
-      // Fix case for special vendor names
-      if (capitalizedShopName === "Dmart") {
-        capitalizedShopName = "DMart";
-      } else if (capitalizedShopName === "Bigbasket") {
-        capitalizedShopName = "BigBasket";
-      }
+      if (capitalizedShopName === "Dmart") capitalizedShopName = "DMart";
+      else if (capitalizedShopName === "Bigbasket") capitalizedShopName = "BigBasket";
+      // Add other capitalizations if needed (e.g., Instamart)
+
       addToCart({
-        id: `${item.id}-${shopName}`,
+        id: cartItemId, // Use the generated unique ID
         name: item.name,
         image: item.image,
-        quantity: item.quantity,
+        quantity: shop.quantity, // Use quantity from the specific shop entry
         shopName: capitalizedShopName,
-        price: price,
-        url: item.shops.find(shop => shop.name === shopName)?.link || '',
-        searchId
+        price: shop.price, // Use price from the shop object
+        url: shop.link, // Use link from the specific shop entry
+        // searchId is no longer needed in the cart item itself
       });
       Toast.show({
         type: 'success',
-        text1: 'Added to Cart',
-        text2: `${item.name} from ${shopName} added to your cart`,
+        text1: 'Added to Cart', // Keep Toast messages concise
+        text2: `${item.name} (${shop.quantity}) from ${shopName} added.`,
         position: 'bottom',
+        visibilityTime: 2000,
       });
     }
   };
@@ -400,19 +424,19 @@ export default function CompareResultScreen() {
         <View key={`pair-${i}`} style={styles.comparePair}>
           <ComparisonCard
             item={compareData[i]}
-            opacity={fadeAnims[i] || new Animated.Value(1)}
-            onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
+            opacity={fadeAnims[i] || new Animated.Value(1)} // Animation logic remains
+            onAddToCart={handleCartAction} // Pass the updated handler
             isInCart={isInCart}
-            searchId={searchId}
+            // searchId prop removed
             style={cardStyle}
           />
           {i + 1 < compareData.length && (
             <ComparisonCard
               item={compareData[i + 1]}
-              opacity={fadeAnims[i + 1] || new Animated.Value(1)}
-              onAddToCart={(item, shopName, price, remove) => handleCartAction(item, shopName, price, remove)}
+              opacity={fadeAnims[i + 1] || new Animated.Value(1)} // Animation logic remains
+              onAddToCart={handleCartAction} // Pass the updated handler
               isInCart={isInCart}
-              searchId={searchId}
+              // searchId prop removed
               style={cardStyle}
             />
           )}

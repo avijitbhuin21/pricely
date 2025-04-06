@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SearchBarProps } from '../types';
 
 // Define the list of words for the placeholder
-const placeholderWords = ["Milk", "Biscuits", "Ear-phone", "Fruti", "Coca-cola", "Chips", "Bread", "Eggs", "Butter", "Cheese", "Ice-cream", "Juice", "Vegetables", "Fruits", "Snacks", "Chocolates", "Cereals", "Pasta", "Rice", "Noodles", "Sauces", "Spices", "Condiments", "Frozen Foods", "Beverages"];
+const placeholderWords = ["Milk", "Biscuits", "Ear-phone", "Frooti", "Coca-cola", "Chips", "Bread", "Eggs", "Butter", "Cheese", "Ice-cream", "Juice", "Vegetables", "Fruits", "Snacks", "Chocolates", "Cereals", "Pasta", "Rice", "Noodles", "Sauces", "Spices", "Condiments", "Frozen Foods", "Beverages"];
 
 const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
