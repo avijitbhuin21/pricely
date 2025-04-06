@@ -26,6 +26,15 @@ def send_otp():
 def confirm_otp():
     pass
 
+@app.route("/autocomplete", methods=["POST"])
+def autocomplete():
+    data = request.get_json()
+    query = data.get("query")
+    if not query:
+        return jsonify({"status": "error", "message": "Query parameter is required", "data": []}), 400
+    else:
+        return jsonify({"status": "success", "data": get_suggestions(query)})
+
 @app.route("/login", methods=["POST"])
 def login_to_supabase():
     data = request.get_json()
@@ -75,9 +84,9 @@ def get_search_results():
 
     print("credentials",credentials)
 
-    data = get_compared_results(item_name, lat, lon, credentials)
-    # data = open("compared_data.json", "r").read()
-    # data = json.loads(data)
+    # data = get_compared_results(item_name, lat, lon, credentials)
+    data = open("compared.json", "r").read()
+    data = json.loads(data)
 
     return jsonify({"status": "success", "data": data})
 
@@ -577,31 +586,6 @@ if __name__ == "__main__":
     main()
 
 
-# remove the logo in the home page --done
-#  so update the name and the location section similer to zepto  name pricely- compare it --done
-# add the hamburger menu -- done
-# remove the borders from the recent search and keep them small  -- done
-# make the recent search logos a little smaller.  -- done
 
-# app opening animation, they will send --(pending as they have not sent yet)
-# in the sign in page add a drop shadow to the white section.  -- done
-# password hide and show button --done
-# instead of the solid pink colour add the gradient colour they provided --done 
-# in the searchbar add changing names. like provided --done
-# add slider in the home page. --pending
-# recommended daily needs also needs a animation  -- done
-
-
-
-# web analytics
-# edit offer prices from the admin panel -- done
-# in the admin panel we need to update slideshow images as well -- done
-# the daily needs sections should be updated from the admin panel -- done
-
-# add push notifications as well. -- pending
-# normal anaytics --pending
-
-
-
-# notes today 4-03-25
-# in the header make c and i caps in compare it and add a space after the hiphen.
+# the profile page number is not visible cause it needs verification.
+# the dropdown suggestion system is ongoing should be finished by 6pm today. it'll take quite some space in database tho.
